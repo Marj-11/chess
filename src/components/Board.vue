@@ -80,8 +80,6 @@ export default {
       piece.style.cursor = "grabbing";
       piece.style.position = "absolute";
       piece.style.zIndex = 1000;
-      console.log(this.moves);
-
       this.moves[0].forEach(allowed => {
         squares.forEach(s => {
           if (allowed === s.id) {
@@ -245,7 +243,70 @@ export default {
           }
         }
       }
-      if (selectedPiece.selected_piece_initial === "wN") {
+      if (selectedPiece.selected_piece_initial === "bP") {
+        const forward = -1;
+        const letter = selectedPiece.selected_piece_position.charAt(0);
+        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+        const oneForward = `${letter}${num + forward}`;
+        const twoForward = `${letter}${num + forward + forward}`;
+
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const letterLeft = `${letters[i - 1]}${num + forward}`;
+            const letterRight = `${letters[i + 1]}${num + forward}`;
+            const fields = {
+              l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
+              r: letterRight.substring(0, 2) == "un" ? null : letterRight,
+              of: oneForward.substring(1, 2) == "0" ? null : oneForward,
+              tf: twoForward.substring(1, 2) == "0" ? null : twoForward
+            };
+            const finalMoves = [];
+            squares.forEach(square => {
+              if (square.id === fields.r) {
+                if (square.firstElementChild) {
+                  if (square.firstElementChild.classList[0] === "white") {
+                    finalMoves.push(fields.r);
+                  }
+                }
+              }
+              if (square.id === fields.l) {
+                if (square.firstElementChild) {
+                  if (square.firstElementChild.classList[0] === "white") {
+                    finalMoves.push(fields.l);
+                  }
+                }
+              }
+
+              if (square.id === fields.of) {
+                if (!square.firstElementChild) {
+                  finalMoves.push(fields.of);
+                } else {
+                  finalMoves.pop();
+                }
+              }
+
+              if (
+                selectedPiece.selected_piece_position.substring(1, 2) == "7"
+              ) {
+                if (square.id === fields.tf) {
+                  if (!square.firstElementChild) {
+                    finalMoves.push(fields.tf);
+                  }
+                }
+              }
+            });
+            this.moves.push(finalMoves);
+          }
+        }
+      }
+      if (
+        selectedPiece.selected_piece_initial === "wN" ||
+        selectedPiece.selected_piece_initial === "bN"
+      ) {
+        const colorClass =
+          selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
         this.moves = [];
         const letter = selectedPiece.selected_piece_position.charAt(0);
         const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
@@ -270,7 +331,7 @@ export default {
               squares.forEach(square => {
                 if (square.id === element) {
                   if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
+                    if (square.firstElementChild.classList[0] === colorClass) {
                       finalMoves.push(element);
                     }
                   } else {
@@ -283,17 +344,53 @@ export default {
           }
         }
       }
-
-      if (selectedPiece.selected_piece_initial === "wB") {
+      const forbiden = [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "h7",
+        "h8",
+        "a1",
+        "b1",
+        "c1",
+        "d1",
+        "e1",
+        "f1",
+        "g1",
+        "h1",
+        "a8",
+        "b8",
+        "c8",
+        "d8",
+        "e8",
+        "f8",
+        "g8",
+        "h8"
+      ];
+      if (
+        selectedPiece.selected_piece_initial === "wB" ||
+        selectedPiece.selected_piece_initial === "bB"
+      ) {
+        const colorClass =
+          selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
         this.moves = [];
         const letter = selectedPiece.selected_piece_position.charAt(0);
         const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-
         let finalMoves = [];
-
         let objectNumber = 0;
         let m = 1;
-        function direction() {
+        function diagonal() {
           const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
           for (let i = 0; i < letters.length; i++) {
             const element = letters[i];
@@ -305,50 +402,106 @@ export default {
                 four: `${letters[i - m]}${num - m}`
               };
               m++;
-
-              const forbiden = [
-                "a1",
-                "a2",
-                "a3",
-                "a4",
-                "a5",
-                "a6",
-                "a7",
-                "a8",
-                "h1",
-                "h2",
-                "h3",
-                "h4",
-                "h5",
-                "h6",
-                "h7",
-                "h8",
-                "a1",
-                "b1",
-                "c1",
-                "d1",
-                "e1",
-                "f1",
-                "g1",
-                "h1",
-                "a8",
-                "b8",
-                "c8",
-                "d8",
-                "e8",
-                "f8",
-                "g8",
-                "h8"
-              ];
               squares.forEach(square => {
                 const obj = objects[Object.keys(objects)[objectNumber]];
-                console.log(obj);
 
-                if (obj === "undefined2") {
+                if (obj == undefined) {
+                  return obj == "undefined";
+                }
+                if (obj.substring(0, 1) === "u") {
                   objectNumber++;
                   objectNumber++;
                   m = 1;
-                  direction();
+                  diagonal();
+                }
+                if (
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
+                ) {
+                  objectNumber++;
+                  m = 1;
+                  diagonal();
+                } else {
+                  if (square.id === obj) {
+                    if (square.firstElementChild) {
+                      m = 1;
+                      if (
+                        square.firstElementChild.classList[0] === colorClass
+                      ) {
+                        finalMoves.push(obj);
+                        objectNumber++;
+
+                        diagonal();
+                      } else {
+                        objectNumber++;
+                        diagonal();
+                      }
+                    } else {
+                      forbiden.forEach(forbid => {
+                        if (obj === forbid) {
+                          objectNumber++;
+                          m = 1;
+                          diagonal();
+                        }
+                      });
+                      finalMoves.push(obj);
+                      diagonal();
+                    }
+                  }
+                }
+              });
+            }
+          }
+        }
+        diagonal();
+        this.moves.push(finalMoves);
+      }
+      if (
+        selectedPiece.selected_piece_initial === "wR" ||
+        selectedPiece.selected_piece_initial === "bR"
+      ) {
+        const colorClass =
+          selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
+        this.moves = [];
+        const letter = selectedPiece.selected_piece_position.charAt(0);
+        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+        let finalMoves = [];
+        let objectNumber = 0;
+        let m = 1;
+        function straight() {
+          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+          for (let i = 0; i < letters.length; i++) {
+            const element = letters[i];
+            if (element === letter) {
+              const objects = {
+                one: `${letters[i + m]}${num}`,
+                two: `${letter}${num + m}`,
+                three: `${letters[i - m]}${num}`,
+                four: `${letter}${num - m}`
+              };
+              m++;
+              squares.forEach(square => {
+                const obj = objects[Object.keys(objects)[objectNumber]];
+                if (obj == undefined) {
+                  return obj == "undefined";
+                }
+                console.log(obj);
+
+                if (obj.substring(0, 1) === "u") {
+                  objectNumber++;
+                  m = 1;
+                  straight();
+                }
+
+                if (
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
+                ) {
+                  objectNumber++;
+                  m = 1;
+                  straight();
                 } else {
                   if (square.id === obj) {
                     if (square.firstElementChild) {
@@ -357,21 +510,95 @@ export default {
                         finalMoves.push(obj);
                         objectNumber++;
 
-                        direction();
+                        straight();
                       } else {
                         objectNumber++;
-                        direction();
+                        m = 1;
+                        straight();
+                      }
+                    } else {
+                      finalMoves.push(obj);
+                      straight();
+                    }
+                  }
+                }
+              });
+            }
+          }
+        }
+        straight();
+        this.moves.push(finalMoves);
+      }
+      if (
+        selectedPiece.selected_piece_initial === "wQ" ||
+        selectedPiece.selected_piece_initial === "bQ"
+      ) {
+        const colorClass =
+          selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
+        this.moves = [];
+        const letter = selectedPiece.selected_piece_position.charAt(0);
+        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+
+        let finalMoves = [];
+
+        let objectNumber = 0;
+        let m = 1;
+        function diagonal() {
+          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+          for (let i = 0; i < letters.length; i++) {
+            const element = letters[i];
+            if (element === letter) {
+              const objects = {
+                one: `${letters[i + m]}${num - m}`,
+                two: `${letters[i + m]}${num + m}`,
+                three: `${letters[i - m]}${num + m}`,
+                four: `${letters[i - m]}${num - m}`
+              };
+              m++;
+              squares.forEach(square => {
+                const obj = objects[Object.keys(objects)[objectNumber]];
+                if (obj == undefined) {
+                  return obj == "undefined";
+                }
+                if (obj.substring(0, 1) === "u") {
+                  objectNumber++;
+                  objectNumber++;
+                  m = 1;
+                  diagonal();
+                }
+                if (
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
+                ) {
+                  objectNumber++;
+                  m = 1;
+                  diagonal();
+                } else {
+                  if (square.id === obj) {
+                    if (square.firstElementChild) {
+                      m = 1;
+                      if (
+                        square.firstElementChild.classList[0] === colorClass
+                      ) {
+                        finalMoves.push(obj);
+                        objectNumber++;
+
+                        diagonal();
+                      } else {
+                        objectNumber++;
+                        diagonal();
                       }
                     } else {
                       forbiden.forEach(forbid => {
                         if (obj === forbid) {
                           objectNumber++;
                           m = 1;
-                          direction();
+                          diagonal();
                         }
                       });
                       finalMoves.push(obj);
-                      direction();
+                      diagonal();
                     }
                   }
                 }
@@ -379,142 +606,57 @@ export default {
             }
           }
         }
-
-        direction();
-        this.moves.push(finalMoves);
-      }
-      if (selectedPiece.selected_piece_initial === "wR") {
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-
-        let finalMoves = [];
-
-        let g = 1;
-        function directionOne() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i + g]}${num}`;
-              g++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-
-                    directionOne();
-                  }
-                }
-              });
-            }
-          }
-        }
+        let objectNumberStraight = 0;
         let n = 1;
-        function directionTwo() {
+        function straight() {
           const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
           for (let i = 0; i < letters.length; i++) {
             const element = letters[i];
             if (element === letter) {
-              const one = `${letters[i]}${num + n}`;
+              const objects = {
+                one: `${letters[i + n]}${num}`,
+                two: `${letter}${num + n}`,
+                three: `${letters[i - n]}${num}`,
+                four: `${letter}${num - n}`
+              };
               n++;
               squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionTwo();
-                  }
+                const obj = objects[Object.keys(objects)[objectNumberStraight]];
+                if (obj == undefined) {
+                  return obj == "undefined";
                 }
-              });
-            }
-          }
-        }
-        let h = 1;
-        function directionThree() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i - h]}${num}`;
-              h++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionThree();
-                  }
+                if (obj.substring(0, 1) === "u") {
+                  objectNumberStraight++;
+                  n = 1;
+                  straight();
                 }
-              });
-            }
-          }
-        }
-        let k = 1;
-        function directionFour() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i]}${num - k}`;
-              k++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
+                if (
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
+                ) {
+                  objectNumberStraight++;
+                  n = 1;
+                  straight();
+                } else {
+                  if (square.id === obj) {
+                    if (square.firstElementChild) {
+                      n = 1;
+                      if (
+                        square.firstElementChild.classList[0] === colorClass
+                      ) {
+                        finalMoves.push(obj);
+                        objectNumberStraight++;
+                        straight();
+                      } else {
+                        objectNumberStraight++;
+                        n = 1;
+                        straight();
+                      }
+                    } else {
+                      finalMoves.push(obj);
+                      straight();
                     }
-                  } else {
-                    finalMoves.push(one);
-                    directionFour();
-                  }
-                }
-              });
-            }
-          }
-        }
-        directionOne();
-        directionTwo();
-        directionThree();
-        directionFour();
-
-        this.moves.push(finalMoves);
-      }
-      if (selectedPiece.selected_piece_initial === "wQ") {
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-
-        let finalMoves = [];
-
-        let g = 1;
-        function directionOne() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i + g]}${num - g}`;
-              g++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-
-                    directionOne();
                   }
                 }
               });
@@ -522,176 +664,8 @@ export default {
           }
         }
 
-        let n = 1;
-        function directionTwo() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i + n]}${num + n}`;
-              n++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionTwo();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let h = 1;
-        function directionThree() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i - h]}${num + h}`;
-              h++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionThree();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let k = 1;
-        function directionFour() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i - k]}${num - k}`;
-              k++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionFour();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let w = 1;
-        function directionFive() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i + w]}${num}`;
-              w++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-
-                    directionFive();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let z = 1;
-        function directionSix() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i]}${num + z}`;
-              z++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionSix();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let o = 1;
-        function directionSeven() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i - o]}${num}`;
-              o++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionSeven();
-                  }
-                }
-              });
-            }
-          }
-        }
-        let p = 1;
-        function directionEight() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const one = `${letters[i]}${num - p}`;
-              p++;
-              squares.forEach(square => {
-                if (square.id === one) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
-                      finalMoves.push(one);
-                    }
-                  } else {
-                    finalMoves.push(one);
-                    directionEight();
-                  }
-                }
-              });
-            }
-          }
-        }
-        directionOne();
-        directionTwo();
-        directionThree();
-        directionFour();
-        directionFive();
-        directionSix();
-        directionSeven();
-        directionEight();
+        diagonal();
+        straight();
         this.moves.push(finalMoves);
       }
       if (selectedPiece.selected_piece_initial === "wK") {
