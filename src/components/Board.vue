@@ -81,11 +81,10 @@ export default {
       let new_piece = this.selected_piece(piece, square);
 
       this.available_moves(new_piece);
-
       piece.style.width = "70px";
+      piece.style.zIndex = 1;
       piece.style.cursor = "grabbing";
       piece.style.position = "absolute";
-      piece.style.zIndex = 1000;
       this.moves[0].forEach(allowed => {
         squares.forEach(s => {
           if (allowed === s.id) {
@@ -105,7 +104,6 @@ export default {
       moveAt(event.pageX, event.pageY);
       function moveAt(pageX, pageY) {
         square.style.position = null;
-
         piece.style.left = pageX - shiftX + "px";
         piece.style.top = pageY - shiftY + "px";
       }
@@ -141,26 +139,49 @@ export default {
           if (currentDroppable) {
             if (currentDroppable.classList.contains("droppable")) {
               piece.onmouseup = function(e) {
+                e.preventDefault();
                 if (currentDroppable) {
-                  e.preventDefault();
-                  document.removeEventListener("mousemove", onMouseMove);
-                  piece.onmouseup = null;
-                  piece.style.width = "62px";
-                  piece.style.cursor = "grab";
-                  piece.setAttribute("id", currentDroppable.id);
-                  currentDroppable.appendChild(piece);
-                  currentDroppable.style.position = "relative";
-                  piece.style.position = "absolute";
-                  piece.style.top = "0px";
-                  piece.style.left = "0px";
-                  piece.style.boxSizing = "border-box";
-                  currentDroppable.style.border = "none";
-                  squares.forEach(s => {
-                    s.classList.remove("mark");
-                  });
+                  if (!currentDroppable.hasChildNodes()) {
+                    document.removeEventListener("mousemove", onMouseMove);
+                    piece.onmouseup = null;
+                    piece.style.width = "62px";
+                    piece.style.cursor = "grab";
+                    console.log(piece);
+                    piece.style.zIndex = 0;
+                    piece.setAttribute("id", currentDroppable.id);
+                    currentDroppable.appendChild(piece);
+                    currentDroppable.style.position = "relative";
+                    piece.style.position = "absolute";
+                    piece.style.top = "0px";
+                    piece.style.left = "0px";
+                    piece.style.boxSizing = "border-box";
+                    currentDroppable.style.border = "none";
+                    squares.forEach(s => {
+                      s.classList.remove("mark");
+                    });
+                  } else {
+                    currentDroppable.removeChild(currentDroppable.firstChild);
+                    document.removeEventListener("mousemove", onMouseMove);
+                    piece.onmouseup = null;
+                    piece.style.width = "62px";
+                    piece.style.cursor = "grab";
+                    piece.style.zIndex = 0;
+                    piece.setAttribute("id", currentDroppable.id);
+                    currentDroppable.appendChild(piece);
+                    currentDroppable.style.position = "relative";
+                    piece.style.position = "absolute";
+                    piece.style.top = "0px";
+                    piece.style.left = "0px";
+                    piece.style.boxSizing = "border-box";
+                    currentDroppable.style.border = "none";
+                    squares.forEach(s => {
+                      s.classList.remove("mark");
+                    });
+                  }
                 } else {
                   document.removeEventListener("mousemove", onMouseMove);
                   piece.style.width = "62px";
+                  piece.style.zIndex = 0;
                   piece.style.cursor = "grab";
                   square.style.position = "relative";
                   piece.style.position = "absolute";
@@ -178,10 +199,11 @@ export default {
 
       piece.onmouseup = function() {
         document.removeEventListener("mousemove", onMouseMove);
+
+        piece.style.zIndex = 0;
         piece.onmouseup = null;
         piece.style.width = "62px";
         piece.style.cursor = "grab";
-
         square.style.position = "relative";
         piece.style.position = "absolute";
         piece.style.top = "0px";
@@ -776,6 +798,7 @@ export default {
 .white_square img {
   width: 62px;
   cursor: grab;
+  z-index: 0;
 }
 .mark::after {
   display: block;
