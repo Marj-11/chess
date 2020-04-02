@@ -72,8 +72,14 @@ export default {
       });
 
       const square = event.path[1];
+
       let piece = square.firstElementChild;
+
+      if (piece.tagName == "DIV") {
+        return;
+      }
       let new_piece = this.selected_piece(piece, square);
+
       this.available_moves(new_piece);
 
       piece.style.width = "70px";
@@ -106,35 +112,61 @@ export default {
 
       function onMouseMove(event) {
         moveAt(event.pageX, event.pageY);
-
+        if (
+          event.pageX < 150 ||
+          event.pageX > 900 ||
+          event.pageY < 20 ||
+          event.pageY > 550
+        ) {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.addEventListener("mouseup", onmouseup);
+          piece.style.width = "62px";
+          piece.style.cursor = "grab";
+          square.style.position = "relative";
+          piece.style.position = "absolute";
+          piece.style.top = "0px";
+          piece.style.left = "0px";
+        }
         piece.hidden = true;
         let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-
         piece.hidden = false;
         let droppableBelow = elemBelow.closest(".droppable");
+
         if (currentDroppable != droppableBelow) {
           if (currentDroppable) {
             leaveDroppable(currentDroppable);
           }
           currentDroppable = droppableBelow;
+
           if (currentDroppable) {
             if (currentDroppable.classList.contains("droppable")) {
               piece.onmouseup = function(e) {
-                document.removeEventListener("mousemove", onMouseMove);
-                piece.onmouseup = null;
-                piece.style.width = "62px";
-                piece.style.cursor = "grab";
-                piece.setAttribute("id", currentDroppable.id);
-                currentDroppable.appendChild(piece);
-                currentDroppable.style.position = "relative";
-                piece.style.position = "absolute";
-                piece.style.top = "0px";
-                piece.style.left = "0px";
-                piece.style.boxSizing = "border-box";
-                currentDroppable.style.border = "none";
-                squares.forEach(s => {
-                  s.classList.remove("mark");
-                });
+                if (currentDroppable) {
+                  e.preventDefault();
+                  document.removeEventListener("mousemove", onMouseMove);
+                  piece.onmouseup = null;
+                  piece.style.width = "62px";
+                  piece.style.cursor = "grab";
+                  piece.setAttribute("id", currentDroppable.id);
+                  currentDroppable.appendChild(piece);
+                  currentDroppable.style.position = "relative";
+                  piece.style.position = "absolute";
+                  piece.style.top = "0px";
+                  piece.style.left = "0px";
+                  piece.style.boxSizing = "border-box";
+                  currentDroppable.style.border = "none";
+                  squares.forEach(s => {
+                    s.classList.remove("mark");
+                  });
+                } else {
+                  document.removeEventListener("mousemove", onMouseMove);
+                  piece.style.width = "62px";
+                  piece.style.cursor = "grab";
+                  square.style.position = "relative";
+                  piece.style.position = "absolute";
+                  piece.style.top = "0px";
+                  piece.style.left = "0px";
+                }
               };
             }
             enterDroppable(currentDroppable);
@@ -144,7 +176,7 @@ export default {
 
       document.addEventListener("mousemove", onMouseMove);
 
-      piece.onmouseup = function(e) {
+      piece.onmouseup = function() {
         document.removeEventListener("mousemove", onMouseMove);
         piece.onmouseup = null;
         piece.style.width = "62px";
@@ -431,7 +463,6 @@ export default {
                       ) {
                         finalMoves.push(obj);
                         objectNumber++;
-
                         diagonal();
                       } else {
                         objectNumber++;
@@ -486,8 +517,6 @@ export default {
                 if (obj == undefined) {
                   return obj == "undefined";
                 }
-                console.log(obj);
-
                 if (obj.substring(0, 1) === "u") {
                   objectNumber++;
                   m = 1;
@@ -506,7 +535,9 @@ export default {
                   if (square.id === obj) {
                     if (square.firstElementChild) {
                       m = 1;
-                      if (square.firstElementChild.classList[0] === "black") {
+                      if (
+                        square.firstElementChild.classList[0] === colorClass
+                      ) {
                         finalMoves.push(obj);
                         objectNumber++;
 
@@ -724,7 +755,6 @@ export default {
 .chessboard {
   height: 500px;
   width: 500px;
-  margin: 20px auto;
   border: 3px solid black;
 }
 
