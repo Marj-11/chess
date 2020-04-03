@@ -819,21 +819,27 @@ export default {
 }
 
 .black_square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
   background-color: rgb(0, 101, 141);
 }
 
 .white_square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
   background-color: rgb(66, 217, 255);
 }
 
-.black_square img,
-.white_square img {
-  width: calc(var(--square_size) / 8);
+img {
+  width: 44px;
   cursor: grab;
+  margin: 0 auto;
   z-index: 0;
 }
 .mark::after {
