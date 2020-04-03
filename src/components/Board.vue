@@ -48,12 +48,14 @@ export default {
       const entries = Object.values(pieces);
       squares.forEach(square => {
         square.onmousedown = this.mouseDown;
+
         let img = new Image();
         entries.forEach(piece => {
           if (square.id === piece.position) {
             img.src = this.imageUrl + piece.imageUrl;
             img.id = square.id;
             img.draggable = true;
+            img.style.position = "absolute";
             img.classList =
               img.src.charAt(img.src.length - 6) == "b" ? "black" : "white";
             square.appendChild(img);
@@ -64,6 +66,8 @@ export default {
 
     /////////////////////////////////////////////MOUSE DOWN////////////////////////////////////////////////////////////
     mouseDown(event) {
+      document.addEventListener("contextmenu", event => event.preventDefault());
+
       const squares = document.querySelectorAll(".square");
 
       squares.forEach(s => {
@@ -90,12 +94,17 @@ export default {
           if (allowed === s.id) {
             s.classList.add("droppable");
             s.classList.add("mark");
+            if (s.firstElementChild) {
+              s.classList.add("target");
+            }
             setTimeout(() => {
               s.classList.remove("mark");
+              s.classList.remove("target");
             }, 2000);
           }
         });
       });
+
       this.moves = [];
       let currentDroppable = null;
       let shiftX = event.clientX - piece.getBoundingClientRect().left;
@@ -125,6 +134,7 @@ export default {
           piece.style.top = "0px";
           piece.style.left = "0px";
         }
+
         piece.hidden = true;
         let elemBelow = document.elementFromPoint(event.clientX, event.clientY);
         piece.hidden = false;
@@ -288,7 +298,6 @@ export default {
                   const letter = square.id.substring(0, 1);
                   const strigifiedNumber = numberMinusOne.toString();
                   const madeUpId = letter + strigifiedNumber;
-                  console.log(madeUpId);
                   if (square.firstElementChild) {
                     finalMoves.push(fields.of);
                   } else {
@@ -366,7 +375,7 @@ export default {
                     squares.forEach(s => {
                       if (s.id === madeUpId) {
                         if (s.firstElementChild) {
-                          finalMoves.shift();
+                          finalMoves.pop();
                         }
                       }
                     });
@@ -797,39 +806,54 @@ export default {
 </script>
 
 <style>
+:root {
+  --square_size: 500px;
+}
 .chessboard {
-  height: 500px;
-  width: 500px;
+  height: var(--square_size);
+  width: var(--square_size);
   border: 3px solid black;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .black_square {
-  float: left;
-  height: calc(500px / 8);
-  width: calc(500px / 8);
-  background-color: rgb(22, 139, 168);
+  height: calc(var(--square_size) / 8);
+  width: calc(var(--square_size) / 8);
+  background-color: rgb(0, 101, 141);
 }
 
 .white_square {
-  float: left;
-  height: calc(500px / 8);
-  width: calc(500px / 8);
-  background-color: rgb(117, 255, 255);
+  height: calc(var(--square_size) / 8);
+  width: calc(var(--square_size) / 8);
+  background-color: rgb(66, 217, 255);
 }
 
 .black_square img,
 .white_square img {
-  width: 62px;
+  width: calc(var(--square_size) / 8);
   cursor: grab;
   z-index: 0;
 }
 .mark::after {
   display: block;
   content: " ";
-  margin: 20px auto;
-  width: 20px;
-  height: 20px;
-  background: rgb(85, 85, 85);
+  margin: 14px auto;
+  width: 35px;
+  height: 35px;
+  background: rgba(85, 85, 85, 0.5);
   border-radius: 50%;
+  z-index: -5;
+}
+.target::after {
+  display: block;
+  content: " ";
+  margin: 7px auto;
+  width: 50px;
+  height: 50px;
+  background: rgb(255, 74, 74);
+  border-radius: 50%;
+  z-index: 5;
 }
 </style>
