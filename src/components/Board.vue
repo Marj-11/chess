@@ -16,7 +16,7 @@ export default {
   data() {
     return {
       imageUrl:
-        "https://github.com/Marj-11/chess-final/blob/master/src/assets/bB.png",
+        "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/bB.png",
       fields: [],
       x: ["8", "7", "6", "5", "4", "3", "2", "1"],
       y: ["a", "b", "c", "d", "e", "f", "g", "h"],
