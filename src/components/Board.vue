@@ -146,7 +146,6 @@ export default {
                     piece.onmouseup = null;
                     piece.style.width = "62px";
                     piece.style.cursor = "grab";
-                    console.log(piece);
                     piece.style.zIndex = 0;
                     piece.setAttribute("id", currentDroppable.id);
                     currentDroppable.appendChild(piece);
@@ -278,8 +277,6 @@ export default {
               if (square.id === fields.of) {
                 if (!square.firstElementChild) {
                   finalMoves.push(fields.of);
-                } else {
-                  finalMoves.pop();
                 }
               }
 
@@ -287,8 +284,22 @@ export default {
                 selectedPiece.selected_piece_position.substring(1, 2) == "2"
               ) {
                 if (square.id === fields.tf) {
-                  if (!square.firstElementChild) {
+                  const numberMinusOne = square.id.substring(1, 2) - 1;
+                  const letter = square.id.substring(0, 1);
+                  const strigifiedNumber = numberMinusOne.toString();
+                  const madeUpId = letter + strigifiedNumber;
+                  console.log(madeUpId);
+                  if (square.firstElementChild) {
+                    finalMoves.push(fields.of);
+                  } else {
                     finalMoves.push(fields.tf);
+                    squares.forEach(s => {
+                      if (s.id === madeUpId) {
+                        if (s.firstElementChild) {
+                          finalMoves.pop();
+                        }
+                      }
+                    });
                   }
                 }
               }
@@ -336,8 +347,6 @@ export default {
               if (square.id === fields.of) {
                 if (!square.firstElementChild) {
                   finalMoves.push(fields.of);
-                } else {
-                  finalMoves.pop();
                 }
               }
 
@@ -345,8 +354,22 @@ export default {
                 selectedPiece.selected_piece_position.substring(1, 2) == "7"
               ) {
                 if (square.id === fields.tf) {
-                  if (!square.firstElementChild) {
+                  const numberPlusOne = parseInt(square.id.substring(1, 2));
+                  const parsedNumber = numberPlusOne + 1;
+                  const letter = square.id.substring(0, 1);
+                  const strigifiedNumber = parsedNumber.toString();
+                  const madeUpId = letter + strigifiedNumber;
+                  if (square.firstElementChild) {
+                    finalMoves.push(fields.of);
+                  } else {
                     finalMoves.push(fields.tf);
+                    squares.forEach(s => {
+                      if (s.id === madeUpId) {
+                        if (s.firstElementChild) {
+                          finalMoves.shift();
+                        }
+                      }
+                    });
                   }
                 }
               }
