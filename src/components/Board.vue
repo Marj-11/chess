@@ -16,7 +16,7 @@ export default {
   data() {
     return {
       imageUrl:
-        "https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/",
+        "https://github.com/Marj-11/chess-final/blob/master/src/assets/bB.png",
       fields: [],
       x: ["8", "7", "6", "5", "4", "3", "2", "1"],
       y: ["a", "b", "c", "d", "e", "f", "g", "h"],
@@ -52,7 +52,7 @@ export default {
         let img = new Image();
         entries.forEach(piece => {
           if (square.id === piece.position) {
-            img.src = this.imageUrl + piece.imageUrl;
+            img.src = this.imageUrl;
             img.id = square.id;
             img.draggable = true;
             img.style.position = "absolute";
