@@ -23,7 +23,7 @@ export default {
       color: "",
       class: "square",
       moves: [],
-      droppable: false
+      droppable: false,
     };
   },
   methods: {
@@ -36,7 +36,7 @@ export default {
           const object = {
             id: this.y[field - 1] + this.x[row],
             color: this.color,
-            class: this.class
+            class: this.class,
           };
           this.fields.push(object);
         }
@@ -46,11 +46,11 @@ export default {
     placePieces() {
       const squares = document.querySelectorAll(".square");
       const entries = Object.values(pieces);
-      squares.forEach(square => {
+      squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
 
         let img = new Image();
-        entries.forEach(piece => {
+        entries.forEach((piece) => {
           if (square.id === piece.position) {
             img.src = this.imageUrl + piece.imageUrl;
             img.id = square.id;
@@ -66,11 +66,13 @@ export default {
 
     /////////////////////////////////////////////MOUSE DOWN////////////////////////////////////////////////////////////
     mouseDown(event) {
-      document.addEventListener("contextmenu", event => event.preventDefault());
+      document.addEventListener("contextmenu", (event) =>
+        event.preventDefault()
+      );
 
       const squares = document.querySelectorAll(".square");
 
-      squares.forEach(s => {
+      squares.forEach((s) => {
         s.classList.remove("droppable");
         s.classList.remove("mark");
       });
@@ -86,11 +88,11 @@ export default {
 
       this.available_moves(new_piece);
       piece.style.width = "70px";
-      piece.style.zIndex = 1;
+      piece.style.zIndex = 2;
       piece.style.cursor = "grabbing";
       piece.style.position = "absolute";
-      this.moves[0].forEach(allowed => {
-        squares.forEach(s => {
+      this.moves[0].forEach((allowed) => {
+        squares.forEach((s) => {
           if (allowed === s.id) {
             s.classList.add("droppable");
             s.classList.add("mark");
@@ -129,6 +131,8 @@ export default {
           document.addEventListener("mouseup", onmouseup);
           piece.style.width = "62px";
           piece.style.cursor = "grab";
+          square.style.display = "flex";
+          square.style.justifyContent = "center";
           square.style.position = "relative";
           piece.style.position = "absolute";
           piece.style.top = "0px";
@@ -148,7 +152,7 @@ export default {
 
           if (currentDroppable) {
             if (currentDroppable.classList.contains("droppable")) {
-              piece.onmouseup = function(e) {
+              piece.onmouseup = function (e) {
                 e.preventDefault();
                 if (currentDroppable) {
                   if (!currentDroppable.hasChildNodes()) {
@@ -156,7 +160,7 @@ export default {
                     piece.onmouseup = null;
                     piece.style.width = "62px";
                     piece.style.cursor = "grab";
-                    piece.style.zIndex = 0;
+                    piece.style.zIndex = 1;
                     piece.setAttribute("id", currentDroppable.id);
                     currentDroppable.appendChild(piece);
                     currentDroppable.style.position = "relative";
@@ -165,7 +169,7 @@ export default {
                     piece.style.left = "0px";
                     piece.style.boxSizing = "border-box";
                     currentDroppable.style.border = "none";
-                    squares.forEach(s => {
+                    squares.forEach((s) => {
                       s.classList.remove("mark");
                     });
                   } else {
@@ -174,7 +178,7 @@ export default {
                     piece.onmouseup = null;
                     piece.style.width = "62px";
                     piece.style.cursor = "grab";
-                    piece.style.zIndex = 0;
+                    piece.style.zIndex = 1;
                     piece.setAttribute("id", currentDroppable.id);
                     currentDroppable.appendChild(piece);
                     currentDroppable.style.position = "relative";
@@ -183,14 +187,14 @@ export default {
                     piece.style.left = "0px";
                     piece.style.boxSizing = "border-box";
                     currentDroppable.style.border = "none";
-                    squares.forEach(s => {
+                    squares.forEach((s) => {
                       s.classList.remove("mark");
                     });
                   }
                 } else {
                   document.removeEventListener("mousemove", onMouseMove);
                   piece.style.width = "62px";
-                  piece.style.zIndex = 0;
+                  piece.style.zIndex = 1;
                   piece.style.cursor = "grab";
                   square.style.position = "relative";
                   piece.style.position = "absolute";
@@ -206,10 +210,9 @@ export default {
 
       document.addEventListener("mousemove", onMouseMove);
 
-      piece.onmouseup = function() {
+      piece.onmouseup = function () {
         document.removeEventListener("mousemove", onMouseMove);
-
-        piece.style.zIndex = 0;
+        piece.style.zIndex = 1;
         piece.onmouseup = null;
         piece.style.width = "62px";
         piece.style.cursor = "grab";
@@ -228,7 +231,7 @@ export default {
         elem.style.border = "none";
       }
 
-      piece.ondragstart = function() {
+      piece.ondragstart = function () {
         return false;
       };
     },
@@ -265,10 +268,10 @@ export default {
               l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
               r: letterRight.substring(0, 2) == "un" ? null : letterRight,
               of: oneForward.substring(1, 2) == "9" ? null : oneForward,
-              tf: twoForward.substring(1, 2) == "9" ? null : twoForward
+              tf: twoForward.substring(1, 2) == "9" ? null : twoForward,
             };
             const finalMoves = [];
-            squares.forEach(square => {
+            squares.forEach((square) => {
               if (square.id === fields.r) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === "black") {
@@ -302,7 +305,7 @@ export default {
                     finalMoves.push(fields.of);
                   } else {
                     finalMoves.push(fields.tf);
-                    squares.forEach(s => {
+                    squares.forEach((s) => {
                       if (s.id === madeUpId) {
                         if (s.firstElementChild) {
                           finalMoves.pop();
@@ -334,10 +337,10 @@ export default {
               l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
               r: letterRight.substring(0, 2) == "un" ? null : letterRight,
               of: oneForward.substring(1, 2) == "0" ? null : oneForward,
-              tf: twoForward.substring(1, 2) == "0" ? null : twoForward
+              tf: twoForward.substring(1, 2) == "0" ? null : twoForward,
             };
             const finalMoves = [];
-            squares.forEach(square => {
+            squares.forEach((square) => {
               if (square.id === fields.r) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === "white") {
@@ -372,7 +375,7 @@ export default {
                     finalMoves.push(fields.of);
                   } else {
                     finalMoves.push(fields.tf);
-                    squares.forEach(s => {
+                    squares.forEach((s) => {
                       if (s.id === madeUpId) {
                         if (s.firstElementChild) {
                           finalMoves.pop();
@@ -408,13 +411,13 @@ export default {
               five: `${letters[i + 1]}${num - 2}`,
               six: `${letters[i + 2]}${num - 1}`,
               seven: `${letters[i + 2]}${num + 1}`,
-              eight: `${letters[i + 1]}${num + 2}`
+              eight: `${letters[i + 1]}${num + 2}`,
             };
             const finalMoves = [];
             const obj = Object.values(fields);
             for (let i = 0; i < obj.length; i++) {
               const element = obj[i];
-              squares.forEach(square => {
+              squares.forEach((square) => {
                 if (square.id === element) {
                   if (square.firstElementChild) {
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -462,7 +465,7 @@ export default {
         "e8",
         "f8",
         "g8",
-        "h8"
+        "h8",
       ];
       if (
         selectedPiece.selected_piece_initial === "wB" ||
@@ -485,10 +488,10 @@ export default {
                 one: `${letters[i + m]}${num - m}`,
                 two: `${letters[i + m]}${num + m}`,
                 three: `${letters[i - m]}${num + m}`,
-                four: `${letters[i - m]}${num - m}`
+                four: `${letters[i - m]}${num - m}`,
               };
               m++;
-              squares.forEach(square => {
+              squares.forEach((square) => {
                 const obj = objects[Object.keys(objects)[objectNumber]];
 
                 if (obj == undefined) {
@@ -523,7 +526,7 @@ export default {
                         diagonal();
                       }
                     } else {
-                      forbiden.forEach(forbid => {
+                      forbiden.forEach((forbid) => {
                         if (obj === forbid) {
                           objectNumber++;
                           m = 1;
@@ -563,10 +566,10 @@ export default {
                 one: `${letters[i + m]}${num}`,
                 two: `${letter}${num + m}`,
                 three: `${letters[i - m]}${num}`,
-                four: `${letter}${num - m}`
+                four: `${letter}${num - m}`,
               };
               m++;
-              squares.forEach(square => {
+              squares.forEach((square) => {
                 const obj = objects[Object.keys(objects)[objectNumber]];
                 if (obj == undefined) {
                   return obj == "undefined";
@@ -637,10 +640,10 @@ export default {
                 one: `${letters[i + m]}${num - m}`,
                 two: `${letters[i + m]}${num + m}`,
                 three: `${letters[i - m]}${num + m}`,
-                four: `${letters[i - m]}${num - m}`
+                four: `${letters[i - m]}${num - m}`,
               };
               m++;
-              squares.forEach(square => {
+              squares.forEach((square) => {
                 const obj = objects[Object.keys(objects)[objectNumber]];
                 if (obj == undefined) {
                   return obj == "undefined";
@@ -675,7 +678,7 @@ export default {
                         diagonal();
                       }
                     } else {
-                      forbiden.forEach(forbid => {
+                      forbiden.forEach((forbid) => {
                         if (obj === forbid) {
                           objectNumber++;
                           m = 1;
@@ -702,10 +705,10 @@ export default {
                 one: `${letters[i + n]}${num}`,
                 two: `${letter}${num + n}`,
                 three: `${letters[i - n]}${num}`,
-                four: `${letter}${num - n}`
+                four: `${letter}${num - n}`,
               };
               n++;
-              squares.forEach(square => {
+              squares.forEach((square) => {
                 const obj = objects[Object.keys(objects)[objectNumberStraight]];
                 if (obj == undefined) {
                   return obj == "undefined";
@@ -772,11 +775,11 @@ export default {
               upRight: `${letters[i + 1]}${num + 1}`,
               upLeft: `${letters[i - 1]}${num + 1}`,
               downRight: `${letters[i + 1]}${num - 1}`,
-              downLeft: `${letters[i - 1]}${num - 1}`
+              downLeft: `${letters[i - 1]}${num - 1}`,
             };
             const objects = Object.values(fields);
-            objects.forEach(obj => {
-              squares.forEach(square => {
+            objects.forEach((obj) => {
+              squares.forEach((square) => {
                 if (square.id === obj) {
                   if (square.firstElementChild) {
                     if (square.firstElementChild.classList[0] === "black") {
@@ -792,7 +795,7 @@ export default {
         }
         this.moves.push(finalMoves);
       }
-    }
+    },
   },
   computed: {},
 
@@ -801,7 +804,7 @@ export default {
   },
   mounted() {
     this.placePieces();
-  }
+  },
 };
 </script>
 
@@ -819,46 +822,40 @@ export default {
 }
 
 .black_square {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
   background-color: rgb(0, 101, 141);
 }
 
 .white_square {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
   background-color: rgb(66, 217, 255);
 }
 
 img {
-  width: 58px;
+  width: 62px;
   cursor: grab;
-  z-index: 0;
+  z-index: 1;
 }
 .mark::after {
   display: block;
   content: " ";
-  margin: 14px auto;
-  width: 35px;
-  height: 35px;
+  margin: 20px auto;
+  width: 22px;
+  height: 22px;
   background: rgba(85, 85, 85, 0.5);
   border-radius: 50%;
-  z-index: -5;
+  z-index: 0;
 }
 .target::after {
   display: block;
   content: " ";
-  margin: 7px auto;
-  width: 50px;
-  height: 50px;
-  background: rgb(255, 74, 74);
+  margin: 18px auto;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 74, 74, 0.5);
   border-radius: 50%;
-  z-index: 5;
+  z-index: 0;
 }
 </style>
