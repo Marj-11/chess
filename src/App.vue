@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" @mousedown="this.prevent">
     <Board />
   </div>
 </template>
@@ -10,8 +10,13 @@ import Board from "./components/Board.vue";
 export default {
   name: "App",
   components: {
-    Board
-  }
+    Board,
+  },
+  methods: {
+    prevent(e) {
+      e.preventDefault();
+    },
+  },
 };
 </script>
 
@@ -23,6 +28,7 @@ export default {
   align-items: center;
 }
 html {
+  background-color: rgb(41, 41, 41);
   height: 100vh;
   box-sizing: border-box;
   padding: 0;
