@@ -23,8 +23,7 @@ export default {
       color: "",
       class: ["square", "whiteS"],
       moves: [],
-
-      droppable: false,
+      whiteToPlay: true,
     };
   },
   methods: {
@@ -58,7 +57,6 @@ export default {
             img.style.position = "absolute";
             img.classList =
               img.src.charAt(img.src.length - 6) == "b" ? "black" : "white";
-
             square.appendChild(img);
           }
         });
@@ -95,17 +93,30 @@ export default {
         piece.style.position = "absolute";
         this.moves[0].forEach((allowed) => {
           squares.forEach((s) => {
-            if (allowed === s.id) {
-              s.classList.add("droppable");
-              s.classList.add("mark");
-              if (s.firstElementChild) {
-                s.classList.add("target");
+            if (piece.classList[0] === "white" && this.whiteToPlay) {
+              if (allowed === s.id) {
+                s.classList.add("droppable");
+                s.classList.add("mark");
+                if (s.firstElementChild) {
+                  s.classList.add("target");
+                }
+              }
+            }
+            if (piece.classList[0] === "black" && !this.whiteToPlay) {
+              if (allowed === s.id) {
+                s.classList.add("droppable");
+                s.classList.add("mark");
+                if (s.firstElementChild) {
+                  s.classList.add("target");
+                }
               }
             }
           });
         });
 
         this.moves = [];
+
+        let self = this;
         let currentDroppable = null;
         let shiftX = event.clientX - piece.getBoundingClientRect().left;
         let shiftY = event.clientY - piece.getBoundingClientRect().top;
@@ -145,77 +156,141 @@ export default {
 
           piece.hidden = false;
           let droppableBelow = elemBelow.closest(".droppable");
-
           if (currentDroppable != droppableBelow) {
             if (currentDroppable) {
               leaveDroppable(currentDroppable);
             }
             currentDroppable = droppableBelow;
 
-            if (currentDroppable) {
-              if (currentDroppable.classList.contains("droppable")) {
-                piece.onmouseup = function (e) {
-                  e.preventDefault();
-                  if (currentDroppable) {
-                    if (!currentDroppable.hasChildNodes()) {
-                      this.moves = [];
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.onmouseup = null;
-                      piece.style.width = "62px";
-                      piece.style.cursor = "grab";
-                      piece.style.zIndex = 1;
-                      piece.setAttribute("id", currentDroppable.id);
-                      currentDroppable.appendChild(piece);
-                      currentDroppable.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
-                      piece.style.boxSizing = "border-box";
-                      currentDroppable.style.borderColor = "transparent";
-                      squares.forEach((s) => {
-                        s.classList.remove("mark");
-                        s.classList.remove("target");
-                      });
+            if (piece.classList[0] === "white" && self.whiteToPlay) {
+              self.whiteToPlay = false;
+              if (currentDroppable) {
+                if (currentDroppable.classList.contains("droppable")) {
+                  piece.onmouseup = function(e) {
+                    e.preventDefault();
+                    if (currentDroppable) {
+                      if (!currentDroppable.hasChildNodes()) {
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        piece.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                      } else {
+                        const take = currentDroppable.firstChild;
+                        currentDroppable.removeChild(take);
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        piece.style.boxSizing = "border-box";
+                        currentDroppable.style.border = "none";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                      }
                     } else {
-                      currentDroppable.removeChild(currentDroppable.firstChild);
                       document.removeEventListener("mousemove", onMouseMove);
-                      piece.onmouseup = null;
                       piece.style.width = "62px";
-                      piece.style.cursor = "grab";
                       piece.style.zIndex = 1;
-                      piece.setAttribute("id", currentDroppable.id);
-                      currentDroppable.appendChild(piece);
-                      currentDroppable.style.position = "relative";
+                      piece.style.cursor = "grab";
+                      square.style.position = "relative";
                       piece.style.position = "absolute";
                       piece.style.top = "0px";
                       piece.style.left = "0px";
-                      piece.style.boxSizing = "border-box";
-                      currentDroppable.style.border = "none";
-                      squares.forEach((s) => {
-                        s.classList.remove("mark");
-                        s.classList.remove("target");
-                      });
                     }
-                  } else {
-                    document.removeEventListener("mousemove", onMouseMove);
-                    piece.style.width = "62px";
-                    piece.style.zIndex = 1;
-                    piece.style.cursor = "grab";
-                    square.style.position = "relative";
-                    piece.style.position = "absolute";
-                    piece.style.top = "0px";
-                    piece.style.left = "0px";
-                  }
-                };
+                  };
+                }
+                enterDroppable(currentDroppable);
               }
-              enterDroppable(currentDroppable);
+            }
+
+            if (piece.classList[0] === "black" && !self.whiteToPlay) {
+              self.whiteToPlay = true;
+              if (currentDroppable) {
+                if (currentDroppable.classList.contains("droppable")) {
+                  piece.onmouseup = function(e) {
+                    e.preventDefault();
+                    if (currentDroppable) {
+                      if (!currentDroppable.hasChildNodes()) {
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        piece.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                      } else {
+                        const take = currentDroppable.firstChild;
+                        currentDroppable.removeChild(take);
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        piece.style.boxSizing = "border-box";
+                        currentDroppable.style.border = "none";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                      }
+                    } else {
+                      document.removeEventListener("mousemove", onMouseMove);
+                      piece.style.width = "62px";
+                      piece.style.zIndex = 1;
+                      piece.style.cursor = "grab";
+                      square.style.position = "relative";
+                      piece.style.position = "absolute";
+                      piece.style.top = "0px";
+                      piece.style.left = "0px";
+                    }
+                  };
+                }
+                enterDroppable(currentDroppable);
+              }
             }
           }
         }
 
         document.addEventListener("mousemove", onMouseMove);
 
-        piece.onmouseup = function () {
+        piece.onmouseup = function() {
           this.moves = [];
           document.removeEventListener("mousemove", onMouseMove);
           piece.style.zIndex = 1;
@@ -236,7 +311,7 @@ export default {
           elem.style.borderColor = "transparent";
         }
 
-        piece.ondragstart = function () {
+        piece.ondragstart = function() {
           return false;
         };
       }
@@ -257,6 +332,40 @@ export default {
 
     available_moves(selectedPiece) {
       const squares = document.querySelectorAll(".square");
+      const forbiden = [
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "h7",
+        "h8",
+        "a1",
+        "b1",
+        "c1",
+        "d1",
+        "e1",
+        "f1",
+        "g1",
+        "h1",
+        "a8",
+        "b8",
+        "c8",
+        "d8",
+        "e8",
+        "f8",
+        "g8",
+        "h8",
+      ];
       if (selectedPiece.selected_piece_initial === "wP") {
         const forward = +1;
         const letter = selectedPiece.selected_piece_position.charAt(0);
@@ -439,40 +548,6 @@ export default {
           }
         }
       }
-      const forbiden = [
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a5",
-        "a6",
-        "a7",
-        "a8",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "h7",
-        "h8",
-        "a1",
-        "b1",
-        "c1",
-        "d1",
-        "e1",
-        "f1",
-        "g1",
-        "h1",
-        "a8",
-        "b8",
-        "c8",
-        "d8",
-        "e8",
-        "f8",
-        "g8",
-        "h8",
-      ];
       if (
         selectedPiece.selected_piece_initial === "wB" ||
         selectedPiece.selected_piece_initial === "bB"

@@ -1,16 +1,16 @@
 <template>
   <div id="app" @mousedown="this.prevent">
-    <Board />
+    <Game />
   </div>
 </template>
 
 <script>
-import Board from "./components/Board.vue";
+import Game from "./components/Game.vue";
 
 export default {
   name: "App",
   components: {
-    Board,
+    Game,
   },
   methods: {
     prevent(e) {
