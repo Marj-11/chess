@@ -23,7 +23,15 @@ export default {
       color: "",
       class: ["square", "whiteS"],
       moves: [],
+      checks: [],
       whiteToPlay: true,
+      takenPieces_images: [],
+      recorded_moves: [],
+      checkmate_moves: [],
+      white_king_checked: false,
+      black_king_checked: false,
+      white_checkmate: false,
+      black_checkmate: false,
     };
   },
   methods: {
@@ -52,6 +60,7 @@ export default {
         entries.forEach((piece) => {
           if (square.id === piece.position) {
             img.src = this.imageUrl + piece.imageUrl;
+            img.alt = piece.imageUrl.substring(0, 2);
             img.id = square.id;
             img.draggable = true;
             img.style.position = "absolute";
@@ -79,7 +88,6 @@ export default {
       const square = event.path[1];
 
       let piece = square.firstElementChild;
-
       if (piece.tagName == "DIV") {
         return;
       }
@@ -162,76 +170,17 @@ export default {
             }
             currentDroppable = droppableBelow;
 
-            if (piece.classList[0] === "white" && self.whiteToPlay) {
-              self.whiteToPlay = false;
-              if (currentDroppable) {
-                if (currentDroppable.classList.contains("droppable")) {
+            if (currentDroppable) {
+              if (currentDroppable.classList.contains("droppable")) {
+                if (piece.classList[0] === "white" && self.whiteToPlay) {
                   piece.onmouseup = function(e) {
                     e.preventDefault();
                     if (currentDroppable) {
                       if (!currentDroppable.hasChildNodes()) {
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        piece.style.boxSizing = "border-box";
-                        currentDroppable.style.borderColor = "transparent";
-                        squares.forEach((s) => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
-                      } else {
-                        const take = currentDroppable.firstChild;
-                        currentDroppable.removeChild(take);
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        piece.style.boxSizing = "border-box";
-                        currentDroppable.style.border = "none";
-                        squares.forEach((s) => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
-                      }
-                    } else {
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.style.width = "62px";
-                      piece.style.zIndex = 1;
-                      piece.style.cursor = "grab";
-                      square.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
-                    }
-                  };
-                }
-                enterDroppable(currentDroppable);
-              }
-            }
+                        self.whiteToPlay = false;
+                        const toRecord = `${piece.alt},${currentDroppable.id}`;
+                        self.recorded_moves.push(toRecord);
 
-            if (piece.classList[0] === "black" && !self.whiteToPlay) {
-              self.whiteToPlay = true;
-              if (currentDroppable) {
-                if (currentDroppable.classList.contains("droppable")) {
-                  piece.onmouseup = function(e) {
-                    e.preventDefault();
-                    if (currentDroppable) {
-                      if (!currentDroppable.hasChildNodes()) {
                         document.removeEventListener("mousemove", onMouseMove);
                         piece.onmouseup = null;
                         piece.style.width = "62px";
@@ -243,15 +192,19 @@ export default {
                         piece.style.position = "absolute";
                         piece.style.top = "0px";
                         piece.style.left = "0px";
-                        piece.style.boxSizing = "border-box";
+                        currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
+                        check_for_checks();
                       } else {
+                        self.whiteToPlay = false;
                         const take = currentDroppable.firstChild;
                         currentDroppable.removeChild(take);
+                        const toRecord = `${piece.alt}x${take.id}`;
+                        self.recorded_moves.push(toRecord);
                         document.removeEventListener("mousemove", onMouseMove);
                         piece.onmouseup = null;
                         piece.style.width = "62px";
@@ -263,12 +216,23 @@ export default {
                         piece.style.position = "absolute";
                         piece.style.top = "0px";
                         piece.style.left = "0px";
-                        piece.style.boxSizing = "border-box";
-                        currentDroppable.style.border = "none";
+                        currentDroppable.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
+
+                          if (s.firstElementChild === null) {
+                            return;
+                          }
+                          if (
+                            s.firstElementChild.alt == "wK" ||
+                            s.firstElementChild.alt == "bK"
+                          ) {
+                            s.classList.add("kingDanger");
+                          }
                         });
+                        check_for_checks();
                       }
                     } else {
                       document.removeEventListener("mousemove", onMouseMove);
@@ -282,14 +246,77 @@ export default {
                     }
                   };
                 }
-                enterDroppable(currentDroppable);
+                if (piece.classList[0] === "black" && !self.whiteToPlay) {
+                  piece.onmouseup = function(e) {
+                    e.preventDefault();
+                    if (currentDroppable) {
+                      if (!currentDroppable.hasChildNodes()) {
+                        self.whiteToPlay = true;
+                        const toRecord = `${piece.alt},${currentDroppable.id}`;
+                        self.recorded_moves.push(toRecord);
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        currentDroppable.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                        check_for_checks();
+                      } else {
+                        self.whiteToPlay = true;
+                        const take = currentDroppable.firstChild;
+                        currentDroppable.removeChild(take);
+                        const toRecord = `${piece.alt}x${take.id}`;
+                        self.recorded_moves.push(toRecord);
+
+                        document.removeEventListener("mousemove", onMouseMove);
+                        piece.onmouseup = null;
+                        piece.style.width = "62px";
+                        piece.style.cursor = "grab";
+                        piece.style.zIndex = 1;
+                        piece.setAttribute("id", currentDroppable.id);
+                        currentDroppable.appendChild(piece);
+                        currentDroppable.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
+                        currentDroppable.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                        check_for_checks();
+                      }
+                    } else {
+                      document.removeEventListener("mousemove", onMouseMove);
+                      piece.style.width = "62px";
+                      piece.style.zIndex = 1;
+                      piece.style.cursor = "grab";
+                      square.style.position = "relative";
+                      piece.style.position = "absolute";
+                      piece.style.top = "0px";
+                      piece.style.left = "0px";
+                    }
+                  };
+                }
               }
+              enterDroppable(currentDroppable);
             }
           }
         }
 
         document.addEventListener("mousemove", onMouseMove);
-
         piece.onmouseup = function() {
           this.moves = [];
           document.removeEventListener("mousemove", onMouseMove);
@@ -315,22 +342,151 @@ export default {
           return false;
         };
       }
+      let self = this;
+      function check_for_checks() {
+        self.checks = [];
+        let check = true;
+        const forbiden = [
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6",
+          "a7",
+          "a8",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "h7",
+          "h8",
+          "a1",
+          "b1",
+          "c1",
+          "d1",
+          "e1",
+          "f1",
+          "g1",
+          "h1",
+          "a8",
+          "b8",
+          "c8",
+          "d8",
+          "e8",
+          "f8",
+          "g8",
+          "h8",
+        ];
+        if (piece.alt.charAt(0) == "w") {
+          squares.forEach((square) => {
+            if (square.firstElementChild === null) {
+              return;
+            }
+            if (square.firstElementChild.alt.charAt(0) == "w") {
+              let selected_piece_position = square.firstElementChild.id;
+              let selected_piece_initial = square.firstElementChild.alt;
+              let selectedPiece = {
+                selected_piece_initial,
+                selected_piece_position,
+              };
+              if (selectedPiece.selected_piece_initial === "wP") {
+                self.get_white_pawn_moves(selectedPiece, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wK" ||
+                selectedPiece.selected_piece_initial === "bK"
+              ) {
+                self.get_knight_moves(selectedPiece, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wB" ||
+                selectedPiece.selected_piece_initial === "bB"
+              ) {
+                self.get_bishop_moves(selectedPiece, forbiden, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wR" ||
+                selectedPiece.selected_piece_initial === "bR"
+              ) {
+                self.get_rook_moves(selectedPiece, forbiden, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wQ" ||
+                selectedPiece.selected_piece_initial === "bQ"
+              ) {
+                self.get_queen_moves(selectedPiece, forbiden, check);
+              }
+              if (selectedPiece.selected_piece_initial === "wK") {
+                self.get_white_king_moves(selectedPiece, check);
+              }
+            }
+          });
+        } else {
+          squares.forEach((square) => {
+            if (square.firstElementChild === null) {
+              return;
+            }
+            if (square.firstElementChild.alt.charAt(0) == "b") {
+              let selected_piece_position = square.firstElementChild.id;
+              let selected_piece_initial = square.firstElementChild.alt;
+              let selectedPiece = {
+                selected_piece_initial,
+                selected_piece_position,
+              };
+
+              if (selectedPiece.selected_piece_initial === "bP") {
+                self.get_black_pawn_moves(selectedPiece, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wN" ||
+                selectedPiece.selected_piece_initial === "bN"
+              ) {
+                self.get_knight_moves(selectedPiece, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wB" ||
+                selectedPiece.selected_piece_initial === "bB"
+              ) {
+                self.get_bishop_moves(selectedPiece, forbiden, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wR" ||
+                selectedPiece.selected_piece_initial === "bR"
+              ) {
+                self.get_rook_moves(selectedPiece, forbiden, check);
+              }
+              if (
+                selectedPiece.selected_piece_initial === "wQ" ||
+                selectedPiece.selected_piece_initial === "bQ"
+              ) {
+                self.get_queen_moves(selectedPiece, forbiden, check);
+              }
+
+              if (selectedPiece.selected_piece_initial === "bK") {
+                self.get_black_king_moves(selectedPiece, check);
+              }
+            }
+          });
+        }
+        self.removeDuplicates();
+      }
     },
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////METHODS/////////////////////////////////////////////////////////
+
     selected_piece(new_piece, position_square) {
-      let selected_piece_letter = new_piece.src.charAt(
-        new_piece.src.length - 5
-      );
-      let selected_piece_color = new_piece.src.charAt(new_piece.src.length - 6);
       let selected_piece_position = position_square.id;
-      let selected_piece_initial = `${selected_piece_color}${selected_piece_letter}`;
+      let selected_piece_initial = new_piece.alt;
       return {selected_piece_initial, selected_piece_position};
     },
 
     available_moves(selectedPiece) {
+      let check = false;
       const squares = document.querySelectorAll(".square");
       const forbiden = [
         "a1",
@@ -367,515 +523,619 @@ export default {
         "h8",
       ];
       if (selectedPiece.selected_piece_initial === "wP") {
-        const forward = +1;
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-        const oneForward = `${letter}${num + forward}`;
-        const twoForward = `${letter}${num + forward + forward}`;
-
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-        for (let i = 0; i < letters.length; i++) {
-          const element = letters[i];
-          if (element === letter) {
-            const letterLeft = `${letters[i - 1]}${num + forward}`;
-            const letterRight = `${letters[i + 1]}${num + forward}`;
-            const fields = {
-              l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
-              r: letterRight.substring(0, 2) == "un" ? null : letterRight,
-              of: oneForward.substring(1, 2) == "9" ? null : oneForward,
-              tf: twoForward.substring(1, 2) == "9" ? null : twoForward,
-            };
-            const finalMoves = [];
-            squares.forEach((square) => {
-              if (square.id === fields.r) {
-                if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "black") {
-                    finalMoves.push(fields.r);
-                  }
-                }
-              }
-              if (square.id === fields.l) {
-                if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "black") {
-                    finalMoves.push(fields.l);
-                  }
-                }
-              }
-
-              if (square.id === fields.of) {
-                if (!square.firstElementChild) {
-                  finalMoves.push(fields.of);
-                }
-              }
-
-              if (
-                selectedPiece.selected_piece_position.substring(1, 2) == "2"
-              ) {
-                if (square.id === fields.tf) {
-                  const numberMinusOne = square.id.substring(1, 2) - 1;
-                  const letter = square.id.substring(0, 1);
-                  const strigifiedNumber = numberMinusOne.toString();
-                  const madeUpId = letter + strigifiedNumber;
-                  if (square.firstElementChild) {
-                    finalMoves.push(fields.of);
-                  } else {
-                    finalMoves.push(fields.tf);
-                    squares.forEach((s) => {
-                      if (s.id === madeUpId) {
-                        if (s.firstElementChild) {
-                          finalMoves.pop();
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
-            this.moves.push(finalMoves);
-          }
-        }
+        this.get_white_pawn_moves(selectedPiece, check);
       }
       if (selectedPiece.selected_piece_initial === "bP") {
-        const forward = -1;
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-        const oneForward = `${letter}${num + forward}`;
-        const twoForward = `${letter}${num + forward + forward}`;
-
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-        for (let i = 0; i < letters.length; i++) {
-          const element = letters[i];
-          if (element === letter) {
-            const letterLeft = `${letters[i - 1]}${num + forward}`;
-            const letterRight = `${letters[i + 1]}${num + forward}`;
-            const fields = {
-              l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
-              r: letterRight.substring(0, 2) == "un" ? null : letterRight,
-              of: oneForward.substring(1, 2) == "0" ? null : oneForward,
-              tf: twoForward.substring(1, 2) == "0" ? null : twoForward,
-            };
-            const finalMoves = [];
-            squares.forEach((square) => {
-              if (square.id === fields.r) {
-                if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "white") {
-                    finalMoves.push(fields.r);
-                  }
-                }
-              }
-              if (square.id === fields.l) {
-                if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "white") {
-                    finalMoves.push(fields.l);
-                  }
-                }
-              }
-
-              if (square.id === fields.of) {
-                if (!square.firstElementChild) {
-                  finalMoves.push(fields.of);
-                }
-              }
-
-              if (
-                selectedPiece.selected_piece_position.substring(1, 2) == "7"
-              ) {
-                if (square.id === fields.tf) {
-                  const numberPlusOne = parseInt(square.id.substring(1, 2));
-                  const parsedNumber = numberPlusOne + 1;
-                  const letter = square.id.substring(0, 1);
-                  const strigifiedNumber = parsedNumber.toString();
-                  const madeUpId = letter + strigifiedNumber;
-                  if (square.firstElementChild) {
-                    finalMoves.push(fields.of);
-                  } else {
-                    finalMoves.push(fields.tf);
-                    squares.forEach((s) => {
-                      if (s.id === madeUpId) {
-                        if (s.firstElementChild) {
-                          finalMoves.pop();
-                        }
-                      }
-                    });
-                  }
-                }
-              }
-            });
-            this.moves.push(finalMoves);
-          }
-        }
+        this.get_black_pawn_moves(selectedPiece, check);
       }
       if (
         selectedPiece.selected_piece_initial === "wN" ||
         selectedPiece.selected_piece_initial === "bN"
       ) {
-        const colorClass =
-          selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-        for (let i = 0; i < letters.length; i++) {
-          const element = letters[i];
-          if (element === letter) {
-            const fields = {
-              one: `${letters[i - 1]}${num + 2}`,
-              two: `${letters[i - 2]}${num + 1}`,
-              three: `${letters[i - 2]}${num - 1}`,
-              four: `${letters[i - 1]}${num - 2}`,
-              five: `${letters[i + 1]}${num - 2}`,
-              six: `${letters[i + 2]}${num - 1}`,
-              seven: `${letters[i + 2]}${num + 1}`,
-              eight: `${letters[i + 1]}${num + 2}`,
-            };
-            const finalMoves = [];
-            const obj = Object.values(fields);
-            for (let i = 0; i < obj.length; i++) {
-              const element = obj[i];
-              squares.forEach((square) => {
-                if (square.id === element) {
-                  if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === colorClass) {
-                      finalMoves.push(element);
-                    }
-                  } else {
-                    finalMoves.push(element);
-                  }
-                }
-              });
-            }
-            this.moves.push(finalMoves);
-          }
-        }
+        this.get_knight_moves(selectedPiece, check);
       }
       if (
         selectedPiece.selected_piece_initial === "wB" ||
         selectedPiece.selected_piece_initial === "bB"
       ) {
-        const colorClass =
-          selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-        let finalMoves = [];
-        let objectNumber = 0;
-        let m = 1;
-        function diagonal() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const objects = {
-                one: `${letters[i + m]}${num - m}`,
-                two: `${letters[i + m]}${num + m}`,
-                three: `${letters[i - m]}${num + m}`,
-                four: `${letters[i - m]}${num - m}`,
-              };
-              m++;
-              squares.forEach((square) => {
-                const obj = objects[Object.keys(objects)[objectNumber]];
-
-                if (obj == undefined) {
-                  return obj == "undefined";
-                }
-                if (obj.substring(0, 1) === "u") {
-                  objectNumber++;
-                  objectNumber++;
-                  m = 1;
-                  diagonal();
-                }
-                if (
-                  obj.substring(1, 2) === "0" ||
-                  obj.substring(1, 2) === "10" ||
-                  obj.substring(1, 2) === "9"
-                ) {
-                  objectNumber++;
-                  m = 1;
-                  diagonal();
-                } else {
-                  if (square.id === obj) {
-                    if (square.firstElementChild) {
-                      m = 1;
-                      if (
-                        square.firstElementChild.classList[0] === colorClass
-                      ) {
-                        finalMoves.push(obj);
-                        objectNumber++;
-                        diagonal();
-                      } else {
-                        objectNumber++;
-                        diagonal();
-                      }
-                    } else {
-                      forbiden.forEach((forbid) => {
-                        if (obj === forbid) {
-                          objectNumber++;
-                          m = 1;
-                          diagonal();
-                        }
-                      });
-                      finalMoves.push(obj);
-                      diagonal();
-                    }
-                  }
-                }
-              });
-            }
-          }
-        }
-        diagonal();
-        this.moves.push(finalMoves);
+        this.get_bishop_moves(selectedPiece, forbiden, check);
       }
       if (
         selectedPiece.selected_piece_initial === "wR" ||
         selectedPiece.selected_piece_initial === "bR"
       ) {
-        const colorClass =
-          selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-        let finalMoves = [];
-        let objectNumber = 0;
-        let m = 1;
-        function straight() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const objects = {
-                one: `${letters[i + m]}${num}`,
-                two: `${letter}${num + m}`,
-                three: `${letters[i - m]}${num}`,
-                four: `${letter}${num - m}`,
-              };
-              m++;
-              squares.forEach((square) => {
-                const obj = objects[Object.keys(objects)[objectNumber]];
-                if (obj == undefined) {
-                  return obj == "undefined";
-                }
-                if (obj.substring(0, 1) === "u") {
-                  objectNumber++;
-                  m = 1;
-                  straight();
-                }
-
-                if (
-                  obj.substring(1, 2) === "0" ||
-                  obj.substring(1, 2) === "10" ||
-                  obj.substring(1, 2) === "9"
-                ) {
-                  objectNumber++;
-                  m = 1;
-                  straight();
-                } else {
-                  if (square.id === obj) {
-                    if (square.firstElementChild) {
-                      m = 1;
-                      if (
-                        square.firstElementChild.classList[0] === colorClass
-                      ) {
-                        finalMoves.push(obj);
-                        objectNumber++;
-
-                        straight();
-                      } else {
-                        objectNumber++;
-                        m = 1;
-                        straight();
-                      }
-                    } else {
-                      finalMoves.push(obj);
-                      straight();
-                    }
-                  }
-                }
-              });
-            }
-          }
-        }
-        straight();
-        this.moves.push(finalMoves);
+        this.get_rook_moves(selectedPiece, forbiden, check);
       }
       if (
         selectedPiece.selected_piece_initial === "wQ" ||
         selectedPiece.selected_piece_initial === "bQ"
       ) {
-        const colorClass =
-          selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-
-        let finalMoves = [];
-
-        let objectNumber = 0;
-        let m = 1;
-        function diagonal() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const objects = {
-                one: `${letters[i + m]}${num - m}`,
-                two: `${letters[i + m]}${num + m}`,
-                three: `${letters[i - m]}${num + m}`,
-                four: `${letters[i - m]}${num - m}`,
-              };
-              m++;
-              squares.forEach((square) => {
-                const obj = objects[Object.keys(objects)[objectNumber]];
-                if (obj == undefined) {
-                  return obj == "undefined";
-                }
-                if (obj.substring(0, 1) === "u") {
-                  objectNumber++;
-                  objectNumber++;
-                  m = 1;
-                  diagonal();
-                }
-                if (
-                  obj.substring(1, 2) === "0" ||
-                  obj.substring(1, 2) === "10" ||
-                  obj.substring(1, 2) === "9"
-                ) {
-                  objectNumber++;
-                  m = 1;
-                  diagonal();
-                } else {
-                  if (square.id === obj) {
-                    if (square.firstElementChild) {
-                      m = 1;
-                      if (
-                        square.firstElementChild.classList[0] === colorClass
-                      ) {
-                        finalMoves.push(obj);
-                        objectNumber++;
-
-                        diagonal();
-                      } else {
-                        objectNumber++;
-                        diagonal();
-                      }
-                    } else {
-                      forbiden.forEach((forbid) => {
-                        if (obj === forbid) {
-                          objectNumber++;
-                          m = 1;
-                          diagonal();
-                        }
-                      });
-                      finalMoves.push(obj);
-                      diagonal();
-                    }
-                  }
-                }
-              });
-            }
-          }
-        }
-        let objectNumberStraight = 0;
-        let n = 1;
-        function straight() {
-          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
-          for (let i = 0; i < letters.length; i++) {
-            const element = letters[i];
-            if (element === letter) {
-              const objects = {
-                one: `${letters[i + n]}${num}`,
-                two: `${letter}${num + n}`,
-                three: `${letters[i - n]}${num}`,
-                four: `${letter}${num - n}`,
-              };
-              n++;
-              squares.forEach((square) => {
-                const obj = objects[Object.keys(objects)[objectNumberStraight]];
-                if (obj == undefined) {
-                  return obj == "undefined";
-                }
-                if (obj.substring(0, 1) === "u") {
-                  objectNumberStraight++;
-                  n = 1;
-                  straight();
-                }
-                if (
-                  obj.substring(1, 2) === "0" ||
-                  obj.substring(1, 2) === "10" ||
-                  obj.substring(1, 2) === "9"
-                ) {
-                  objectNumberStraight++;
-                  n = 1;
-                  straight();
-                } else {
-                  if (square.id === obj) {
-                    if (square.firstElementChild) {
-                      n = 1;
-                      if (
-                        square.firstElementChild.classList[0] === colorClass
-                      ) {
-                        finalMoves.push(obj);
-                        objectNumberStraight++;
-                        straight();
-                      } else {
-                        objectNumberStraight++;
-                        n = 1;
-                        straight();
-                      }
-                    } else {
-                      finalMoves.push(obj);
-                      straight();
-                    }
-                  }
-                }
-              });
-            }
-          }
-        }
-
-        diagonal();
-        straight();
-        this.moves.push(finalMoves);
+        this.get_queen_moves(selectedPiece, forbiden, check);
       }
       if (selectedPiece.selected_piece_initial === "wK") {
-        this.moves = [];
-        const letter = selectedPiece.selected_piece_position.charAt(0);
-        const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+        this.get_white_king_moves(selectedPiece, check, check);
+      }
+      if (selectedPiece.selected_piece_initial === "bK") {
+        this.get_black_king_moves(selectedPiece, check);
+      }
+    },
+    get_white_pawn_moves(selectedPiece, check) {
+      this.moves = [];
+      const squares = document.querySelectorAll(".square");
+      const forward = +1;
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+      const oneForward = `${letter}${num + forward}`;
+      const twoForward = `${letter}${num + forward + forward}`;
 
-        let finalMoves = [];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < letters.length; i++) {
+        const element = letters[i];
+        if (element === letter) {
+          const letterLeft = `${letters[i - 1]}${num + forward}`;
+          const letterRight = `${letters[i + 1]}${num + forward}`;
+          const fields = {
+            l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
+            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
+            of: oneForward.substring(1, 2) == "9" ? null : oneForward,
+            tf: twoForward.substring(1, 2) == "9" ? null : twoForward,
+          };
 
+          const finalMoves = [];
+          squares.forEach((square) => {
+            if (square.id === fields.r) {
+              if (square.firstElementChild) {
+                if (square.firstElementChild.classList[0] === "black") {
+                  finalMoves.push(fields.r);
+                }
+              }
+            }
+            if (square.id === fields.l) {
+              if (square.firstElementChild) {
+                if (square.firstElementChild.classList[0] === "black") {
+                  finalMoves.push(fields.l);
+                }
+              }
+            }
+
+            if (square.id === fields.of) {
+              if (!square.firstElementChild) {
+                finalMoves.push(fields.of);
+              }
+            }
+
+            if (selectedPiece.selected_piece_position.substring(1, 2) == "2") {
+              if (square.id === fields.tf) {
+                const numberMinusOne = square.id.substring(1, 2) - 1;
+                const letter = square.id.substring(0, 1);
+                const strigifiedNumber = numberMinusOne.toString();
+                const madeUpId = letter + strigifiedNumber;
+                if (square.firstElementChild) {
+                  finalMoves.push(fields.of);
+                } else {
+                  finalMoves.push(fields.tf);
+                  squares.forEach((s) => {
+                    if (s.id === madeUpId) {
+                      if (s.firstElementChild) {
+                        finalMoves.pop();
+                      }
+                    }
+                  });
+                }
+              }
+            }
+          });
+          if (!check) {
+            this.moves.push(finalMoves);
+          } else {
+            this.checks.push(finalMoves);
+          }
+        }
+      }
+    },
+    get_black_pawn_moves(selectedPiece, check) {
+      this.moves = [];
+      const squares = document.querySelectorAll(".square");
+      const forward = -1;
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+      const oneForward = `${letter}${num + forward}`;
+      const twoForward = `${letter}${num + forward + forward}`;
+
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < letters.length; i++) {
+        const element = letters[i];
+        if (element === letter) {
+          const letterLeft = `${letters[i - 1]}${num + forward}`;
+          const letterRight = `${letters[i + 1]}${num + forward}`;
+          const fields = {
+            l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
+            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
+            of: oneForward.substring(1, 2) == "0" ? null : oneForward,
+            tf: twoForward.substring(1, 2) == "0" ? null : twoForward,
+          };
+          const finalMoves = [];
+          squares.forEach((square) => {
+            if (square.id === fields.r) {
+              if (square.firstElementChild) {
+                if (square.firstElementChild.classList[0] === "white") {
+                  finalMoves.push(fields.r);
+                }
+              }
+            }
+            if (square.id === fields.l) {
+              if (square.firstElementChild) {
+                if (square.firstElementChild.classList[0] === "white") {
+                  finalMoves.push(fields.l);
+                }
+              }
+            }
+
+            if (square.id === fields.of) {
+              if (!square.firstElementChild) {
+                finalMoves.push(fields.of);
+              }
+            }
+
+            if (selectedPiece.selected_piece_position.substring(1, 2) == "7") {
+              if (square.id === fields.tf) {
+                const numberPlusOne = parseInt(square.id.substring(1, 2));
+                const parsedNumber = numberPlusOne + 1;
+                const letter = square.id.substring(0, 1);
+                const strigifiedNumber = parsedNumber.toString();
+                const madeUpId = letter + strigifiedNumber;
+                if (square.firstElementChild) {
+                  finalMoves.push(fields.of);
+                } else {
+                  finalMoves.push(fields.tf);
+                  squares.forEach((s) => {
+                    if (s.id === madeUpId) {
+                      if (s.firstElementChild) {
+                        finalMoves.pop();
+                      }
+                    }
+                  });
+                }
+              }
+            }
+          });
+          if (!check) {
+            this.moves.push(finalMoves);
+          } else {
+            this.checks.push(finalMoves);
+          }
+        }
+      }
+    },
+    get_knight_moves(selectedPiece, check) {
+      const squares = document.querySelectorAll(".square");
+      const colorClass =
+        selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < letters.length; i++) {
+        const element = letters[i];
+        if (element === letter) {
+          const fields = {
+            one: `${letters[i - 1]}${num + 2}`,
+            two: `${letters[i - 2]}${num + 1}`,
+            three: `${letters[i - 2]}${num - 1}`,
+            four: `${letters[i - 1]}${num - 2}`,
+            five: `${letters[i + 1]}${num - 2}`,
+            six: `${letters[i + 2]}${num - 1}`,
+            seven: `${letters[i + 2]}${num + 1}`,
+            eight: `${letters[i + 1]}${num + 2}`,
+          };
+          const finalMoves = [];
+          const obj = Object.values(fields);
+          for (let i = 0; i < obj.length; i++) {
+            const element = obj[i];
+            squares.forEach((square) => {
+              if (square.id === element) {
+                if (square.firstElementChild) {
+                  if (square.firstElementChild.classList[0] === colorClass) {
+                    finalMoves.push(element);
+                  }
+                } else {
+                  finalMoves.push(element);
+                }
+              }
+            });
+          }
+          if (!check) {
+            this.moves.push(finalMoves);
+          } else {
+            this.checks.push(finalMoves);
+          }
+        }
+      }
+    },
+    get_bishop_moves(selectedPiece, forbiden, check) {
+      const squares = document.querySelectorAll(".square");
+      const colorClass =
+        selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+      let finalMoves = [];
+      let objectNumber = 0;
+      let m = 1;
+      function diagonal() {
         const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
-            const fields = {
-              forward: `${letter}${num + 1}`,
-              backward: `${letter}${num - 1}`,
-              left: `${letters[i - 1]}${num}`,
-              right: `${letters[i + 1]}${num}`,
-              upRight: `${letters[i + 1]}${num + 1}`,
-              upLeft: `${letters[i - 1]}${num + 1}`,
-              downRight: `${letters[i + 1]}${num - 1}`,
-              downLeft: `${letters[i - 1]}${num - 1}`,
+            const objects = {
+              one: `${letters[i + m]}${num - m}`,
+              two: `${letters[i + m]}${num + m}`,
+              three: `${letters[i - m]}${num + m}`,
+              four: `${letters[i - m]}${num - m}`,
             };
-            const objects = Object.values(fields);
-            objects.forEach((obj) => {
-              squares.forEach((square) => {
+            m++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumber]];
+
+              if (obj == undefined) {
+                return obj == "undefined";
+              }
+              if (obj.substring(0, 1) === "u") {
+                objectNumber++;
+                objectNumber++;
+                m = 1;
+                diagonal();
+              }
+              if (
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
+              ) {
+                objectNumber++;
+                m = 1;
+                diagonal();
+              } else {
                 if (square.id === obj) {
                   if (square.firstElementChild) {
-                    if (square.firstElementChild.classList[0] === "black") {
+                    m = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
                       finalMoves.push(obj);
+                      objectNumber++;
+                      diagonal();
+                    } else {
+                      objectNumber++;
+                      diagonal();
                     }
                   } else {
+                    forbiden.forEach((forbid) => {
+                      if (obj === forbid) {
+                        objectNumber++;
+                        m = 1;
+                        diagonal();
+                      }
+                    });
                     finalMoves.push(obj);
+                    diagonal();
                   }
                 }
-              });
+              }
             });
           }
         }
-        this.moves.push(finalMoves);
       }
+      diagonal();
+      if (!check) {
+        this.moves.push(finalMoves);
+      } else {
+        this.checks.push(finalMoves);
+      }
+    },
+    get_rook_moves(selectedPiece, forbiden, check) {
+      const squares = document.querySelectorAll(".square");
+      const colorClass =
+        selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+      let finalMoves = [];
+      let objectNumber = 0;
+      let m = 1;
+      function straight() {
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + m]}${num}`,
+              two: `${letter}${num + m}`,
+              three: `${letters[i - m]}${num}`,
+              four: `${letter}${num - m}`,
+            };
+            m++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumber]];
+              if (obj == undefined) {
+                return obj == "undefined";
+              }
+              if (obj.substring(0, 1) === "u") {
+                objectNumber++;
+                m = 1;
+                straight();
+              }
+
+              if (
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
+              ) {
+                objectNumber++;
+                m = 1;
+                straight();
+              } else {
+                if (square.id === obj) {
+                  if (square.firstElementChild) {
+                    m = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      finalMoves.push(obj);
+                      objectNumber++;
+
+                      straight();
+                    } else {
+                      objectNumber++;
+                      m = 1;
+                      straight();
+                    }
+                  } else {
+                    finalMoves.push(obj);
+                    straight();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+      straight();
+      if (!check) {
+        this.moves.push(finalMoves);
+      } else {
+        this.checks.push(finalMoves);
+      }
+    },
+    get_queen_moves(selectedPiece, forbiden, check) {
+      const squares = document.querySelectorAll(".square");
+      const colorClass =
+        selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+
+      let finalMoves = [];
+
+      let objectNumber = 0;
+      let m = 1;
+      function diagonal() {
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + m]}${num - m}`,
+              two: `${letters[i + m]}${num + m}`,
+              three: `${letters[i - m]}${num + m}`,
+              four: `${letters[i - m]}${num - m}`,
+            };
+            m++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumber]];
+              if (obj == undefined) {
+                return obj == "undefined";
+              }
+              if (obj.substring(0, 1) === "u") {
+                objectNumber++;
+                objectNumber++;
+                m = 1;
+                diagonal();
+              }
+              if (
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
+              ) {
+                objectNumber++;
+                m = 1;
+                diagonal();
+              } else {
+                if (square.id === obj) {
+                  if (square.firstElementChild) {
+                    m = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      finalMoves.push(obj);
+                      objectNumber++;
+
+                      diagonal();
+                    } else {
+                      objectNumber++;
+                      diagonal();
+                    }
+                  } else {
+                    forbiden.forEach((forbid) => {
+                      if (obj === forbid) {
+                        objectNumber++;
+                        m = 1;
+                        diagonal();
+                      }
+                    });
+                    finalMoves.push(obj);
+                    diagonal();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+      let objectNumberStraight = 0;
+      let n = 1;
+      function straight() {
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + n]}${num}`,
+              two: `${letter}${num + n}`,
+              three: `${letters[i - n]}${num}`,
+              four: `${letter}${num - n}`,
+            };
+            n++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumberStraight]];
+              if (obj == undefined) {
+                return obj == "undefined";
+              }
+              if (obj.substring(0, 1) === "u") {
+                objectNumberStraight++;
+                n = 1;
+                straight();
+              }
+              if (
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
+              ) {
+                objectNumberStraight++;
+                n = 1;
+                straight();
+              } else {
+                if (square.id === obj) {
+                  if (square.firstElementChild) {
+                    n = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      finalMoves.push(obj);
+                      objectNumberStraight++;
+                      straight();
+                    } else {
+                      objectNumberStraight++;
+                      n = 1;
+                      straight();
+                    }
+                  } else {
+                    finalMoves.push(obj);
+                    straight();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      diagonal();
+      straight();
+      if (!check) {
+        this.moves.push(finalMoves);
+      } else {
+        this.checks.push(finalMoves);
+      }
+    },
+    get_white_king_moves(selectedPiece, check) {
+      const squares = document.querySelectorAll(".square");
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+
+      let finalMoves = [];
+
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < letters.length; i++) {
+        const element = letters[i];
+        if (element === letter) {
+          const fields = {
+            forward: `${letter}${num + 1}`,
+            backward: `${letter}${num - 1}`,
+            left: `${letters[i - 1]}${num}`,
+            right: `${letters[i + 1]}${num}`,
+            upRight: `${letters[i + 1]}${num + 1}`,
+            upLeft: `${letters[i - 1]}${num + 1}`,
+            downRight: `${letters[i + 1]}${num - 1}`,
+            downLeft: `${letters[i - 1]}${num - 1}`,
+          };
+          const objects = Object.values(fields);
+          objects.forEach((obj) => {
+            squares.forEach((square) => {
+              if (square.id === obj) {
+                if (square.firstElementChild) {
+                  if (square.firstElementChild.classList[0] === "black") {
+                    finalMoves.push(obj);
+                  }
+                } else {
+                  finalMoves.push(obj);
+                }
+              }
+            });
+          });
+        }
+      }
+      if (!check) {
+        this.moves.push(finalMoves);
+      } else {
+        this.checks.push(finalMoves);
+      }
+    },
+    get_black_king_moves(selectedPiece, check) {
+      const squares = document.querySelectorAll(".square");
+      this.moves = [];
+      const letter = selectedPiece.selected_piece_position.charAt(0);
+      const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
+
+      let finalMoves = [];
+
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      for (let i = 0; i < letters.length; i++) {
+        const element = letters[i];
+        if (element === letter) {
+          const fields = {
+            forward: `${letter}${num + 1}`,
+            backward: `${letter}${num - 1}`,
+            left: `${letters[i - 1]}${num}`,
+            right: `${letters[i + 1]}${num}`,
+            upRight: `${letters[i + 1]}${num + 1}`,
+            upLeft: `${letters[i - 1]}${num + 1}`,
+            downRight: `${letters[i + 1]}${num - 1}`,
+            downLeft: `${letters[i - 1]}${num - 1}`,
+          };
+          const objects = Object.values(fields);
+          objects.forEach((obj) => {
+            squares.forEach((square) => {
+              if (square.id === obj) {
+                if (square.firstElementChild) {
+                  if (square.firstElementChild.classList[0] === "white") {
+                    finalMoves.push(obj);
+                  }
+                } else {
+                  finalMoves.push(obj);
+                }
+              }
+            });
+          });
+        }
+      }
+      if (!check) {
+        this.moves.push(finalMoves);
+      } else {
+        this.checks.push(finalMoves);
+      }
+    },
+    removeDuplicates() {
+      const res = [];
+      for (let i = 0; i < this.checks.length; i++) {
+        const element = this.checks[i];
+        res.push(...element);
+      }
+      this.checks = [];
+      let unique = [...new Set(res)];
+      this.checks.push(unique);
     },
   },
   computed: {},
@@ -886,6 +1146,14 @@ export default {
   mounted() {
     this.placePieces();
   },
+  // watch: {
+  //   moves(old, ne) {
+  //     console.log("moves: " + ne);
+  //   },
+  //   checks(old, ne) {
+  //     console.log("checks: " + ne);
+  //   },
+  // },
 };
 </script>
 
@@ -943,5 +1211,8 @@ img {
   background: rgba(255, 74, 74, 0.5);
   border-radius: 50%;
   z-index: 0;
+}
+.kingDanger {
+  background-color: red;
 }
 </style>
