@@ -23,10 +23,11 @@ export default {
       color: "",
       class: ["square", "whiteS"],
       moves: [],
-      checks: [],
-      whiteToPlay: true,
-      takenPieces_images: [],
+      similar: [],
       recorded_moves: [],
+      white_moves: [],
+      black_moves: [],
+      whiteToPlay: true,
       checkmate_moves: [],
       white_king_checked: false,
       black_king_checked: false,
@@ -122,8 +123,6 @@ export default {
           });
         });
 
-        this.moves = [];
-
         let self = this;
         let currentDroppable = null;
         let shiftX = event.clientX - piece.getBoundingClientRect().left;
@@ -180,7 +179,6 @@ export default {
                         self.whiteToPlay = false;
                         const toRecord = `${piece.alt},${currentDroppable.id}`;
                         self.recorded_moves.push(toRecord);
-
                         document.removeEventListener("mousemove", onMouseMove);
                         piece.onmouseup = null;
                         piece.style.width = "62px";
@@ -194,11 +192,36 @@ export default {
                         piece.style.left = "0px";
                         currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
+                        get_moves();
+                        let currentSquare = currentDroppable;
+                        let currentPiece = currentDroppable.firstElementChild;
+                        let new_piece = self.selected_piece(
+                          currentPiece,
+                          currentSquare
+                        );
+
+                        self.available_moves(new_piece);
+
+                        self.get_similar();
+
+                        squares.forEach((s) => {
+                          if (s.firstElementChild === null) {
+                            return;
+                          }
+
+                          self.moves[0].forEach((e) => {
+                            if (
+                              s.firstElementChild.alt === "bK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                            }
+                          });
+                        });
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
-                        check_for_checks();
                       } else {
                         self.whiteToPlay = false;
                         const take = currentDroppable.firstChild;
@@ -218,21 +241,36 @@ export default {
                         piece.style.left = "0px";
                         currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
-                        squares.forEach((s) => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
+                        let currentSquare = currentDroppable;
+                        let currentPiece = currentDroppable.firstElementChild;
+                        let new_piece = self.selected_piece(
+                          currentPiece,
+                          currentSquare
+                        );
 
+                        self.available_moves(new_piece);
+
+                        self.get_similar();
+
+                        squares.forEach((s) => {
                           if (s.firstElementChild === null) {
                             return;
                           }
-                          if (
-                            s.firstElementChild.alt == "wK" ||
-                            s.firstElementChild.alt == "bK"
-                          ) {
-                            s.classList.add("kingDanger");
-                          }
+
+                          self.moves[0].forEach((e) => {
+                            if (
+                              s.firstElementChild.alt === "bK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                            }
+                          });
                         });
-                        check_for_checks();
+                        squares.forEach((s) => {
+                          s.classList.remove("mark");
+                          s.classList.remove("target");
+                        });
+                        get_moves();
                       }
                     } else {
                       document.removeEventListener("mousemove", onMouseMove);
@@ -267,11 +305,36 @@ export default {
                         piece.style.left = "0px";
                         currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
+                        let currentSquare = currentDroppable;
+                        let currentPiece = currentDroppable.firstElementChild;
+                        let new_piece = self.selected_piece(
+                          currentPiece,
+                          currentSquare
+                        );
+
+                        self.available_moves(new_piece);
+
+                        self.get_similar();
+
+                        squares.forEach((s) => {
+                          if (s.firstElementChild === null) {
+                            return;
+                          }
+
+                          self.moves[0].forEach((e) => {
+                            if (
+                              s.firstElementChild.alt === "wK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                            }
+                          });
+                        });
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
-                        check_for_checks();
+                        get_moves();
                       } else {
                         self.whiteToPlay = true;
                         const take = currentDroppable.firstChild;
@@ -292,11 +355,36 @@ export default {
                         piece.style.left = "0px";
                         currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
+                        let currentSquare = currentDroppable;
+                        let currentPiece = currentDroppable.firstElementChild;
+                        let new_piece = self.selected_piece(
+                          currentPiece,
+                          currentSquare
+                        );
+
+                        self.available_moves(new_piece);
+
+                        self.get_similar();
+
+                        squares.forEach((s) => {
+                          if (s.firstElementChild === null) {
+                            return;
+                          }
+
+                          self.moves[0].forEach((e) => {
+                            if (
+                              s.firstElementChild.alt === "wK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                            }
+                          });
+                        });
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
-                        check_for_checks();
+                        get_moves();
                       }
                     } else {
                       document.removeEventListener("mousemove", onMouseMove);
@@ -318,7 +406,6 @@ export default {
 
         document.addEventListener("mousemove", onMouseMove);
         piece.onmouseup = function() {
-          this.moves = [];
           document.removeEventListener("mousemove", onMouseMove);
           piece.style.zIndex = 1;
           piece.onmouseup = null;
@@ -343,8 +430,9 @@ export default {
         };
       }
       let self = this;
-      function check_for_checks() {
-        self.checks = [];
+      function get_moves() {
+        self.white_moves = [];
+        self.black_moves = [];
         let check = true;
         const forbiden = [
           "a1",
@@ -380,97 +468,55 @@ export default {
           "g8",
           "h8",
         ];
-        if (piece.alt.charAt(0) == "w") {
-          squares.forEach((square) => {
-            if (square.firstElementChild === null) {
-              return;
-            }
-            if (square.firstElementChild.alt.charAt(0) == "w") {
-              let selected_piece_position = square.firstElementChild.id;
-              let selected_piece_initial = square.firstElementChild.alt;
-              let selectedPiece = {
-                selected_piece_initial,
-                selected_piece_position,
-              };
-              if (selectedPiece.selected_piece_initial === "wP") {
-                self.get_white_pawn_moves(selectedPiece, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wK" ||
-                selectedPiece.selected_piece_initial === "bK"
-              ) {
-                self.get_knight_moves(selectedPiece, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wB" ||
-                selectedPiece.selected_piece_initial === "bB"
-              ) {
-                self.get_bishop_moves(selectedPiece, forbiden, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wR" ||
-                selectedPiece.selected_piece_initial === "bR"
-              ) {
-                self.get_rook_moves(selectedPiece, forbiden, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wQ" ||
-                selectedPiece.selected_piece_initial === "bQ"
-              ) {
-                self.get_queen_moves(selectedPiece, forbiden, check);
-              }
-              if (selectedPiece.selected_piece_initial === "wK") {
-                self.get_white_king_moves(selectedPiece, check);
-              }
-            }
-          });
-        } else {
-          squares.forEach((square) => {
-            if (square.firstElementChild === null) {
-              return;
-            }
-            if (square.firstElementChild.alt.charAt(0) == "b") {
-              let selected_piece_position = square.firstElementChild.id;
-              let selected_piece_initial = square.firstElementChild.alt;
-              let selectedPiece = {
-                selected_piece_initial,
-                selected_piece_position,
-              };
+        squares.forEach((square) => {
+          if (square.firstElementChild === null) {
+            return;
+          }
 
-              if (selectedPiece.selected_piece_initial === "bP") {
-                self.get_black_pawn_moves(selectedPiece, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wN" ||
-                selectedPiece.selected_piece_initial === "bN"
-              ) {
-                self.get_knight_moves(selectedPiece, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wB" ||
-                selectedPiece.selected_piece_initial === "bB"
-              ) {
-                self.get_bishop_moves(selectedPiece, forbiden, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wR" ||
-                selectedPiece.selected_piece_initial === "bR"
-              ) {
-                self.get_rook_moves(selectedPiece, forbiden, check);
-              }
-              if (
-                selectedPiece.selected_piece_initial === "wQ" ||
-                selectedPiece.selected_piece_initial === "bQ"
-              ) {
-                self.get_queen_moves(selectedPiece, forbiden, check);
-              }
+          let selected_piece_position = square.firstElementChild.id;
+          let selected_piece_initial = square.firstElementChild.alt;
+          let selectedPiece = {
+            selected_piece_initial,
+            selected_piece_position,
+          };
+          if (selectedPiece.selected_piece_initial === "wP") {
+            self.get_white_pawn_moves(selectedPiece, check);
+          }
+          if (selectedPiece.selected_piece_initial === "wN") {
+            self.get_knight_moves(selectedPiece, check, "w");
+          }
+          if (selectedPiece.selected_piece_initial === "wB") {
+            self.get_bishop_moves(selectedPiece, forbiden, check, "w");
+          }
+          if (selectedPiece.selected_piece_initial === "wR") {
+            self.get_rook_moves(selectedPiece, forbiden, check, "w");
+          }
+          if (selectedPiece.selected_piece_initial === "wQ") {
+            self.get_queen_moves(selectedPiece, forbiden, check, "w");
+          }
+          if (selectedPiece.selected_piece_initial === "wK") {
+            self.get_white_king_moves(selectedPiece, check);
+          }
+          if (selectedPiece.selected_piece_initial === "bP") {
+            self.get_black_pawn_moves(selectedPiece, check);
+          }
+          if (selectedPiece.selected_piece_initial === "bN") {
+            self.get_knight_moves(selectedPiece, check, "b");
+          }
+          if (selectedPiece.selected_piece_initial === "bB") {
+            self.get_bishop_moves(selectedPiece, forbiden, check, "b");
+          }
+          if (selectedPiece.selected_piece_initial === "bR") {
+            self.get_rook_moves(selectedPiece, forbiden, check, "b");
+          }
+          if (selectedPiece.selected_piece_initial === "bQ") {
+            self.get_queen_moves(selectedPiece, forbiden, check, "b");
+          }
+          if (selectedPiece.selected_piece_initial === "bK") {
+            self.get_black_king_moves(selectedPiece, check, "b");
+          }
+        });
 
-              if (selectedPiece.selected_piece_initial === "bK") {
-                self.get_black_king_moves(selectedPiece, check);
-              }
-            }
-          });
-        }
         self.removeDuplicates();
       }
     },
@@ -628,7 +674,7 @@ export default {
           if (!check) {
             this.moves.push(finalMoves);
           } else {
-            this.checks.push(finalMoves);
+            this.white_moves.push(finalMoves);
           }
         }
       }
@@ -702,12 +748,12 @@ export default {
           if (!check) {
             this.moves.push(finalMoves);
           } else {
-            this.checks.push(finalMoves);
+            this.black_moves.push(finalMoves);
           }
         }
       }
     },
-    get_knight_moves(selectedPiece, check) {
+    get_knight_moves(selectedPiece, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
@@ -746,13 +792,16 @@ export default {
           }
           if (!check) {
             this.moves.push(finalMoves);
+          }
+          if (color === "b") {
+            this.black_moves.push(finalMoves);
           } else {
-            this.checks.push(finalMoves);
+            this.white_moves.push(finalMoves);
           }
         }
       }
     },
-    get_bishop_moves(selectedPiece, forbiden, check) {
+    get_bishop_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
@@ -826,11 +875,14 @@ export default {
       diagonal();
       if (!check) {
         this.moves.push(finalMoves);
+      }
+      if (color === "b") {
+        this.black_moves.push(finalMoves);
       } else {
-        this.checks.push(finalMoves);
+        this.white_moves.push(finalMoves);
       }
     },
-    get_rook_moves(selectedPiece, forbiden, check) {
+    get_rook_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
@@ -898,11 +950,14 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
+      }
+      if (color === "b") {
+        this.black_moves.push(finalMoves);
       } else {
-        this.checks.push(finalMoves);
+        this.white_moves.push(finalMoves);
       }
     },
-    get_queen_moves(selectedPiece, forbiden, check) {
+    get_queen_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
@@ -1035,8 +1090,11 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
+      }
+      if (color === "b") {
+        this.black_moves.push(finalMoves);
       } else {
-        this.checks.push(finalMoves);
+        this.white_moves.push(finalMoves);
       }
     },
     get_white_king_moves(selectedPiece, check) {
@@ -1080,7 +1138,7 @@ export default {
       if (!check) {
         this.moves.push(finalMoves);
       } else {
-        this.checks.push(finalMoves);
+        this.white_moves.push(finalMoves);
       }
     },
     get_black_king_moves(selectedPiece, check) {
@@ -1124,18 +1182,34 @@ export default {
       if (!check) {
         this.moves.push(finalMoves);
       } else {
-        this.checks.push(finalMoves);
+        this.black_moves.push(finalMoves);
       }
     },
     removeDuplicates() {
       const res = [];
-      for (let i = 0; i < this.checks.length; i++) {
-        const element = this.checks[i];
+      for (let i = 0; i < this.white_moves.length; i++) {
+        const element = this.white_moves[i];
         res.push(...element);
       }
-      this.checks = [];
+      this.white_moves = [];
       let unique = [...new Set(res)];
-      this.checks.push(unique);
+      this.white_moves.push(unique);
+      ///////////////////////////////////////////
+      const res2 = [];
+      for (let i = 0; i < this.black_moves.length; i++) {
+        const element = this.black_moves[i];
+        res2.push(...element);
+      }
+      this.black_moves = [];
+      let unique2 = [...new Set(res2)];
+      this.black_moves.push(unique2);
+    },
+    get_similar() {
+      this.similar = [];
+      const intersection = this.white_moves[0].filter((element) =>
+        this.black_moves[0].includes(element)
+      );
+      this.similar.push(intersection);
     },
   },
   computed: {},
