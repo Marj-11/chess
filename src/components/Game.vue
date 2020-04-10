@@ -171,12 +171,19 @@ export default {
 
             if (currentDroppable) {
               if (currentDroppable.classList.contains("droppable")) {
-                if (piece.classList[0] === "white" && self.whiteToPlay) {
+                if (
+                  (piece.classList[0] === "white" && self.whiteToPlay) ||
+                  (piece.classList[0] === "black" && !self.whiteToPlay)
+                ) {
                   piece.onmouseup = function(e) {
                     e.preventDefault();
                     if (currentDroppable) {
                       if (!currentDroppable.hasChildNodes()) {
-                        self.whiteToPlay = false;
+                        if (piece.alt.charAt(0) === "b") {
+                          self.whiteToPlay = true;
+                        } else {
+                          self.whiteToPlay = false;
+                        }
                         const toRecord = `${piece.alt},${currentDroppable.id}`;
                         self.recorded_moves.push(toRecord);
                         document.removeEventListener("mousemove", onMouseMove);
@@ -192,7 +199,7 @@ export default {
                         piece.style.left = "0px";
                         currentDroppable.style.boxSizing = "border-box";
                         currentDroppable.style.borderColor = "transparent";
-                        get_moves();
+
                         let currentSquare = currentDroppable;
                         let currentPiece = currentDroppable.firstElementChild;
                         let new_piece = self.selected_piece(
@@ -202,28 +209,47 @@ export default {
 
                         self.available_moves(new_piece);
 
-                        self.get_similar();
+                        // self.get_similar();
 
                         squares.forEach((s) => {
                           if (s.firstElementChild === null) {
                             return;
                           }
-
                           self.moves[0].forEach((e) => {
                             if (
                               s.firstElementChild.alt === "bK" &&
                               s.firstElementChild.id === e
                             ) {
                               s.classList.add("kingDanger");
+                              self.black_king_checked = true;
+                            }
+                            if (
+                              s.firstElementChild.alt === "wK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                              self.white_king_checked = true;
+                              // get_moves();
                             }
                           });
                         });
+                        // get moves when the king is checked
+                        if (self.black_king_checked) {
+                          console.log(self.moves[0]);
+                          get_moves();
+                          console.log(self.white_moves);
+                          console.log(self.black_moves);
+                        }
                         squares.forEach((s) => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
                       } else {
-                        self.whiteToPlay = false;
+                        if (piece.alt.charAt(0) === "b") {
+                          self.whiteToPlay = true;
+                        } else {
+                          self.whiteToPlay = false;
+                        }
                         const take = currentDroppable.firstChild;
                         currentDroppable.removeChild(take);
                         const toRecord = `${piece.alt}x${take.id}`;
@@ -250,7 +276,7 @@ export default {
 
                         self.available_moves(new_piece);
 
-                        self.get_similar();
+                        // self.get_similar();
 
                         squares.forEach((s) => {
                           if (s.firstElementChild === null) {
@@ -259,8 +285,10 @@ export default {
 
                           self.moves[0].forEach((e) => {
                             if (
-                              s.firstElementChild.alt === "bK" &&
-                              s.firstElementChild.id === e
+                              (s.firstElementChild.alt === "bK" &&
+                                s.firstElementChild.id === e) ||
+                              (s.firstElementChild.alt === "wK" &&
+                                s.firstElementChild.id === e)
                             ) {
                               s.classList.add("kingDanger");
                             }
@@ -270,121 +298,6 @@ export default {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
-                        get_moves();
-                      }
-                    } else {
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.style.width = "62px";
-                      piece.style.zIndex = 1;
-                      piece.style.cursor = "grab";
-                      square.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
-                    }
-                  };
-                }
-                if (piece.classList[0] === "black" && !self.whiteToPlay) {
-                  piece.onmouseup = function(e) {
-                    e.preventDefault();
-                    if (currentDroppable) {
-                      if (!currentDroppable.hasChildNodes()) {
-                        self.whiteToPlay = true;
-                        const toRecord = `${piece.alt},${currentDroppable.id}`;
-                        self.recorded_moves.push(toRecord);
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        currentDroppable.style.boxSizing = "border-box";
-                        currentDroppable.style.borderColor = "transparent";
-                        let currentSquare = currentDroppable;
-                        let currentPiece = currentDroppable.firstElementChild;
-                        let new_piece = self.selected_piece(
-                          currentPiece,
-                          currentSquare
-                        );
-
-                        self.available_moves(new_piece);
-
-                        self.get_similar();
-
-                        squares.forEach((s) => {
-                          if (s.firstElementChild === null) {
-                            return;
-                          }
-
-                          self.moves[0].forEach((e) => {
-                            if (
-                              s.firstElementChild.alt === "wK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                            }
-                          });
-                        });
-                        squares.forEach((s) => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
-                        get_moves();
-                      } else {
-                        self.whiteToPlay = true;
-                        const take = currentDroppable.firstChild;
-                        currentDroppable.removeChild(take);
-                        const toRecord = `${piece.alt}x${take.id}`;
-                        self.recorded_moves.push(toRecord);
-
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        currentDroppable.style.boxSizing = "border-box";
-                        currentDroppable.style.borderColor = "transparent";
-                        let currentSquare = currentDroppable;
-                        let currentPiece = currentDroppable.firstElementChild;
-                        let new_piece = self.selected_piece(
-                          currentPiece,
-                          currentSquare
-                        );
-
-                        self.available_moves(new_piece);
-
-                        self.get_similar();
-
-                        squares.forEach((s) => {
-                          if (s.firstElementChild === null) {
-                            return;
-                          }
-
-                          self.moves[0].forEach((e) => {
-                            if (
-                              s.firstElementChild.alt === "wK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                            }
-                          });
-                        });
-                        squares.forEach((s) => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
-                        get_moves();
                       }
                     } else {
                       document.removeEventListener("mousemove", onMouseMove);
@@ -416,7 +329,6 @@ export default {
           piece.style.top = "0px";
           piece.style.left = "0px";
         };
-
         function enterDroppable(elem) {
           elem.style.borderColor = "white";
         }
@@ -517,7 +429,7 @@ export default {
           }
         });
 
-        self.removeDuplicates();
+        // self.removeDuplicates();
       }
     },
 
@@ -528,12 +440,16 @@ export default {
     selected_piece(new_piece, position_square) {
       let selected_piece_position = position_square.id;
       let selected_piece_initial = new_piece.alt;
-      return {selected_piece_initial, selected_piece_position};
+      return {
+        selected_piece_initial,
+        selected_piece_position,
+      };
     },
 
     available_moves(selectedPiece) {
       let check = false;
       const squares = document.querySelectorAll(".square");
+
       const forbiden = [
         "a1",
         "a2",
@@ -606,7 +522,9 @@ export default {
       }
     },
     get_white_pawn_moves(selectedPiece, check) {
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const squares = document.querySelectorAll(".square");
       const forward = +1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
@@ -628,6 +546,7 @@ export default {
           };
 
           const finalMoves = [];
+
           squares.forEach((square) => {
             if (square.id === fields.r) {
               if (square.firstElementChild) {
@@ -656,9 +575,7 @@ export default {
                 const letter = square.id.substring(0, 1);
                 const strigifiedNumber = numberMinusOne.toString();
                 const madeUpId = letter + strigifiedNumber;
-                if (square.firstElementChild) {
-                  finalMoves.push(fields.of);
-                } else {
+                if (!square.firstElementChild) {
                   finalMoves.push(fields.tf);
                   squares.forEach((s) => {
                     if (s.id === madeUpId) {
@@ -674,13 +591,18 @@ export default {
           if (!check) {
             this.moves.push(finalMoves);
           } else {
-            this.white_moves.push(finalMoves);
+            this.moves = [];
+            const piece = selectedPiece.selected_piece_position;
+            this.white_moves.push({ piece, finalMoves });
+            this.moves.push(finalMoves);
           }
         }
       }
     },
     get_black_pawn_moves(selectedPiece, check) {
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const squares = document.querySelectorAll(".square");
       const forward = -1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
@@ -748,7 +670,10 @@ export default {
           if (!check) {
             this.moves.push(finalMoves);
           } else {
-            this.black_moves.push(finalMoves);
+            this.moves = [];
+            const piece = selectedPiece.selected_piece_position;
+            this.black_moves.push({ piece, finalMoves });
+            this.moves.push(finalMoves);
           }
         }
       }
@@ -757,7 +682,9 @@ export default {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -792,11 +719,16 @@ export default {
           }
           if (!check) {
             this.moves.push(finalMoves);
-          }
-          if (color === "b") {
-            this.black_moves.push(finalMoves);
+          } else if (color === "b") {
+            this.moves = [];
+            const piece = selectedPiece.selected_piece_position;
+            this.black_moves.push({ piece, finalMoves });
+            this.moves.push(finalMoves);
           } else {
-            this.white_moves.push(finalMoves);
+            this.moves = [];
+            const piece = selectedPiece.selected_piece_position;
+            this.white_moves.push({ piece, finalMoves });
+            this.moves.push(finalMoves);
           }
         }
       }
@@ -805,7 +737,9 @@ export default {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
@@ -875,18 +809,25 @@ export default {
       diagonal();
       if (!check) {
         this.moves.push(finalMoves);
-      }
-      if (color === "b") {
-        this.black_moves.push(finalMoves);
+      } else if (color === "b") {
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.black_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       } else {
-        this.white_moves.push(finalMoves);
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.white_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       }
     },
     get_rook_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
@@ -950,18 +891,25 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
-      }
-      if (color === "b") {
-        this.black_moves.push(finalMoves);
+      } else if (color === "b") {
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.black_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       } else {
-        this.white_moves.push(finalMoves);
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.white_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       }
     },
     get_queen_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll(".square");
       const colorClass =
         selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
-      this.moves = [];
+      if (!check) {
+        this.moves = [];
+      }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
@@ -1090,11 +1038,16 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
-      }
-      if (color === "b") {
-        this.black_moves.push(finalMoves);
+      } else if (color === "b") {
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.black_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       } else {
-        this.white_moves.push(finalMoves);
+        this.moves = [];
+        const piece = selectedPiece.selected_piece_position;
+        this.white_moves.push({ piece, finalMoves });
+        this.moves.push(finalMoves);
       }
     },
     get_white_king_moves(selectedPiece, check) {
@@ -1137,8 +1090,6 @@ export default {
       }
       if (!check) {
         this.moves.push(finalMoves);
-      } else {
-        this.white_moves.push(finalMoves);
       }
     },
     get_black_king_moves(selectedPiece, check) {
@@ -1181,8 +1132,6 @@ export default {
       }
       if (!check) {
         this.moves.push(finalMoves);
-      } else {
-        this.black_moves.push(finalMoves);
       }
     },
     removeDuplicates() {
