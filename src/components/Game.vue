@@ -32,7 +32,7 @@ export default {
       white_king_checked: false,
       black_king_checked: false,
       white_checkmate: false,
-      black_checkmate: false,
+      black_checkmate: false
     };
   },
   methods: {
@@ -45,7 +45,7 @@ export default {
           const object = {
             id: this.y[field - 1] + this.x[row],
             color: this.color,
-            class: this.class,
+            class: this.class
           };
           this.fields.push(object);
         }
@@ -55,10 +55,10 @@ export default {
     placePieces() {
       const squares = document.querySelectorAll(".square");
       const entries = Object.values(pieces);
-      squares.forEach((square) => {
+      squares.forEach(square => {
         square.onmousedown = this.mouseDown;
         let img = new Image();
-        entries.forEach((piece) => {
+        entries.forEach(piece => {
           if (square.id === piece.position) {
             img.src = this.imageUrl + piece.imageUrl;
             img.alt = piece.imageUrl.substring(0, 2);
@@ -76,11 +76,11 @@ export default {
     /////////////////////////////////////////////MOUSE DOWN////////////////////////////////////////////////////////////
     mouseDown(event) {
       const chess = document.querySelector(".chessboard");
-      chess.addEventListener("contextmenu", (event) => event.preventDefault());
+      chess.addEventListener("contextmenu", event => event.preventDefault());
       event.preventDefault();
       const squares = document.querySelectorAll(".square");
 
-      squares.forEach((s) => {
+      squares.forEach(s => {
         s.classList.remove("droppable");
         s.classList.remove("mark");
         s.classList.remove("target");
@@ -100,8 +100,9 @@ export default {
         piece.style.zIndex = 2;
         piece.style.cursor = "grabbing";
         piece.style.position = "absolute";
-        this.moves[0].forEach((allowed) => {
-          squares.forEach((s) => {
+
+        this.moves[0].forEach(allowed => {
+          squares.forEach(s => {
             if (piece.classList[0] === "white" && this.whiteToPlay) {
               if (allowed === s.id) {
                 s.classList.add("droppable");
@@ -169,6 +170,8 @@ export default {
             }
             currentDroppable = droppableBelow;
 
+            enterDroppable(currentDroppable);
+
             if (currentDroppable) {
               if (currentDroppable.classList.contains("droppable")) {
                 if (
@@ -184,8 +187,6 @@ export default {
                         } else {
                           self.whiteToPlay = false;
                         }
-                        const toRecord = `${piece.alt},${currentDroppable.id}`;
-                        self.recorded_moves.push(toRecord);
                         document.removeEventListener("mousemove", onMouseMove);
                         piece.onmouseup = null;
                         piece.style.width = "62px";
@@ -209,13 +210,11 @@ export default {
 
                         self.available_moves(new_piece);
 
-                        // self.get_similar();
-
-                        squares.forEach((s) => {
+                        squares.forEach(s => {
                           if (s.firstElementChild === null) {
                             return;
                           }
-                          self.moves[0].forEach((e) => {
+                          self.moves[0].forEach(e => {
                             if (
                               s.firstElementChild.alt === "bK" &&
                               s.firstElementChild.id === e
@@ -229,26 +228,21 @@ export default {
                             ) {
                               s.classList.add("kingDanger");
                               self.white_king_checked = true;
-                              // get_moves();
                             }
                           });
                         });
-                        // get moves when the king is checked
-                        if (self.black_king_checked) {
-                          console.log(self.moves[0]);
-                          get_moves();
-                          console.log(self.white_moves);
-                          console.log(self.black_moves);
-                        }
-                        squares.forEach((s) => {
+                        squares.forEach(s => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
+                        // take and check for checkes.....................................
                       } else {
                         if (piece.alt.charAt(0) === "b") {
                           self.whiteToPlay = true;
                         } else {
                           self.whiteToPlay = false;
+                        }
+                        if (!self.white_king_checked) {
                         }
                         const take = currentDroppable.firstChild;
                         currentDroppable.removeChild(take);
@@ -275,26 +269,29 @@ export default {
                         );
 
                         self.available_moves(new_piece);
-
-                        // self.get_similar();
-
-                        squares.forEach((s) => {
+                        squares.forEach(s => {
                           if (s.firstElementChild === null) {
                             return;
                           }
-
-                          self.moves[0].forEach((e) => {
+                          self.moves[0].forEach(e => {
                             if (
-                              (s.firstElementChild.alt === "bK" &&
-                                s.firstElementChild.id === e) ||
-                              (s.firstElementChild.alt === "wK" &&
-                                s.firstElementChild.id === e)
+                              s.firstElementChild.alt === "bK" &&
+                              s.firstElementChild.id === e
                             ) {
                               s.classList.add("kingDanger");
+                              self.black_king_checked = true;
+                            }
+                            if (
+                              s.firstElementChild.alt === "wK" &&
+                              s.firstElementChild.id === e
+                            ) {
+                              s.classList.add("kingDanger");
+                              self.white_king_checked = true;
+                              // get_moves();
                             }
                           });
                         });
-                        squares.forEach((s) => {
+                        squares.forEach(s => {
                           s.classList.remove("mark");
                           s.classList.remove("target");
                         });
@@ -312,7 +309,6 @@ export default {
                   };
                 }
               }
-              enterDroppable(currentDroppable);
             }
           }
         }
@@ -330,10 +326,32 @@ export default {
           piece.style.left = "0px";
         };
         function enterDroppable(elem) {
+          elem.append(piece);
+          get_moves();
+          if (piece.alt.charAt(0) === "w") {
+            squares.forEach(square => {
+              if (square.firstElementChild == null) {
+                return;
+              }
+              if (square.firstElementChild.alt === "wK") {
+                self.black_moves.forEach(piece_moves => {
+                  const arr = piece_moves.finalMoves;
+                  arr.forEach(a => {
+                    if (a === square.id) {
+                      console.log("King is checked!");
+                    }
+                  });
+                });
+              }
+            });
+          }
+
           elem.style.borderColor = "white";
         }
 
         function leaveDroppable(elem) {
+          elem.removeChild(piece);
+
           elem.style.borderColor = "transparent";
         }
 
@@ -378,9 +396,9 @@ export default {
           "e8",
           "f8",
           "g8",
-          "h8",
+          "h8"
         ];
-        squares.forEach((square) => {
+        squares.forEach(square => {
           if (square.firstElementChild === null) {
             return;
           }
@@ -389,7 +407,7 @@ export default {
           let selected_piece_initial = square.firstElementChild.alt;
           let selectedPiece = {
             selected_piece_initial,
-            selected_piece_position,
+            selected_piece_position
           };
           if (selectedPiece.selected_piece_initial === "wP") {
             self.get_white_pawn_moves(selectedPiece, check);
@@ -442,7 +460,7 @@ export default {
       let selected_piece_initial = new_piece.alt;
       return {
         selected_piece_initial,
-        selected_piece_position,
+        selected_piece_position
       };
     },
 
@@ -482,7 +500,7 @@ export default {
         "e8",
         "f8",
         "g8",
-        "h8",
+        "h8"
       ];
       if (selectedPiece.selected_piece_initial === "wP") {
         this.get_white_pawn_moves(selectedPiece, check);
@@ -542,12 +560,12 @@ export default {
             l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
             r: letterRight.substring(0, 2) == "un" ? null : letterRight,
             of: oneForward.substring(1, 2) == "9" ? null : oneForward,
-            tf: twoForward.substring(1, 2) == "9" ? null : twoForward,
+            tf: twoForward.substring(1, 2) == "9" ? null : twoForward
           };
 
           const finalMoves = [];
 
-          squares.forEach((square) => {
+          squares.forEach(square => {
             if (square.id === fields.r) {
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === "black") {
@@ -577,7 +595,7 @@ export default {
                 const madeUpId = letter + strigifiedNumber;
                 if (!square.firstElementChild) {
                   finalMoves.push(fields.tf);
-                  squares.forEach((s) => {
+                  squares.forEach(s => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
                         finalMoves.pop();
@@ -620,10 +638,10 @@ export default {
             l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
             r: letterRight.substring(0, 2) == "un" ? null : letterRight,
             of: oneForward.substring(1, 2) == "0" ? null : oneForward,
-            tf: twoForward.substring(1, 2) == "0" ? null : twoForward,
+            tf: twoForward.substring(1, 2) == "0" ? null : twoForward
           };
           const finalMoves = [];
-          squares.forEach((square) => {
+          squares.forEach(square => {
             if (square.id === fields.r) {
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === "white") {
@@ -656,7 +674,7 @@ export default {
                   finalMoves.push(fields.of);
                 } else {
                   finalMoves.push(fields.tf);
-                  squares.forEach((s) => {
+                  squares.forEach(s => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
                         finalMoves.pop();
@@ -699,13 +717,13 @@ export default {
             five: `${letters[i + 1]}${num - 2}`,
             six: `${letters[i + 2]}${num - 1}`,
             seven: `${letters[i + 2]}${num + 1}`,
-            eight: `${letters[i + 1]}${num + 2}`,
+            eight: `${letters[i + 1]}${num + 2}`
           };
           const finalMoves = [];
           const obj = Object.values(fields);
           for (let i = 0; i < obj.length; i++) {
             const element = obj[i];
-            squares.forEach((square) => {
+            squares.forEach(square => {
               if (square.id === element) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === colorClass) {
@@ -754,10 +772,10 @@ export default {
               one: `${letters[i + m]}${num - m}`,
               two: `${letters[i + m]}${num + m}`,
               three: `${letters[i - m]}${num + m}`,
-              four: `${letters[i - m]}${num - m}`,
+              four: `${letters[i - m]}${num - m}`
             };
             m++;
-            squares.forEach((square) => {
+            squares.forEach(square => {
               const obj = objects[Object.keys(objects)[objectNumber]];
 
               if (obj == undefined) {
@@ -790,7 +808,7 @@ export default {
                       diagonal();
                     }
                   } else {
-                    forbiden.forEach((forbid) => {
+                    forbiden.forEach(forbid => {
                       if (obj === forbid) {
                         objectNumber++;
                         m = 1;
@@ -842,10 +860,10 @@ export default {
               one: `${letters[i + m]}${num}`,
               two: `${letter}${num + m}`,
               three: `${letters[i - m]}${num}`,
-              four: `${letter}${num - m}`,
+              four: `${letter}${num - m}`
             };
             m++;
-            squares.forEach((square) => {
+            squares.forEach(square => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
                 return obj == "undefined";
@@ -926,10 +944,10 @@ export default {
               one: `${letters[i + m]}${num - m}`,
               two: `${letters[i + m]}${num + m}`,
               three: `${letters[i - m]}${num + m}`,
-              four: `${letters[i - m]}${num - m}`,
+              four: `${letters[i - m]}${num - m}`
             };
             m++;
-            squares.forEach((square) => {
+            squares.forEach(square => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
                 return obj == "undefined";
@@ -962,7 +980,7 @@ export default {
                       diagonal();
                     }
                   } else {
-                    forbiden.forEach((forbid) => {
+                    forbiden.forEach(forbid => {
                       if (obj === forbid) {
                         objectNumber++;
                         m = 1;
@@ -989,10 +1007,10 @@ export default {
               one: `${letters[i + n]}${num}`,
               two: `${letter}${num + n}`,
               three: `${letters[i - n]}${num}`,
-              four: `${letter}${num - n}`,
+              four: `${letter}${num - n}`
             };
             n++;
-            squares.forEach((square) => {
+            squares.forEach(square => {
               const obj = objects[Object.keys(objects)[objectNumberStraight]];
               if (obj == undefined) {
                 return obj == "undefined";
@@ -1070,11 +1088,11 @@ export default {
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
-            downLeft: `${letters[i - 1]}${num - 1}`,
+            downLeft: `${letters[i - 1]}${num - 1}`
           };
           const objects = Object.values(fields);
-          objects.forEach((obj) => {
-            squares.forEach((square) => {
+          objects.forEach(obj => {
+            squares.forEach(square => {
               if (square.id === obj) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === "black") {
@@ -1112,11 +1130,11 @@ export default {
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
-            downLeft: `${letters[i - 1]}${num - 1}`,
+            downLeft: `${letters[i - 1]}${num - 1}`
           };
           const objects = Object.values(fields);
-          objects.forEach((obj) => {
-            squares.forEach((square) => {
+          objects.forEach(obj => {
+            squares.forEach(square => {
               if (square.id === obj) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === "white") {
@@ -1155,11 +1173,11 @@ export default {
     },
     get_similar() {
       this.similar = [];
-      const intersection = this.white_moves[0].filter((element) =>
+      const intersection = this.white_moves[0].filter(element =>
         this.black_moves[0].includes(element)
       );
       this.similar.push(intersection);
-    },
+    }
   },
   computed: {},
 
@@ -1168,7 +1186,7 @@ export default {
   },
   mounted() {
     this.placePieces();
-  },
+  }
   // watch: {
   //   moves(old, ne) {
   //     console.log("moves: " + ne);
