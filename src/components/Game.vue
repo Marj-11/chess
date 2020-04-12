@@ -23,6 +23,7 @@ export default {
       color: "",
       class: ["square", "whiteS"],
       moves: [],
+      count: 0,
       similar: [],
       recorded_moves: [],
       white_moves: [],
@@ -73,13 +74,30 @@ export default {
       });
     },
 
-    /////////////////////////////////////////////MOUSE DOWN////////////////////////////////////////////////////////////
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //###################### mouse down ####################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
     mouseDown(event) {
       const chess = document.querySelector(".chessboard");
       chess.addEventListener("contextmenu", event => event.preventDefault());
       event.preventDefault();
       const squares = document.querySelectorAll(".square");
-
       squares.forEach(s => {
         s.classList.remove("droppable");
         s.classList.remove("mark");
@@ -87,20 +105,17 @@ export default {
       });
 
       const square = event.path[1];
-
       let piece = square.firstElementChild;
       if (piece.tagName == "DIV") {
         return;
       }
       if (event.button == 0) {
         let new_piece = this.selected_piece(piece, square);
-
         this.available_moves(new_piece);
         piece.style.width = "70px";
         piece.style.zIndex = 2;
         piece.style.cursor = "grabbing";
         piece.style.position = "absolute";
-
         this.moves[0].forEach(allowed => {
           squares.forEach(s => {
             if (piece.classList[0] === "white" && this.whiteToPlay) {
@@ -124,6 +139,12 @@ export default {
           });
         });
 
+        //######################################################
+        //######################################################
+        //###################### mouse event ###################
+        //######################################################
+        //######################################################
+        //######################################################
         let self = this;
         let currentDroppable = null;
         let shiftX = event.clientX - piece.getBoundingClientRect().left;
@@ -149,20 +170,27 @@ export default {
             piece.style.width = "62px";
             piece.style.cursor = "grab";
             square.style.display = "flex";
+            piece.setAttribute("id", square.id);
+            square.appendChild(piece);
             square.style.justifyContent = "center";
             square.style.position = "relative";
             piece.style.position = "absolute";
             piece.style.top = "0px";
             piece.style.left = "0px";
           }
-
           piece.hidden = true;
           let elemBelow = document.elementFromPoint(
             event.clientX,
             event.clientY
           );
-
           piece.hidden = false;
+          //######################################################
+          //######################################################
+          //######################################################
+          //################# mouse event ends ###################
+          //######################################################
+          //######################################################
+          //######################################################
           let droppableBelow = elemBelow.closest(".droppable");
           if (currentDroppable != droppableBelow) {
             if (currentDroppable) {
@@ -170,132 +198,202 @@ export default {
             }
             currentDroppable = droppableBelow;
 
-            enterDroppable(currentDroppable);
+            if (currentDroppable !== null) {
+              if (currentDroppable.hasChildNodes()) {
+                piece.onmouseup = function(e) {
+                  e.preventDefault();
+                  const take = currentDroppable.firstChild;
+                  currentDroppable.removeChild(take);
+                  document.removeEventListener("mousemove", onMouseMove);
+                  piece.onmouseup = null;
+                  piece.style.width = "62px";
+                  piece.style.cursor = "grab";
+                  piece.style.zIndex = 1;
+                  piece.setAttribute("id", currentDroppable.id);
+                  currentDroppable.appendChild(piece);
+                  currentDroppable.style.position = "relative";
+                  piece.style.position = "absolute";
+                  piece.style.top = "0px";
+                  piece.style.left = "0px";
+                  currentDroppable.style.boxSizing = "border-box";
+                  currentDroppable.style.borderColor = "transparent";
+                };
+              } else {
+                currentDroppable.appendChild(piece);
+              }
+            } else {
+              piece.onmouseup = function(e) {
+                e.preventDefault();
 
+                squares.forEach(s => {
+                  if (s.firstElementChild === null) {
+                    return;
+                  }
+                });
+                document.removeEventListener("mousemove", onMouseMove);
+                piece.onmouseup = null;
+                piece.style.width = "62px";
+                piece.style.cursor = "grab";
+                piece.style.zIndex = 1;
+                piece.setAttribute("id", square.id);
+                square.appendChild(piece);
+                square.style.position = "relative";
+                piece.style.position = "absolute";
+                piece.style.top = "0px";
+                piece.style.left = "0px";
+                square.style.boxSizing = "border-box";
+                square.style.borderColor = "transparent";
+              };
+            }
             if (currentDroppable) {
-              if (currentDroppable.classList.contains("droppable")) {
-                if (
-                  (piece.classList[0] === "white" && self.whiteToPlay) ||
-                  (piece.classList[0] === "black" && !self.whiteToPlay)
-                ) {
+              if (
+                (piece.classList[0] === "white" && self.whiteToPlay) ||
+                (piece.classList[0] === "black" && !self.whiteToPlay)
+              ) {
+                //...............................................
+                // if (currentDroppable !== null) {
+
+                get_moves();
+                if (piece.alt.charAt(0) === "w") {
+                  squares.forEach(square => {
+                    if (square.firstElementChild == null) {
+                      return;
+                    }
+                    if (square.firstElementChild.alt === "wK") {
+                      self.black_moves.forEach(piece_moves => {
+                        const arr = piece_moves.finalMoves;
+                        arr.forEach(a => {
+                          if (a === square.id) {
+                            self.count++;
+                          }
+                        });
+                      });
+                    }
+                  });
+                }
+                if (self.count > 0) {
+                  self.white_king_checked = true;
+                  self.count = 0;
+                } else {
+                  self.white_king_checked = false;
+                }
+
+                //...............................................
+                if (self.white_king_checked) {
+                  if (currentDroppable) {
+                    squares.forEach(s => {
+                      if (s.firstElementChild === null) {
+                        return;
+                      }
+                      if (s.firstElementChild.alt === "wK") {
+                        s.classList.add("kingDanger");
+                      }
+                    });
+                    piece.onmouseup = function(e) {
+                      e.preventDefault();
+                      if (square.hasChildNodes()) {
+                        const take = square.firstChild;
+                        square.removeChild(take);
+                      }
+                      // squares.forEach(s => {
+                      //   if (s.firstElementChild === null) {
+                      //     return;
+                      //   }
+                      //   if (s.firstElementChild.alt === "wK") {
+                      //     s.classList.remove("kingDanger");
+                      //     self.white_king_checked = true;
+                      //   }
+                      // });
+                      document.removeEventListener("mousemove", onMouseMove);
+                      piece.onmouseup = null;
+                      piece.style.width = "62px";
+                      piece.style.cursor = "grab";
+                      piece.style.zIndex = 1;
+                      piece.setAttribute("id", currentDroppable.id);
+                      square.appendChild(piece);
+                      square.style.position = "relative";
+                      piece.style.position = "absolute";
+                      piece.style.top = "0px";
+                      piece.style.left = "0px";
+                      currentDroppable.style.boxSizing = "border-box";
+                      currentDroppable.style.borderColor = "transparent";
+                    };
+                  } else {
+                    document.removeEventListener("mousemove", onMouseMove);
+                    piece.style.width = "62px";
+                    piece.style.zIndex = 1;
+                    piece.style.cursor = "grab";
+                    square.style.position = "relative";
+                    piece.style.position = "absolute";
+                    piece.style.top = "0px";
+                    piece.style.left = "0px";
+                  }
+                }
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (!self.white_king_checked) {
                   piece.onmouseup = function(e) {
                     e.preventDefault();
+                    squares.forEach(s => {
+                      s.classList.remove("kingDanger");
+                    });
                     if (currentDroppable) {
-                      if (!currentDroppable.hasChildNodes()) {
-                        if (piece.alt.charAt(0) === "b") {
-                          self.whiteToPlay = true;
-                        } else {
-                          self.whiteToPlay = false;
-                        }
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        currentDroppable.style.boxSizing = "border-box";
-                        currentDroppable.style.borderColor = "transparent";
-
-                        let currentSquare = currentDroppable;
-                        let currentPiece = currentDroppable.firstElementChild;
-                        let new_piece = self.selected_piece(
-                          currentPiece,
-                          currentSquare
-                        );
-
-                        self.available_moves(new_piece);
-
-                        squares.forEach(s => {
-                          if (s.firstElementChild === null) {
-                            return;
-                          }
-                          self.moves[0].forEach(e => {
-                            if (
-                              s.firstElementChild.alt === "bK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                              self.black_king_checked = true;
-                            }
-                            if (
-                              s.firstElementChild.alt === "wK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                              self.white_king_checked = true;
-                            }
-                          });
-                        });
-                        squares.forEach(s => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
-                        // take and check for checkes.....................................
+                      if (piece.alt.charAt(0) === "b") {
+                        self.whiteToPlay = true;
                       } else {
-                        if (piece.alt.charAt(0) === "b") {
-                          self.whiteToPlay = true;
-                        } else {
-                          self.whiteToPlay = false;
-                        }
-                        if (!self.white_king_checked) {
-                        }
+                        self.whiteToPlay = false;
+                      }
+                      if (currentDroppable.hasChildNodes()) {
                         const take = currentDroppable.firstChild;
                         currentDroppable.removeChild(take);
-                        const toRecord = `${piece.alt}x${take.id}`;
-                        self.recorded_moves.push(toRecord);
-                        document.removeEventListener("mousemove", onMouseMove);
-                        piece.onmouseup = null;
-                        piece.style.width = "62px";
-                        piece.style.cursor = "grab";
-                        piece.style.zIndex = 1;
-                        piece.setAttribute("id", currentDroppable.id);
-                        currentDroppable.appendChild(piece);
-                        currentDroppable.style.position = "relative";
-                        piece.style.position = "absolute";
-                        piece.style.top = "0px";
-                        piece.style.left = "0px";
-                        currentDroppable.style.boxSizing = "border-box";
-                        currentDroppable.style.borderColor = "transparent";
-                        let currentSquare = currentDroppable;
-                        let currentPiece = currentDroppable.firstElementChild;
-                        let new_piece = self.selected_piece(
-                          currentPiece,
-                          currentSquare
-                        );
-
-                        self.available_moves(new_piece);
-                        squares.forEach(s => {
-                          if (s.firstElementChild === null) {
-                            return;
-                          }
-                          self.moves[0].forEach(e => {
-                            if (
-                              s.firstElementChild.alt === "bK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                              self.black_king_checked = true;
-                            }
-                            if (
-                              s.firstElementChild.alt === "wK" &&
-                              s.firstElementChild.id === e
-                            ) {
-                              s.classList.add("kingDanger");
-                              self.white_king_checked = true;
-                              // get_moves();
-                            }
-                          });
-                        });
-                        squares.forEach(s => {
-                          s.classList.remove("mark");
-                          s.classList.remove("target");
-                        });
                       }
+                      document.removeEventListener("mousemove", onMouseMove);
+                      piece.onmouseup = null;
+                      piece.style.width = "62px";
+                      piece.style.cursor = "grab";
+                      piece.style.zIndex = 1;
+                      piece.setAttribute("id", currentDroppable.id);
+                      currentDroppable.appendChild(piece);
+                      currentDroppable.style.position = "relative";
+                      piece.style.position = "absolute";
+                      piece.style.top = "0px";
+                      piece.style.left = "0px";
+                      currentDroppable.style.boxSizing = "border-box";
+                      currentDroppable.style.borderColor = "transparent";
+
+                      let currentSquare = currentDroppable;
+                      let currentPiece = currentDroppable.firstElementChild;
+                      let new_piece = self.selected_piece(
+                        currentPiece,
+                        currentSquare
+                      );
+
+                      self.available_moves(new_piece);
+
+                      squares.forEach(s => {
+                        if (s.firstElementChild === null) {
+                          return;
+                        }
+                        self.moves[0].forEach(e => {
+                          if (
+                            s.firstElementChild.alt === "bK" &&
+                            s.firstElementChild.id === e
+                          ) {
+                            s.classList.add("kingDanger");
+                            self.black_king_checked = true;
+                          }
+                          if (
+                            s.firstElementChild.alt === "wK" &&
+                            s.firstElementChild.id === e
+                          ) {
+                            s.classList.add("kingDanger");
+                            self.white_king_checked = true;
+                          }
+                        });
+                      });
+                      squares.forEach(s => {
+                        s.classList.remove("mark");
+                        s.classList.remove("target");
+                      });
                     } else {
                       document.removeEventListener("mousemove", onMouseMove);
                       piece.style.width = "62px";
@@ -310,6 +408,7 @@ export default {
                 }
               }
             }
+            enterDroppable(currentDroppable);
           }
         }
 
@@ -325,32 +424,27 @@ export default {
           piece.style.top = "0px";
           piece.style.left = "0px";
         };
+
+        //######################################################
+        //######################################################
+        //######################################################
+        //############## internal functions ####################
+        //######################################################
+        //######################################################
+        //######################################################
         function enterDroppable(elem) {
-          elem.append(piece);
-          get_moves();
-          if (piece.alt.charAt(0) === "w") {
-            squares.forEach(square => {
-              if (square.firstElementChild == null) {
-                return;
-              }
-              if (square.firstElementChild.alt === "wK") {
-                self.black_moves.forEach(piece_moves => {
-                  const arr = piece_moves.finalMoves;
-                  arr.forEach(a => {
-                    if (a === square.id) {
-                      console.log("King is checked!");
-                    }
-                  });
-                });
-              }
-            });
+          if (elem == null) {
+            return;
           }
+          // enterMethod();
 
           elem.style.borderColor = "white";
         }
 
         function leaveDroppable(elem) {
-          elem.removeChild(piece);
+          // if (elem == null) {
+          //   return;
+          // }
 
           elem.style.borderColor = "transparent";
         }
@@ -446,10 +540,30 @@ export default {
             self.get_black_king_moves(selectedPiece, check, "b");
           }
         });
-
-        // self.removeDuplicates();
       }
     },
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //##################end mouse down######################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
+    //######################################################
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1188,12 +1302,17 @@ export default {
     this.placePieces();
   }
   // watch: {
-  //   moves(old, ne) {
-  //     console.log("moves: " + ne);
+  //   white_king_checked(o,n){
+  //         const squares = document.querySelector(".chessboard");
+  //         square.forEach(s=>{
+  //           if (s.firstElementChild.all = ) {
+
+  //           }
+  //         })
   //   },
-  //   checks(old, ne) {
-  //     console.log("checks: " + ne);
-  //   },
+  //   black_king_checked(){
+  //          s.classList.add("kingDanger");
+  //   }
   // },
 };
 </script>
