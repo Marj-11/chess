@@ -10,18 +10,214 @@
 </template>
 
 <script>
-import pieces from "@/components/Pieces";
+// import pieces from '@/services/pieces.js';
 
 export default {
   data() {
     return {
+      entries: [
+        {
+          imageUrl: 'bR.png',
+          start_position: 'a8',
+          new_position: 'a8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bR.png',
+          start_position: 'h8',
+          new_position: 'h8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bN.png',
+          start_position: 'b8',
+          new_position: 'b8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bN.png',
+          start_position: 'g8',
+          new_position: 'g8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bB.png',
+          start_position: 'c8',
+          new_position: 'c8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bB.png',
+          start_position: 'f8',
+          new_position: 'f8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bQ.png',
+          start_position: 'd8',
+          new_position: 'd8',
+          captured: false,
+        },
+        {
+          imageUrl: 'bK.png',
+          start_position: 'e8',
+          new_position: 'e8',
+          black_checkmate: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'a7',
+          new_position: 'a7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'b7',
+          new_position: 'b7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'c7',
+          new_position: 'c7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'd7',
+          new_position: 'd7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'e7',
+          new_position: 'e7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'f7',
+          new_position: 'f7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'g7',
+          new_position: 'g7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bP.png',
+          start_position: 'h7',
+          new_position: 'h7',
+          captured: false,
+        },
+        {
+          imageUrl: 'wR.png',
+          start_position: 'a1',
+          new_position: 'a1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wR.png',
+          start_position: 'h1',
+          new_position: 'h1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wN.png',
+          start_position: 'b1',
+          new_position: 'b1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wN.png',
+          start_position: 'g1',
+          new_position: 'g1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wB.png',
+          start_position: 'c1',
+          new_position: 'c1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wB.png',
+          start_position: 'f1',
+          new_position: 'f1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wQ.png',
+          start_position: 'd1',
+          new_position: 'd1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wK.png',
+          start_position: 'e1',
+          new_position: 'e1',
+          white_checkmate: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'a2',
+          new_position: 'a2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'b2',
+          new_position: 'b2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'c2',
+          new_position: 'c2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'd2',
+          new_position: 'd2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'e2',
+          new_position: 'e2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'f2',
+          new_position: 'f2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'g2',
+          new_position: 'g2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wP.png',
+          start_position: 'h2',
+          new_position: 'h2',
+          captured: false,
+        },
+      ],
+      // imageUrl:
+      //   "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/",
       imageUrl:
-        "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/",
+        'https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/',
       fields: [],
-      x: ["8", "7", "6", "5", "4", "3", "2", "1"],
-      y: ["a", "b", "c", "d", "e", "f", "g", "h"],
-      color: "",
-      class: ["square", "whiteS"],
+      x: ['8', '7', '6', '5', '4', '3', '2', '1'],
+      y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      color: '',
+      class: ['square', 'whiteS'],
       moves: [],
       count: 0,
       similar: [],
@@ -33,20 +229,20 @@ export default {
       white_king_checked: false,
       black_king_checked: false,
       white_checkmate: false,
-      black_checkmate: false
+      black_checkmate: false,
     };
   },
   methods: {
     drawChessboard() {
       for (let row = 0; row < this.x.length; row++) {
-        this.color = row % 2 === 0 ? "black_square" : "white_square";
+        this.color = row % 2 === 0 ? 'black_square' : 'white_square';
         for (let field = 1; field < 9; field++) {
           this.color =
-            this.color === "black_square" ? "white_square" : "black_square";
+            this.color === 'black_square' ? 'white_square' : 'black_square';
           const object = {
             id: this.y[field - 1] + this.x[row],
             color: this.color,
-            class: this.class
+            class: this.class,
           };
           this.fields.push(object);
         }
@@ -54,20 +250,41 @@ export default {
     },
 
     placePieces() {
-      const squares = document.querySelectorAll(".square");
-      const entries = Object.values(pieces);
-      squares.forEach(square => {
+      const squares = document.querySelectorAll('.square');
+      squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
         let img = new Image();
-        entries.forEach(piece => {
-          if (square.id === piece.position) {
+        Object.values(this.entries).forEach((piece) => {
+          if (square.id === piece.start_position) {
             img.src = this.imageUrl + piece.imageUrl;
             img.alt = piece.imageUrl.substring(0, 2);
             img.id = square.id;
             img.draggable = true;
-            img.style.position = "absolute";
+            img.style.position = 'absolute';
             img.classList =
-              img.src.charAt(img.src.length - 6) == "b" ? "black" : "white";
+              img.src.charAt(img.src.length - 6) == 'b' ? 'black' : 'white';
+            square.appendChild(img);
+          }
+        });
+      });
+    },
+    render_new_position() {
+      const squares = document.querySelectorAll('.square');
+      squares.forEach((child) => {
+        child.innerHTML = '';
+      });
+      squares.forEach((square) => {
+        square.onmousedown = this.mouseDown;
+        let img = new Image();
+        Object.values(this.entries).forEach((piece) => {
+          if (square.id === piece.new_position && !piece.captured) {
+            img.src = this.imageUrl + piece.imageUrl;
+            img.alt = piece.imageUrl.substring(0, 2);
+            img.id = square.id;
+            img.draggable = true;
+            img.style.position = 'absolute';
+            img.classList =
+              img.src.charAt(img.src.length - 6) == 'b' ? 'black' : 'white';
             square.appendChild(img);
           }
         });
@@ -94,45 +311,52 @@ export default {
     //######################################################
     //######################################################
     mouseDown(event) {
-      const chess = document.querySelector(".chessboard");
-      chess.addEventListener("contextmenu", event => event.preventDefault());
+      let entries = this.entries;
+      let func = this.render_new_position;
+      function render() {
+        func();
+      }
+
+      const chess = document.querySelector('.chessboard');
+      chess.addEventListener('contextmenu', (event) => event.preventDefault());
       event.preventDefault();
-      const squares = document.querySelectorAll(".square");
-      squares.forEach(s => {
-        s.classList.remove("droppable");
-        s.classList.remove("mark");
-        s.classList.remove("target");
+      const squares = document.querySelectorAll('.square');
+      squares.forEach((s) => {
+        s.classList.remove('droppable');
+        s.classList.remove('mark');
+        s.classList.remove('target');
       });
 
       const square = event.path[1];
       let piece = square.firstElementChild;
-      if (piece.tagName == "DIV") {
+
+      if (piece.tagName == 'DIV') {
         return;
       }
       if (event.button == 0) {
         let new_piece = this.selected_piece(piece, square);
         this.available_moves(new_piece);
-        piece.style.width = "70px";
+        piece.style.width = '70px';
         piece.style.zIndex = 2;
-        piece.style.cursor = "grabbing";
-        piece.style.position = "absolute";
-        this.moves[0].forEach(allowed => {
-          squares.forEach(s => {
-            if (piece.classList[0] === "white" && this.whiteToPlay) {
+        piece.style.cursor = 'grabbing';
+        piece.style.position = 'absolute';
+        this.moves[0].forEach((allowed) => {
+          squares.forEach((s) => {
+            if (piece.classList[0] === 'white' && this.whiteToPlay) {
               if (allowed === s.id) {
-                s.classList.add("droppable");
-                s.classList.add("mark");
+                s.classList.add('droppable');
+                s.classList.add('mark');
                 if (s.firstElementChild) {
-                  s.classList.add("target");
+                  s.classList.add('target');
                 }
               }
             }
-            if (piece.classList[0] === "black" && !this.whiteToPlay) {
+            if (piece.classList[0] === 'black' && !this.whiteToPlay) {
               if (allowed === s.id) {
-                s.classList.add("droppable");
-                s.classList.add("mark");
+                s.classList.add('droppable');
+                s.classList.add('mark');
                 if (s.firstElementChild) {
-                  s.classList.add("target");
+                  s.classList.add('target');
                 }
               }
             }
@@ -153,8 +377,8 @@ export default {
         moveAt(event.pageX, event.pageY);
         function moveAt(pageX, pageY) {
           square.style.position = null;
-          piece.style.left = pageX - shiftX + "px";
-          piece.style.top = pageY - shiftY + "px";
+          piece.style.left = pageX - shiftX + 'px';
+          piece.style.top = pageY - shiftY + 'px';
         }
 
         function onMouseMove(event) {
@@ -165,18 +389,18 @@ export default {
             event.pageY < 20 ||
             event.pageY > 550
           ) {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.addEventListener("mouseup", onmouseup);
-            piece.style.width = "62px";
-            piece.style.cursor = "grab";
-            square.style.display = "flex";
-            piece.setAttribute("id", square.id);
+            document.removeEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onmouseup);
+            piece.style.width = '62px';
+            piece.style.cursor = 'grab';
+            square.style.display = 'flex';
+            piece.setAttribute('id', square.id);
             square.appendChild(piece);
-            square.style.justifyContent = "center";
-            square.style.position = "relative";
-            piece.style.position = "absolute";
-            piece.style.top = "0px";
-            piece.style.left = "0px";
+            square.style.justifyContent = 'center';
+            square.style.position = 'relative';
+            piece.style.position = 'absolute';
+            piece.style.top = '0px';
+            piece.style.left = '0px';
           }
           piece.hidden = true;
           let elemBelow = document.elementFromPoint(
@@ -191,218 +415,99 @@ export default {
           //######################################################
           //######################################################
           //######################################################
-          let droppableBelow = elemBelow.closest(".droppable");
+          let droppableBelow = elemBelow.closest('.droppable');
+
           if (currentDroppable != droppableBelow) {
             if (currentDroppable) {
               leaveDroppable(currentDroppable);
             }
             currentDroppable = droppableBelow;
-
-            if (currentDroppable !== null) {
-              if (currentDroppable.hasChildNodes()) {
-                piece.onmouseup = function(e) {
-                  e.preventDefault();
-                  const take = currentDroppable.firstChild;
-                  currentDroppable.removeChild(take);
-                  document.removeEventListener("mousemove", onMouseMove);
-                  piece.onmouseup = null;
-                  piece.style.width = "62px";
-                  piece.style.cursor = "grab";
-                  piece.style.zIndex = 1;
-                  piece.setAttribute("id", currentDroppable.id);
-                  currentDroppable.appendChild(piece);
-                  currentDroppable.style.position = "relative";
-                  piece.style.position = "absolute";
-                  piece.style.top = "0px";
-                  piece.style.left = "0px";
-                  currentDroppable.style.boxSizing = "border-box";
-                  currentDroppable.style.borderColor = "transparent";
-                };
-              } else {
-                currentDroppable.appendChild(piece);
-              }
-            } else {
-              piece.onmouseup = function(e) {
-                e.preventDefault();
-
-                squares.forEach(s => {
-                  if (s.firstElementChild === null) {
-                    return;
-                  }
-                });
-                document.removeEventListener("mousemove", onMouseMove);
-                piece.onmouseup = null;
-                piece.style.width = "62px";
-                piece.style.cursor = "grab";
-                piece.style.zIndex = 1;
-                piece.setAttribute("id", square.id);
-                square.appendChild(piece);
-                square.style.position = "relative";
-                piece.style.position = "absolute";
-                piece.style.top = "0px";
-                piece.style.left = "0px";
-                square.style.boxSizing = "border-box";
-                square.style.borderColor = "transparent";
-              };
-            }
             if (currentDroppable) {
               if (
-                (piece.classList[0] === "white" && self.whiteToPlay) ||
-                (piece.classList[0] === "black" && !self.whiteToPlay)
+                (piece.classList[0] === 'white' && self.whiteToPlay) ||
+                (piece.classList[0] === 'black' && !self.whiteToPlay)
               ) {
-                //...............................................
-                // if (currentDroppable !== null) {
-
                 get_moves();
-                if (piece.alt.charAt(0) === "w") {
-                  squares.forEach(square => {
-                    if (square.firstElementChild == null) {
-                      return;
-                    }
-                    if (square.firstElementChild.alt === "wK") {
-                      self.black_moves.forEach(piece_moves => {
-                        const arr = piece_moves.finalMoves;
-                        arr.forEach(a => {
-                          if (a === square.id) {
-                            self.count++;
-                          }
-                        });
-                      });
-                    }
-                  });
-                }
-                if (self.count > 0) {
-                  self.white_king_checked = true;
-                  self.count = 0;
-                } else {
-                  self.white_king_checked = false;
-                }
 
-                //...............................................
-                if (self.white_king_checked) {
-                  if (currentDroppable) {
-                    squares.forEach(s => {
-                      if (s.firstElementChild === null) {
-                        return;
-                      }
-                      if (s.firstElementChild.alt === "wK") {
-                        s.classList.add("kingDanger");
-                      }
-                    });
-                    piece.onmouseup = function(e) {
-                      e.preventDefault();
-                      if (square.hasChildNodes()) {
-                        const take = square.firstChild;
-                        square.removeChild(take);
-                      }
-                      // squares.forEach(s => {
-                      //   if (s.firstElementChild === null) {
-                      //     return;
-                      //   }
-                      //   if (s.firstElementChild.alt === "wK") {
-                      //     s.classList.remove("kingDanger");
-                      //     self.white_king_checked = true;
-                      //   }
-                      // });
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.onmouseup = null;
-                      piece.style.width = "62px";
-                      piece.style.cursor = "grab";
-                      piece.style.zIndex = 1;
-                      piece.setAttribute("id", currentDroppable.id);
-                      square.appendChild(piece);
-                      square.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
-                      currentDroppable.style.boxSizing = "border-box";
-                      currentDroppable.style.borderColor = "transparent";
-                    };
-                  } else {
-                    document.removeEventListener("mousemove", onMouseMove);
-                    piece.style.width = "62px";
-                    piece.style.zIndex = 1;
-                    piece.style.cursor = "grab";
-                    square.style.position = "relative";
-                    piece.style.position = "absolute";
-                    piece.style.top = "0px";
-                    piece.style.left = "0px";
-                  }
-                }
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                if (!self.white_king_checked) {
+
+                if (!self.white_king_checked || !self.black_king_checked) {
                   piece.onmouseup = function(e) {
                     e.preventDefault();
-                    squares.forEach(s => {
-                      s.classList.remove("kingDanger");
-                    });
+                    self.white_king_checked = false;
+                    self.black_king_checked = false;
                     if (currentDroppable) {
-                      if (piece.alt.charAt(0) === "b") {
+                      if (piece.alt.charAt(0) === 'b') {
                         self.whiteToPlay = true;
                       } else {
                         self.whiteToPlay = false;
                       }
-                      if (currentDroppable.hasChildNodes()) {
-                        const take = currentDroppable.firstChild;
-                        currentDroppable.removeChild(take);
-                      }
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.onmouseup = null;
-                      piece.style.width = "62px";
-                      piece.style.cursor = "grab";
-                      piece.style.zIndex = 1;
-                      piece.setAttribute("id", currentDroppable.id);
-                      currentDroppable.appendChild(piece);
-                      currentDroppable.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
-                      currentDroppable.style.boxSizing = "border-box";
-                      currentDroppable.style.borderColor = "transparent";
 
-                      let currentSquare = currentDroppable;
-                      let currentPiece = currentDroppable.firstElementChild;
-                      let new_piece = self.selected_piece(
-                        currentPiece,
-                        currentSquare
-                      );
+                      document.removeEventListener('mousemove', onMouseMove);
+                      piece.onmouseup = null;
+                      piece.style.width = '62px';
+                      piece.style.cursor = 'grab';
+                      piece.style.zIndex = 1;
+                      const takenPiece = currentDroppable.firstChild;
+                      Object.values(entries).forEach((entryPiece1) => {
+                        if (
+                          takenPiece !== null &&
+                          takenPiece.id === entryPiece1.new_position
+                        ) {
+                          entryPiece1.captured = true;
+                          render();
+                        }
+                      });
+                      Object.values(entries).forEach((entryPiece) => {
+                        if (piece.id === entryPiece.new_position) {
+                          entryPiece.new_position = currentDroppable.id;
+                          render();
+                        }
+                      });
+                      currentDroppable.style.position = 'relative';
+                      piece.style.position = 'absolute';
+                      piece.style.top = '0px';
+                      piece.style.left = '0px';
+                      currentDroppable.style.boxSizing = 'border-box';
+                      currentDroppable.style.borderColor = 'transparent';
+
+                      // let currentSquare = currentDroppable;
+                      // let currentPiece = currentDroppable.firstElementChild;
+                      // let new_piece = self.selected_piece(
+                      //   currentPiece,
+                      //   currentSquare
+                      // );
 
                       self.available_moves(new_piece);
 
-                      squares.forEach(s => {
+                      squares.forEach((s) => {
                         if (s.firstElementChild === null) {
                           return;
                         }
-                        self.moves[0].forEach(e => {
+                        self.moves[0].forEach((e) => {
                           if (
-                            s.firstElementChild.alt === "bK" &&
+                            s.firstElementChild.alt === 'bK' &&
                             s.firstElementChild.id === e
                           ) {
-                            s.classList.add("kingDanger");
                             self.black_king_checked = true;
                           }
                           if (
-                            s.firstElementChild.alt === "wK" &&
+                            s.firstElementChild.alt === 'wK' &&
                             s.firstElementChild.id === e
                           ) {
-                            s.classList.add("kingDanger");
                             self.white_king_checked = true;
                           }
                         });
                       });
-                      squares.forEach(s => {
-                        s.classList.remove("mark");
-                        s.classList.remove("target");
-                      });
                     } else {
-                      document.removeEventListener("mousemove", onMouseMove);
-                      piece.style.width = "62px";
+                      document.removeEventListener('mousemove', onMouseMove);
+                      piece.style.width = '62px';
                       piece.style.zIndex = 1;
-                      piece.style.cursor = "grab";
-                      square.style.position = "relative";
-                      piece.style.position = "absolute";
-                      piece.style.top = "0px";
-                      piece.style.left = "0px";
+                      piece.style.cursor = 'grab';
+                      square.style.position = 'relative';
+                      piece.style.position = 'absolute';
+                      piece.style.top = '0px';
+                      piece.style.left = '0px';
                     }
                   };
                 }
@@ -412,17 +517,17 @@ export default {
           }
         }
 
-        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener('mousemove', onMouseMove);
         piece.onmouseup = function() {
-          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener('mousemove', onMouseMove);
           piece.style.zIndex = 1;
           piece.onmouseup = null;
-          piece.style.width = "62px";
-          piece.style.cursor = "grab";
-          square.style.position = "relative";
-          piece.style.position = "absolute";
-          piece.style.top = "0px";
-          piece.style.left = "0px";
+          piece.style.width = '62px';
+          piece.style.cursor = 'grab';
+          square.style.position = 'relative';
+          piece.style.position = 'absolute';
+          piece.style.top = '0px';
+          piece.style.left = '0px';
         };
 
         //######################################################
@@ -438,7 +543,7 @@ export default {
           }
           // enterMethod();
 
-          elem.style.borderColor = "white";
+          elem.style.borderColor = 'white';
         }
 
         function leaveDroppable(elem) {
@@ -446,7 +551,7 @@ export default {
           //   return;
           // }
 
-          elem.style.borderColor = "transparent";
+          elem.style.borderColor = 'transparent';
         }
 
         piece.ondragstart = function() {
@@ -459,40 +564,40 @@ export default {
         self.black_moves = [];
         let check = true;
         const forbiden = [
-          "a1",
-          "a2",
-          "a3",
-          "a4",
-          "a5",
-          "a6",
-          "a7",
-          "a8",
-          "h1",
-          "h2",
-          "h3",
-          "h4",
-          "h5",
-          "h6",
-          "h7",
-          "h8",
-          "a1",
-          "b1",
-          "c1",
-          "d1",
-          "e1",
-          "f1",
-          "g1",
-          "h1",
-          "a8",
-          "b8",
-          "c8",
-          "d8",
-          "e8",
-          "f8",
-          "g8",
-          "h8"
+          'a1',
+          'a2',
+          'a3',
+          'a4',
+          'a5',
+          'a6',
+          'a7',
+          'a8',
+          'h1',
+          'h2',
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'h7',
+          'h8',
+          'a1',
+          'b1',
+          'c1',
+          'd1',
+          'e1',
+          'f1',
+          'g1',
+          'h1',
+          'a8',
+          'b8',
+          'c8',
+          'd8',
+          'e8',
+          'f8',
+          'g8',
+          'h8',
         ];
-        squares.forEach(square => {
+        squares.forEach((square) => {
           if (square.firstElementChild === null) {
             return;
           }
@@ -501,43 +606,43 @@ export default {
           let selected_piece_initial = square.firstElementChild.alt;
           let selectedPiece = {
             selected_piece_initial,
-            selected_piece_position
+            selected_piece_position,
           };
-          if (selectedPiece.selected_piece_initial === "wP") {
+          if (selectedPiece.selected_piece_initial === 'wP') {
             self.get_white_pawn_moves(selectedPiece, check);
           }
-          if (selectedPiece.selected_piece_initial === "wN") {
-            self.get_knight_moves(selectedPiece, check, "w");
+          if (selectedPiece.selected_piece_initial === 'wN') {
+            self.get_knight_moves(selectedPiece, check, 'w');
           }
-          if (selectedPiece.selected_piece_initial === "wB") {
-            self.get_bishop_moves(selectedPiece, forbiden, check, "w");
+          if (selectedPiece.selected_piece_initial === 'wB') {
+            self.get_bishop_moves(selectedPiece, forbiden, check, 'w');
           }
-          if (selectedPiece.selected_piece_initial === "wR") {
-            self.get_rook_moves(selectedPiece, forbiden, check, "w");
+          if (selectedPiece.selected_piece_initial === 'wR') {
+            self.get_rook_moves(selectedPiece, forbiden, check, 'w');
           }
-          if (selectedPiece.selected_piece_initial === "wQ") {
-            self.get_queen_moves(selectedPiece, forbiden, check, "w");
+          if (selectedPiece.selected_piece_initial === 'wQ') {
+            self.get_queen_moves(selectedPiece, forbiden, check, 'w');
           }
-          if (selectedPiece.selected_piece_initial === "wK") {
+          if (selectedPiece.selected_piece_initial === 'wK') {
             self.get_white_king_moves(selectedPiece, check);
           }
-          if (selectedPiece.selected_piece_initial === "bP") {
+          if (selectedPiece.selected_piece_initial === 'bP') {
             self.get_black_pawn_moves(selectedPiece, check);
           }
-          if (selectedPiece.selected_piece_initial === "bN") {
-            self.get_knight_moves(selectedPiece, check, "b");
+          if (selectedPiece.selected_piece_initial === 'bN') {
+            self.get_knight_moves(selectedPiece, check, 'b');
           }
-          if (selectedPiece.selected_piece_initial === "bB") {
-            self.get_bishop_moves(selectedPiece, forbiden, check, "b");
+          if (selectedPiece.selected_piece_initial === 'bB') {
+            self.get_bishop_moves(selectedPiece, forbiden, check, 'b');
           }
-          if (selectedPiece.selected_piece_initial === "bR") {
-            self.get_rook_moves(selectedPiece, forbiden, check, "b");
+          if (selectedPiece.selected_piece_initial === 'bR') {
+            self.get_rook_moves(selectedPiece, forbiden, check, 'b');
           }
-          if (selectedPiece.selected_piece_initial === "bQ") {
-            self.get_queen_moves(selectedPiece, forbiden, check, "b");
+          if (selectedPiece.selected_piece_initial === 'bQ') {
+            self.get_queen_moves(selectedPiece, forbiden, check, 'b');
           }
-          if (selectedPiece.selected_piece_initial === "bK") {
-            self.get_black_king_moves(selectedPiece, check, "b");
+          if (selectedPiece.selected_piece_initial === 'bK') {
+            self.get_black_king_moves(selectedPiece, check, 'b');
           }
         });
       }
@@ -574,82 +679,82 @@ export default {
       let selected_piece_initial = new_piece.alt;
       return {
         selected_piece_initial,
-        selected_piece_position
+        selected_piece_position,
       };
     },
 
     available_moves(selectedPiece) {
       let check = false;
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
 
       const forbiden = [
-        "a1",
-        "a2",
-        "a3",
-        "a4",
-        "a5",
-        "a6",
-        "a7",
-        "a8",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "h7",
-        "h8",
-        "a1",
-        "b1",
-        "c1",
-        "d1",
-        "e1",
-        "f1",
-        "g1",
-        "h1",
-        "a8",
-        "b8",
-        "c8",
-        "d8",
-        "e8",
-        "f8",
-        "g8",
-        "h8"
+        'a1',
+        'a2',
+        'a3',
+        'a4',
+        'a5',
+        'a6',
+        'a7',
+        'a8',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'h7',
+        'h8',
+        'a1',
+        'b1',
+        'c1',
+        'd1',
+        'e1',
+        'f1',
+        'g1',
+        'h1',
+        'a8',
+        'b8',
+        'c8',
+        'd8',
+        'e8',
+        'f8',
+        'g8',
+        'h8',
       ];
-      if (selectedPiece.selected_piece_initial === "wP") {
+      if (selectedPiece.selected_piece_initial === 'wP') {
         this.get_white_pawn_moves(selectedPiece, check);
       }
-      if (selectedPiece.selected_piece_initial === "bP") {
+      if (selectedPiece.selected_piece_initial === 'bP') {
         this.get_black_pawn_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === "wN" ||
-        selectedPiece.selected_piece_initial === "bN"
+        selectedPiece.selected_piece_initial === 'wN' ||
+        selectedPiece.selected_piece_initial === 'bN'
       ) {
         this.get_knight_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === "wB" ||
-        selectedPiece.selected_piece_initial === "bB"
+        selectedPiece.selected_piece_initial === 'wB' ||
+        selectedPiece.selected_piece_initial === 'bB'
       ) {
         this.get_bishop_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === "wR" ||
-        selectedPiece.selected_piece_initial === "bR"
+        selectedPiece.selected_piece_initial === 'wR' ||
+        selectedPiece.selected_piece_initial === 'bR'
       ) {
         this.get_rook_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === "wQ" ||
-        selectedPiece.selected_piece_initial === "bQ"
+        selectedPiece.selected_piece_initial === 'wQ' ||
+        selectedPiece.selected_piece_initial === 'bQ'
       ) {
         this.get_queen_moves(selectedPiece, forbiden, check);
       }
-      if (selectedPiece.selected_piece_initial === "wK") {
+      if (selectedPiece.selected_piece_initial === 'wK') {
         this.get_white_king_moves(selectedPiece, check, check);
       }
-      if (selectedPiece.selected_piece_initial === "bK") {
+      if (selectedPiece.selected_piece_initial === 'bK') {
         this.get_black_king_moves(selectedPiece, check);
       }
     },
@@ -657,39 +762,39 @@ export default {
       if (!check) {
         this.moves = [];
       }
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const forward = +1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       const oneForward = `${letter}${num + forward}`;
       const twoForward = `${letter}${num + forward + forward}`;
 
-      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
           const letterLeft = `${letters[i - 1]}${num + forward}`;
           const letterRight = `${letters[i + 1]}${num + forward}`;
           const fields = {
-            l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
-            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
-            of: oneForward.substring(1, 2) == "9" ? null : oneForward,
-            tf: twoForward.substring(1, 2) == "9" ? null : twoForward
+            l: letterLeft.substring(1, 2) == '9' ? null : letterLeft,
+            r: letterRight.substring(0, 2) == 'un' ? null : letterRight,
+            of: oneForward.substring(1, 2) == '9' ? null : oneForward,
+            tf: twoForward.substring(1, 2) == '9' ? null : twoForward,
           };
 
           const finalMoves = [];
 
-          squares.forEach(square => {
+          squares.forEach((square) => {
             if (square.id === fields.r) {
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === "black") {
+                if (square.firstElementChild.classList[0] === 'black') {
                   finalMoves.push(fields.r);
                 }
               }
             }
             if (square.id === fields.l) {
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === "black") {
+                if (square.firstElementChild.classList[0] === 'black') {
                   finalMoves.push(fields.l);
                 }
               }
@@ -701,7 +806,7 @@ export default {
               }
             }
 
-            if (selectedPiece.selected_piece_position.substring(1, 2) == "2") {
+            if (selectedPiece.selected_piece_position.substring(1, 2) == '2') {
               if (square.id === fields.tf) {
                 const numberMinusOne = square.id.substring(1, 2) - 1;
                 const letter = square.id.substring(0, 1);
@@ -709,7 +814,7 @@ export default {
                 const madeUpId = letter + strigifiedNumber;
                 if (!square.firstElementChild) {
                   finalMoves.push(fields.tf);
-                  squares.forEach(s => {
+                  squares.forEach((s) => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
                         finalMoves.pop();
@@ -735,37 +840,37 @@ export default {
       if (!check) {
         this.moves = [];
       }
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const forward = -1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       const oneForward = `${letter}${num + forward}`;
       const twoForward = `${letter}${num + forward + forward}`;
 
-      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
           const letterLeft = `${letters[i - 1]}${num + forward}`;
           const letterRight = `${letters[i + 1]}${num + forward}`;
           const fields = {
-            l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
-            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
-            of: oneForward.substring(1, 2) == "0" ? null : oneForward,
-            tf: twoForward.substring(1, 2) == "0" ? null : twoForward
+            l: letterLeft.substring(1, 2) == '0' ? null : letterLeft,
+            r: letterRight.substring(0, 2) == 'un' ? null : letterRight,
+            of: oneForward.substring(1, 2) == '0' ? null : oneForward,
+            tf: twoForward.substring(1, 2) == '0' ? null : twoForward,
           };
           const finalMoves = [];
-          squares.forEach(square => {
+          squares.forEach((square) => {
             if (square.id === fields.r) {
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === "white") {
+                if (square.firstElementChild.classList[0] === 'white') {
                   finalMoves.push(fields.r);
                 }
               }
             }
             if (square.id === fields.l) {
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === "white") {
+                if (square.firstElementChild.classList[0] === 'white') {
                   finalMoves.push(fields.l);
                 }
               }
@@ -777,7 +882,7 @@ export default {
               }
             }
 
-            if (selectedPiece.selected_piece_position.substring(1, 2) == "7") {
+            if (selectedPiece.selected_piece_position.substring(1, 2) == '7') {
               if (square.id === fields.tf) {
                 const numberPlusOne = parseInt(square.id.substring(1, 2));
                 const parsedNumber = numberPlusOne + 1;
@@ -788,7 +893,7 @@ export default {
                   finalMoves.push(fields.of);
                 } else {
                   finalMoves.push(fields.tf);
-                  squares.forEach(s => {
+                  squares.forEach((s) => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
                         finalMoves.pop();
@@ -811,15 +916,15 @@ export default {
       }
     },
     get_knight_moves(selectedPiece, check, color) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === "wN" ? "black" : "white";
+        selectedPiece.selected_piece_initial === 'wN' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -831,13 +936,13 @@ export default {
             five: `${letters[i + 1]}${num - 2}`,
             six: `${letters[i + 2]}${num - 1}`,
             seven: `${letters[i + 2]}${num + 1}`,
-            eight: `${letters[i + 1]}${num + 2}`
+            eight: `${letters[i + 1]}${num + 2}`,
           };
           const finalMoves = [];
           const obj = Object.values(fields);
           for (let i = 0; i < obj.length; i++) {
             const element = obj[i];
-            squares.forEach(square => {
+            squares.forEach((square) => {
               if (square.id === element) {
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === colorClass) {
@@ -851,7 +956,7 @@ export default {
           }
           if (!check) {
             this.moves.push(finalMoves);
-          } else if (color === "b") {
+          } else if (color === 'b') {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
             this.black_moves.push({ piece, finalMoves });
@@ -866,9 +971,9 @@ export default {
       }
     },
     get_bishop_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === "wB" ? "black" : "white";
+        selectedPiece.selected_piece_initial === 'wB' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -878,7 +983,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -886,25 +991,25 @@ export default {
               one: `${letters[i + m]}${num - m}`,
               two: `${letters[i + m]}${num + m}`,
               three: `${letters[i - m]}${num + m}`,
-              four: `${letters[i - m]}${num - m}`
+              four: `${letters[i - m]}${num - m}`,
             };
             m++;
-            squares.forEach(square => {
+            squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
 
               if (obj == undefined) {
-                return obj == "undefined";
+                return obj == 'undefined';
               }
-              if (obj.substring(0, 1) === "u") {
+              if (obj.substring(0, 1) === 'u') {
                 objectNumber++;
                 objectNumber++;
                 m = 1;
                 diagonal();
               }
               if (
-                obj.substring(1, 2) === "0" ||
-                obj.substring(1, 2) === "10" ||
-                obj.substring(1, 2) === "9"
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
               ) {
                 objectNumber++;
                 m = 1;
@@ -922,7 +1027,7 @@ export default {
                       diagonal();
                     }
                   } else {
-                    forbiden.forEach(forbid => {
+                    forbiden.forEach((forbid) => {
                       if (obj === forbid) {
                         objectNumber++;
                         m = 1;
@@ -941,7 +1046,7 @@ export default {
       diagonal();
       if (!check) {
         this.moves.push(finalMoves);
-      } else if (color === "b") {
+      } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves });
@@ -954,9 +1059,9 @@ export default {
       }
     },
     get_rook_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === "wR" ? "black" : "white";
+        selectedPiece.selected_piece_initial === 'wR' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -966,7 +1071,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function straight() {
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -974,24 +1079,24 @@ export default {
               one: `${letters[i + m]}${num}`,
               two: `${letter}${num + m}`,
               three: `${letters[i - m]}${num}`,
-              four: `${letter}${num - m}`
+              four: `${letter}${num - m}`,
             };
             m++;
-            squares.forEach(square => {
+            squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
-                return obj == "undefined";
+                return obj == 'undefined';
               }
-              if (obj.substring(0, 1) === "u") {
+              if (obj.substring(0, 1) === 'u') {
                 objectNumber++;
                 m = 1;
                 straight();
               }
 
               if (
-                obj.substring(1, 2) === "0" ||
-                obj.substring(1, 2) === "10" ||
-                obj.substring(1, 2) === "9"
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
               ) {
                 objectNumber++;
                 m = 1;
@@ -1023,7 +1128,7 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
-      } else if (color === "b") {
+      } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves });
@@ -1036,9 +1141,9 @@ export default {
       }
     },
     get_queen_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === "wQ" ? "black" : "white";
+        selectedPiece.selected_piece_initial === 'wQ' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -1050,7 +1155,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -1058,24 +1163,24 @@ export default {
               one: `${letters[i + m]}${num - m}`,
               two: `${letters[i + m]}${num + m}`,
               three: `${letters[i - m]}${num + m}`,
-              four: `${letters[i - m]}${num - m}`
+              four: `${letters[i - m]}${num - m}`,
             };
             m++;
-            squares.forEach(square => {
+            squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
-                return obj == "undefined";
+                return obj == 'undefined';
               }
-              if (obj.substring(0, 1) === "u") {
+              if (obj.substring(0, 1) === 'u') {
                 objectNumber++;
                 objectNumber++;
                 m = 1;
                 diagonal();
               }
               if (
-                obj.substring(1, 2) === "0" ||
-                obj.substring(1, 2) === "10" ||
-                obj.substring(1, 2) === "9"
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
               ) {
                 objectNumber++;
                 m = 1;
@@ -1094,7 +1199,7 @@ export default {
                       diagonal();
                     }
                   } else {
-                    forbiden.forEach(forbid => {
+                    forbiden.forEach((forbid) => {
                       if (obj === forbid) {
                         objectNumber++;
                         m = 1;
@@ -1113,7 +1218,7 @@ export default {
       let objectNumberStraight = 0;
       let n = 1;
       function straight() {
-        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -1121,23 +1226,23 @@ export default {
               one: `${letters[i + n]}${num}`,
               two: `${letter}${num + n}`,
               three: `${letters[i - n]}${num}`,
-              four: `${letter}${num - n}`
+              four: `${letter}${num - n}`,
             };
             n++;
-            squares.forEach(square => {
+            squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumberStraight]];
               if (obj == undefined) {
-                return obj == "undefined";
+                return obj == 'undefined';
               }
-              if (obj.substring(0, 1) === "u") {
+              if (obj.substring(0, 1) === 'u') {
                 objectNumberStraight++;
                 n = 1;
                 straight();
               }
               if (
-                obj.substring(1, 2) === "0" ||
-                obj.substring(1, 2) === "10" ||
-                obj.substring(1, 2) === "9"
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
               ) {
                 objectNumberStraight++;
                 n = 1;
@@ -1170,7 +1275,7 @@ export default {
       straight();
       if (!check) {
         this.moves.push(finalMoves);
-      } else if (color === "b") {
+      } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves });
@@ -1183,14 +1288,14 @@ export default {
       }
     },
     get_white_king_moves(selectedPiece, check) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
 
-      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -1202,14 +1307,14 @@ export default {
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
-            downLeft: `${letters[i - 1]}${num - 1}`
+            downLeft: `${letters[i - 1]}${num - 1}`,
           };
           const objects = Object.values(fields);
-          objects.forEach(obj => {
-            squares.forEach(square => {
+          objects.forEach((obj) => {
+            squares.forEach((square) => {
               if (square.id === obj) {
                 if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "black") {
+                  if (square.firstElementChild.classList[0] === 'black') {
                     finalMoves.push(obj);
                   }
                 } else {
@@ -1225,14 +1330,14 @@ export default {
       }
     },
     get_black_king_moves(selectedPiece, check) {
-      const squares = document.querySelectorAll(".square");
+      const squares = document.querySelectorAll('.square');
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
 
-      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
+      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -1244,14 +1349,14 @@ export default {
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
-            downLeft: `${letters[i - 1]}${num - 1}`
+            downLeft: `${letters[i - 1]}${num - 1}`,
           };
           const objects = Object.values(fields);
-          objects.forEach(obj => {
-            squares.forEach(square => {
+          objects.forEach((obj) => {
+            squares.forEach((square) => {
               if (square.id === obj) {
                 if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === "white") {
+                  if (square.firstElementChild.classList[0] === 'white') {
                     finalMoves.push(obj);
                   }
                 } else {
@@ -1266,32 +1371,6 @@ export default {
         this.moves.push(finalMoves);
       }
     },
-    removeDuplicates() {
-      const res = [];
-      for (let i = 0; i < this.white_moves.length; i++) {
-        const element = this.white_moves[i];
-        res.push(...element);
-      }
-      this.white_moves = [];
-      let unique = [...new Set(res)];
-      this.white_moves.push(unique);
-      ///////////////////////////////////////////
-      const res2 = [];
-      for (let i = 0; i < this.black_moves.length; i++) {
-        const element = this.black_moves[i];
-        res2.push(...element);
-      }
-      this.black_moves = [];
-      let unique2 = [...new Set(res2)];
-      this.black_moves.push(unique2);
-    },
-    get_similar() {
-      this.similar = [];
-      const intersection = this.white_moves[0].filter(element =>
-        this.black_moves[0].includes(element)
-      );
-      this.similar.push(intersection);
-    }
   },
   computed: {},
 
@@ -1300,20 +1379,7 @@ export default {
   },
   mounted() {
     this.placePieces();
-  }
-  // watch: {
-  //   white_king_checked(o,n){
-  //         const squares = document.querySelector(".chessboard");
-  //         square.forEach(s=>{
-  //           if (s.firstElementChild.all = ) {
-
-  //           }
-  //         })
-  //   },
-  //   black_king_checked(){
-  //          s.classList.add("kingDanger");
-  //   }
-  // },
+  },
 };
 </script>
 
@@ -1332,13 +1398,13 @@ export default {
 .black_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(26, 111, 160);
+  background-color: rgb(26, 160, 77);
 }
 
 .white_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(0, 195, 255);
+  background-color: rgb(0, 255, 115);
 }
 
 img {
@@ -1354,7 +1420,7 @@ img {
 }
 .mark::after {
   display: block;
-  content: " ";
+  content: ' ';
   margin: 18.5px auto;
   width: 22px;
   height: 22px;
@@ -1364,7 +1430,7 @@ img {
 }
 .target::after {
   display: block;
-  content: " ";
+  content: ' ';
   margin: 16px auto;
   width: 28px;
   height: 28px;
