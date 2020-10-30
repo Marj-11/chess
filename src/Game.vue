@@ -10,11 +10,18 @@
 </template>
 
 <script>
-// import pieces from '@/services/pieces.js';
-
 export default {
   data() {
     return {
+      // imageUrl:
+      //   "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/",
+      imageUrl:
+        'https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/',
+      fields: [],
+      x: ['8', '7', '6', '5', '4', '3', '2', '1'],
+      y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
+      color: '',
+      class: ['square', 'whiteS'],
       entries: [
         {
           imageUrl: 'bR.png',
@@ -158,7 +165,6 @@ export default {
           imageUrl: 'wK.png',
           start_position: 'e1',
           new_position: 'e1',
-          white_checkmate: false,
         },
         {
           imageUrl: 'wP.png',
@@ -209,28 +215,47 @@ export default {
           captured: false,
         },
       ],
-      // imageUrl:
-      //   "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/",
-      imageUrl:
-        'https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/',
-      fields: [],
-      x: ['8', '7', '6', '5', '4', '3', '2', '1'],
-      y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-      color: '',
-      class: ['square', 'whiteS'],
       moves: [],
-      count: 0,
-      similar: [],
-      recorded_moves: [],
       white_moves: [],
       black_moves: [],
+      white_dominant_squares: '',
+      black_dominant_squares: '',
+      wK_position: '',
+      bK_position: '',
       whiteToPlay: true,
-      checkmate_moves: [],
-      white_king_checked: false,
-      black_king_checked: false,
+      white_checked: false,
+      virtual_white_checked: false,
+      black_checked: false,
+      virtual_black_checked: false,
       white_checkmate: false,
       black_checkmate: false,
     };
+  },
+  watch: {
+    black_checked(n, o) {
+      const squares = document.querySelectorAll('.square');
+      if (n) {
+        squares.forEach((s) => {
+          if (s.id === this.bK_position) {
+            s.classList.add('kingDanger');
+          } else if (!n) {
+            s.classList.remove('kingDanger');
+          }
+        });
+      }
+    },
+    white_checked(n, o) {
+      const squares = document.querySelectorAll('.square');
+      if (n) {
+        squares.forEach((s) => {
+          if (s.id === this.wK_position) {
+            s.classList.add('kingDanger');
+          } else if (!n) {
+            s.classList.remove('kingDanger');
+          }
+        });
+      }
+    },
   },
   methods: {
     drawChessboard() {
@@ -248,7 +273,6 @@ export default {
         }
       }
     },
-
     placePieces() {
       const squares = document.querySelectorAll('.square');
       squares.forEach((square) => {
@@ -290,43 +314,96 @@ export default {
         });
       });
     },
+    get_dominant() {
+      const squares = document.querySelectorAll('.square');
+      this.white_dominant_squares = [];
+      const arr1 = [];
+      this.white_moves.forEach((move) => {
+        arr1.push(move.finalMoves);
+      });
+      squares.forEach((square) => {
+        if (
+          square.firstChild !== null &&
+          square.firstChild.classList.contains('white')
+        ) {
+          arr1.push(square.id);
+        }
+      });
+      this.white_dominant_squares = [...new Set(arr1.flat(1))];
 
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
+      this.black_dominant_squares = [];
+      const arr = [];
+      this.black_moves.forEach((move) => {
+        arr.push(move.finalMoves);
+      });
+      squares.forEach((square) => {
+        if (
+          square.firstChild !== null &&
+          square.firstChild.classList.contains('black')
+        ) {
+          arr.push(square.id);
+        }
+      });
+      this.black_dominant_squares = [...new Set(arr.flat(1))];
+    },
+    check_kings() {
+      const squares = document.querySelectorAll('.square');
+      this.white_dominant_squares.forEach((e) => {
+        if (e === this.bK_position) {
+          squares.forEach((sq) => {
+            if (sq.firstChild !== null && sq.firstChild.id === e) {
+              this.black_checked = true;
+              this.virtual_black_checked = true;
+            }
+          });
+        }
+      });
+      this.black_dominant_squares.forEach((e) => {
+        if (e === this.wK_position) {
+          squares.forEach((sq) => {
+            if (sq.firstChild !== null && sq.firstChild.id === e) {
+              this.white_checked = true;
+              this.virtual_white_checked = true;
+            }
+          });
+        }
+      });
+    },
+    track_kings_position() {
+      const squares = document.querySelectorAll('.square');
+      squares.forEach((square) => {
+        if (square.firstChild !== null && square.firstChild.alt === 'wK') {
+          this.wK_position = square.id;
+        } else if (
+          square.firstChild !== null &&
+          square.firstChild.alt === 'bK'
+        ) {
+          this.bK_position = square.id;
+        }
+      });
+    },
+
     //######################################################
     //######################################################
     //###################### mouse down ####################
     //######################################################
     //######################################################
     //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
+
     mouseDown(event) {
       let entries = this.entries;
-      let func = this.render_new_position;
-      function render() {
-        func();
-      }
+      let render = this.render_new_position; // function
 
       const chess = document.querySelector('.chessboard');
       chess.addEventListener('contextmenu', (event) => event.preventDefault());
       event.preventDefault();
       const squares = document.querySelectorAll('.square');
+
       squares.forEach((s) => {
         s.classList.remove('droppable');
         s.classList.remove('mark');
         s.classList.remove('target');
       });
-
       const square = event.path[1];
       let piece = square.firstElementChild;
 
@@ -362,7 +439,6 @@ export default {
             }
           });
         });
-
         //######################################################
         //######################################################
         //###################### mouse event ###################
@@ -370,6 +446,7 @@ export default {
         //######################################################
         //######################################################
         let self = this;
+
         let currentDroppable = null;
         let shiftX = event.clientX - piece.getBoundingClientRect().left;
         let shiftY = event.clientY - piece.getBoundingClientRect().top;
@@ -427,90 +504,90 @@ export default {
                 (piece.classList[0] === 'white' && self.whiteToPlay) ||
                 (piece.classList[0] === 'black' && !self.whiteToPlay)
               ) {
-                get_moves();
-
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                if (!self.white_king_checked || !self.black_king_checked) {
-                  piece.onmouseup = function(e) {
-                    e.preventDefault();
-                    self.white_king_checked = false;
-                    self.black_king_checked = false;
-                    if (currentDroppable) {
-                      if (piece.alt.charAt(0) === 'b') {
-                        self.whiteToPlay = true;
-                      } else {
-                        self.whiteToPlay = false;
+                piece.onmouseup = function(e) {
+                  // if (
+                  //   (self.whiteToPlay && !self.white_king_checked) ||
+                  //   (!self.whiteToPlay && !self.black_king_checked)
+                  // ) {
+                  e.preventDefault();
+                  if (currentDroppable) {
+                    if (piece.alt.charAt(0) === 'b') {
+                      self.whiteToPlay = true;
+                    } else {
+                      self.whiteToPlay = false;
+                    }
+
+                    document.removeEventListener('mousemove', onMouseMove);
+                    piece.onmouseup = null;
+                    piece.style.width = '62px';
+                    piece.style.cursor = 'grab';
+                    piece.style.zIndex = 1;
+
+                    const takenPiece = currentDroppable.firstChild;
+                    Object.values(entries).forEach((entryPiece) => {
+                      if (
+                        takenPiece !== null &&
+                        takenPiece.id === entryPiece.new_position
+                      ) {
+                        entryPiece.captured = true;
+                        render();
+                      } else if (piece.id === entryPiece.new_position) {
+                        entryPiece.new_position = currentDroppable.id;
+                        render();
                       }
+                    });
 
-                      document.removeEventListener('mousemove', onMouseMove);
-                      piece.onmouseup = null;
-                      piece.style.width = '62px';
-                      piece.style.cursor = 'grab';
-                      piece.style.zIndex = 1;
-                      const takenPiece = currentDroppable.firstChild;
-                      Object.values(entries).forEach((entryPiece1) => {
-                        if (
-                          takenPiece !== null &&
-                          takenPiece.id === entryPiece1.new_position
-                        ) {
-                          entryPiece1.captured = true;
-                          render();
-                        }
-                      });
-                      Object.values(entries).forEach((entryPiece) => {
-                        if (piece.id === entryPiece.new_position) {
-                          entryPiece.new_position = currentDroppable.id;
-                          render();
-                        }
-                      });
-                      currentDroppable.style.position = 'relative';
-                      piece.style.position = 'absolute';
-                      piece.style.top = '0px';
-                      piece.style.left = '0px';
-                      currentDroppable.style.boxSizing = 'border-box';
-                      currentDroppable.style.borderColor = 'transparent';
+                    currentDroppable.style.position = 'relative';
+                    piece.style.position = 'absolute';
+                    piece.style.top = '0px';
+                    piece.style.left = '0px';
+                    currentDroppable.style.boxSizing = 'border-box';
+                    currentDroppable.style.borderColor = 'transparent';
 
-                      // let currentSquare = currentDroppable;
-                      // let currentPiece = currentDroppable.firstElementChild;
-                      // let new_piece = self.selected_piece(
-                      //   currentPiece,
-                      //   currentSquare
-                      // );
+                    // let currentSquare = currentDroppable;
+                    // let currentPiece = currentDroppable.firstElementChild;
+                    // let new_piece = self.selected_piece(
+                    //   currentPiece,
+                    //   currentSquare
+                    // );
 
-                      self.available_moves(new_piece);
+                    self.available_moves(new_piece);
 
-                      squares.forEach((s) => {
-                        if (s.firstElementChild === null) {
-                          return;
-                        }
-                        self.moves[0].forEach((e) => {
-                          if (
-                            s.firstElementChild.alt === 'bK' &&
-                            s.firstElementChild.id === e
-                          ) {
-                            self.black_king_checked = true;
+                    get_moves();
+
+                    self.get_dominant();
+
+                    // track wK & bK
+                    self.track_kings_position();
+
+                    // checking kings
+                    self.check_kings();
+
+                    if (self.black_checked) {
+                      self.black_dominant_squares.forEach((e) => {
+                        self.white_dominant_squares.forEach((w) => {
+                          if (e === w) {
+                            console.log(e);
                           }
-                          if (
-                            s.firstElementChild.alt === 'wK' &&
-                            s.firstElementChild.id === e
-                          ) {
-                            self.white_king_checked = true;
-                          }
+                          // else {
+                          //   console.log('checkmate white win');
+                          // }
                         });
                       });
-                    } else {
-                      document.removeEventListener('mousemove', onMouseMove);
-                      piece.style.width = '62px';
-                      piece.style.zIndex = 1;
-                      piece.style.cursor = 'grab';
-                      square.style.position = 'relative';
-                      piece.style.position = 'absolute';
-                      piece.style.top = '0px';
-                      piece.style.left = '0px';
                     }
-                  };
-                }
+                  } else {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    piece.style.width = '62px';
+                    piece.style.zIndex = 1;
+                    piece.style.cursor = 'grab';
+                    square.style.position = 'relative';
+                    piece.style.position = 'absolute';
+                    piece.style.top = '0px';
+                    piece.style.left = '0px';
+                  }
+                };
               }
             }
             enterDroppable(currentDroppable);
@@ -647,25 +724,10 @@ export default {
         });
       }
     },
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
+
     //######################################################
     //######################################################
     //##################end mouse down######################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
-    //######################################################
     //######################################################
     //######################################################
     //######################################################
@@ -682,7 +744,6 @@ export default {
         selected_piece_position,
       };
     },
-
     available_moves(selectedPiece) {
       let check = false;
       const squares = document.querySelectorAll('.square');
@@ -1372,7 +1433,6 @@ export default {
       }
     },
   },
-  computed: {},
 
   created() {
     this.drawChessboard();
@@ -1412,7 +1472,7 @@ img {
   cursor: grab;
   z-index: 1;
   margin-top: -1.5px;
-  margin-left: -2px;
+  margin-left: -1px;
 }
 .whiteS {
   border: 2px transparent solid;
@@ -1431,10 +1491,10 @@ img {
 .target::after {
   display: block;
   content: ' ';
-  margin: 16px auto;
-  width: 28px;
-  height: 28px;
-  background: rgba(255, 74, 74, 0.5);
+  margin: 2px auto;
+  width: 55px;
+  height: 55px;
+  background: rgba(29, 29, 29, 0.4);
   border-radius: 50%;
   z-index: 0;
 }
