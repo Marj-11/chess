@@ -218,17 +218,42 @@ export default {
       moves: [],
       white_moves: [],
       black_moves: [],
-      white_dominant_squares: '',
-      black_dominant_squares: '',
+      black_dominant_without_pawns: '',
+      black_dominant_straight_pawns: '',
+      black_dominant_take_pawns: '',
+      black_dominant_everything_straight: '',
+      black_dominant_everything_take: '',
+
+      white_dominant_without_pawns: '',
+      white_dominant_straight_pawns: '',
+      white_dominant_take_pawns: '',
+      white_dominant_everything_straight: '',
+      white_dominant_everything_take: '',
+      white_protection: [],
+      black_protection: [],
+
       wK_position: '',
       bK_position: '',
+
       whiteToPlay: true,
+
       white_checked: false,
-      virtual_white_checked: false,
       black_checked: false,
-      virtual_black_checked: false,
+
+      can_take_black_dangerous: false,
+      can_take_white_dangerous: false,
+
       white_checkmate: false,
       black_checkmate: false,
+
+      dangerous_white_piece: '',
+      dangerous_black_piece: '',
+
+      black_king_moves: [],
+      white_king_moves: [],
+
+      black_place_to_go: false,
+      white_place_to_go: false,
     };
   },
   watch: {
@@ -238,7 +263,12 @@ export default {
         squares.forEach((s) => {
           if (s.id === this.bK_position) {
             s.classList.add('kingDanger');
-          } else if (!n) {
+          }
+        });
+      } else {
+        const squares = document.querySelectorAll('.square');
+        squares.forEach((s) => {
+          if (s.id === this.bK_position) {
             s.classList.remove('kingDanger');
           }
         });
@@ -279,7 +309,7 @@ export default {
         square.onmousedown = this.mouseDown;
         let img = new Image();
         Object.values(this.entries).forEach((piece) => {
-          if (square.id === piece.start_position) {
+          if (square.id === piece.start_position && !piece.captured) {
             img.src = this.imageUrl + piece.imageUrl;
             img.alt = piece.imageUrl.substring(0, 2);
             img.id = square.id;
@@ -314,56 +344,86 @@ export default {
         });
       });
     },
-    get_dominant() {
+    get_dominant_protection() {
       const squares = document.querySelectorAll('.square');
-      this.white_dominant_squares = [];
+      this.white_dominant_everything_straight = [];
+      this.white_dominant_everything_take = [];
       const arr1 = [];
+      const arr2 = [];
+      const arr3 = [];
+      const arr4 = [];
+      const arr5 = [];
+      const arr6 = [];
       this.white_moves.forEach((move) => {
         arr1.push(move.finalMoves);
+        arr2.push(move.fine);
+        arr3.push(move.newMoves);
+        arr4.push(move.finalMoves);
+        arr4.push(move.fine);
+        arr5.push(move.finalMoves);
+        arr5.push(move.newMoves);
+        arr6.push(move.protect);
       });
-      squares.forEach((square) => {
-        if (
-          square.firstChild !== null &&
-          square.firstChild.classList.contains('white')
-        ) {
-          arr1.push(square.id);
-        }
-      });
-      this.white_dominant_squares = [...new Set(arr1.flat(1))];
 
-      this.black_dominant_squares = [];
-      const arr = [];
+      this.white_dominant_without_pawns = [...new Set(arr1.flat(1))];
+      this.white_dominant_straight_pawns = [...new Set(arr2.flat(1))];
+      this.white_dominant_take_pawns = [...new Set(arr3.flat(1))];
+      this.white_dominant_everything_straight = [...new Set(arr4.flat(1))];
+      this.white_dominant_everything_take = [...new Set(arr5.flat(1))];
+      this.white_protection = [...new Set(arr6.flat(1))];
+
+      ///////
+
+      this.black_dominant_everything_straight = [];
+      this.black_dominant_everything_take = [];
+      const arr10 = [];
+      const arr20 = [];
+      const arr30 = [];
+      const arr40 = [];
+      const arr50 = [];
+      const arr60 = [];
       this.black_moves.forEach((move) => {
-        arr.push(move.finalMoves);
+        arr10.push(move.finalMoves);
+        arr20.push(move.fine);
+        arr30.push(move.newMoves);
+        arr40.push(move.finalMoves);
+        arr40.push(move.fine);
+        arr50.push(move.finalMoves);
+        arr50.push(move.newMoves);
+        arr60.push(move.protect);
       });
-      squares.forEach((square) => {
-        if (
-          square.firstChild !== null &&
-          square.firstChild.classList.contains('black')
-        ) {
-          arr.push(square.id);
-        }
-      });
-      this.black_dominant_squares = [...new Set(arr.flat(1))];
+
+      this.black_dominant_without_pawns = [...new Set(arr10.flat(1))];
+      this.black_dominant_straight_pawns = [...new Set(arr20.flat(1))];
+      this.black_dominant_take_pawns = [...new Set(arr30.flat(1))];
+      this.black_dominant_everything_straight = [...new Set(arr40.flat(1))];
+      this.black_dominant_everything_take = [...new Set(arr50.flat(1))];
+      this.black_protection = [...new Set(arr60.flat(1))];
     },
     check_kings() {
+      let r = '';
       const squares = document.querySelectorAll('.square');
-      this.white_dominant_squares.forEach((e) => {
+      this.white_dominant_everything_straight.forEach((e) => {
         if (e === this.bK_position) {
+          r = e;
           squares.forEach((sq) => {
             if (sq.firstChild !== null && sq.firstChild.id === e) {
               this.black_checked = true;
-              this.virtual_black_checked = true;
             }
           });
         }
       });
-      this.black_dominant_squares.forEach((e) => {
+      if (r === this.bK_position) {
+        return;
+      } else {
+        this.black_checked = false;
+      }
+      this.black_dominant_everything_straight.forEach((e) => {
         if (e === this.wK_position) {
           squares.forEach((sq) => {
             if (sq.firstChild !== null && sq.firstChild.id === e) {
               this.white_checked = true;
-              this.virtual_white_checked = true;
+              // this.can_take_black_dangerous = true;
             }
           });
         }
@@ -382,7 +442,32 @@ export default {
         }
       });
     },
-
+    get_dangerous_piece() {
+      this.white_moves.forEach((obj) => {
+        if (obj.finalMoves) {
+          if (obj.finalMoves.length > 0) {
+            obj.finalMoves.forEach((e) => {
+              if (e === this.bK_position) {
+                this.dangerous_white_piece = obj;
+              }
+            });
+          }
+        }
+      });
+      //  else fine or take pawns
+      this.black_moves.forEach((obj) => {
+        if (obj.finalMoves) {
+          if (obj.finalMoves.length > 0) {
+            obj.finalMoves.forEach((e) => {
+              if (e === this.wK_position) {
+                this.dangerous_black_piece = obj;
+              }
+            });
+          }
+        }
+        //  else fine or take pawns
+      });
+    },
     //######################################################
     //######################################################
     //###################### mouse down ####################
@@ -417,6 +502,7 @@ export default {
         piece.style.zIndex = 2;
         piece.style.cursor = 'grabbing';
         piece.style.position = 'absolute';
+
         this.moves[0].forEach((allowed) => {
           squares.forEach((s) => {
             if (piece.classList[0] === 'white' && this.whiteToPlay) {
@@ -505,13 +591,9 @@ export default {
                 (piece.classList[0] === 'black' && !self.whiteToPlay)
               ) {
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                 piece.onmouseup = function(e) {
-                  // if (
-                  //   (self.whiteToPlay && !self.white_king_checked) ||
-                  //   (!self.whiteToPlay && !self.black_king_checked)
-                  // ) {
                   e.preventDefault();
+
                   if (currentDroppable) {
                     if (piece.alt.charAt(0) === 'b') {
                       self.whiteToPlay = true;
@@ -546,18 +628,9 @@ export default {
                     currentDroppable.style.boxSizing = 'border-box';
                     currentDroppable.style.borderColor = 'transparent';
 
-                    // let currentSquare = currentDroppable;
-                    // let currentPiece = currentDroppable.firstElementChild;
-                    // let new_piece = self.selected_piece(
-                    //   currentPiece,
-                    //   currentSquare
-                    // );
-
-                    self.available_moves(new_piece);
-
                     get_moves();
 
-                    self.get_dominant();
+                    self.get_dominant_protection();
 
                     // track wK & bK
                     self.track_kings_position();
@@ -566,15 +639,59 @@ export default {
                     self.check_kings();
 
                     if (self.black_checked) {
-                      self.black_dominant_squares.forEach((e) => {
-                        self.white_dominant_squares.forEach((w) => {
-                          if (e === w) {
-                            console.log(e);
+                      self.get_dangerous_piece();
+                      get_moves();
+                      self.get_dominant_protection();
+                      self.can_take_white_dangerous = false;
+                      self.black_dominant_everything_take.forEach((e) => {
+                        if (e === self.dangerous_white_piece.piece) {
+                          self.can_take_white_dangerous = true;
+                        }
+                      });
+
+                      self.black_king_moves.forEach((e) => {
+                        if (self.white_dominant_everything_take.includes(e)) {
+                          return;
+                        } else {
+                          self.black_place_to_go = true;
+                        }
+                      });
+
+                      self.black_dominant_everything_straight.forEach((s2) => {
+                        let div = document.createElement('div');
+                        div.classList.add('black');
+                        squares.forEach((s) => {
+                          if (s2 === s.id) {
+                            s.appendChild(div);
                           }
-                          // else {
-                          //   console.log('checkmate white win');
-                          // }
                         });
+                      });
+
+                      get_moves();
+                      self.get_dominant_protection();
+
+                      self.white_dominant_everything_straight.forEach((e) => {
+                        if (
+                          e === self.bK_position &&
+                          !self.can_take_white_dangerous &&
+                          !self.black_place_to_go
+                        ) {
+                          console.log('checkmate');
+                        }
+                        console.log(
+                          e === self.bK_position,
+                          self.can_take_white_dangerous,
+                          self.black_place_to_go
+                        );
+                      });
+
+                      squares.forEach((s) => {
+                        if (
+                          s.hasChildNodes() &&
+                          s.firstChild.tagName === 'DIV'
+                        ) {
+                          s.innerHTML = '';
+                        }
                       });
                     }
                   } else {
@@ -587,6 +704,8 @@ export default {
                     piece.style.top = '0px';
                     piece.style.left = '0px';
                   }
+
+                  // console.log(self.black_dominant_everything_straight);
                 };
               }
             }
@@ -831,6 +950,7 @@ export default {
       const twoForward = `${letter}${num + forward + forward}`;
 
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -842,28 +962,32 @@ export default {
             of: oneForward.substring(1, 2) == '9' ? null : oneForward,
             tf: twoForward.substring(1, 2) == '9' ? null : twoForward,
           };
-
-          const finalMoves = [];
+          const newMoves = [];
+          const fine = [];
 
           squares.forEach((square) => {
             if (square.id === fields.r) {
+              newMoves.push(fields.r);
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === 'black') {
-                  finalMoves.push(fields.r);
+                  fine.push(fields.r);
                 }
               }
             }
+
             if (square.id === fields.l) {
+              newMoves.push(fields.l);
+
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === 'black') {
-                  finalMoves.push(fields.l);
+                  fine.push(fields.l);
                 }
               }
             }
 
             if (square.id === fields.of) {
               if (!square.firstElementChild) {
-                finalMoves.push(fields.of);
+                fine.push(fields.of);
               }
             }
 
@@ -874,11 +998,11 @@ export default {
                 const strigifiedNumber = numberMinusOne.toString();
                 const madeUpId = letter + strigifiedNumber;
                 if (!square.firstElementChild) {
-                  finalMoves.push(fields.tf);
+                  fine.push(fields.tf);
                   squares.forEach((s) => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
-                        finalMoves.pop();
+                        fine.pop();
                       }
                     }
                   });
@@ -886,13 +1010,14 @@ export default {
               }
             }
           });
+
           if (!check) {
-            this.moves.push(finalMoves);
+            this.moves.push(fine);
           } else {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
-            this.white_moves.push({ piece, finalMoves });
-            this.moves.push(finalMoves);
+            this.white_moves.push({ piece, newMoves, fine });
+            this.moves.push(fine);
           }
         }
       }
@@ -920,26 +1045,29 @@ export default {
             of: oneForward.substring(1, 2) == '0' ? null : oneForward,
             tf: twoForward.substring(1, 2) == '0' ? null : twoForward,
           };
-          const finalMoves = [];
+          const newMoves = [];
+          const fine = [];
           squares.forEach((square) => {
             if (square.id === fields.r) {
+              newMoves.push(fields.r);
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === 'white') {
-                  finalMoves.push(fields.r);
+                  fine.push(fields.r);
                 }
               }
             }
             if (square.id === fields.l) {
+              newMoves.push(fields.l);
               if (square.firstElementChild) {
                 if (square.firstElementChild.classList[0] === 'white') {
-                  finalMoves.push(fields.l);
+                  fine.push(fields.l);
                 }
               }
             }
 
             if (square.id === fields.of) {
               if (!square.firstElementChild) {
-                finalMoves.push(fields.of);
+                fine.push(fields.of);
               }
             }
 
@@ -951,13 +1079,13 @@ export default {
                 const strigifiedNumber = parsedNumber.toString();
                 const madeUpId = letter + strigifiedNumber;
                 if (square.firstElementChild) {
-                  finalMoves.push(fields.of);
+                  newMoves.push(fields.of);
                 } else {
-                  finalMoves.push(fields.tf);
+                  fine.push(fields.tf);
                   squares.forEach((s) => {
                     if (s.id === madeUpId) {
                       if (s.firstElementChild) {
-                        finalMoves.pop();
+                        fine.pop();
                       }
                     }
                   });
@@ -966,12 +1094,12 @@ export default {
             }
           });
           if (!check) {
-            this.moves.push(finalMoves);
+            this.moves.push(fine);
           } else {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
-            this.black_moves.push({ piece, finalMoves });
-            this.moves.push(finalMoves);
+            this.black_moves.push({ piece, newMoves, fine });
+            this.moves.push(fine);
           }
         }
       }
@@ -1000,11 +1128,13 @@ export default {
             eight: `${letters[i + 1]}${num + 2}`,
           };
           const finalMoves = [];
+          const protect = [];
           const obj = Object.values(fields);
           for (let i = 0; i < obj.length; i++) {
             const element = obj[i];
             squares.forEach((square) => {
               if (square.id === element) {
+                protect.push(element);
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === colorClass) {
                     finalMoves.push(element);
@@ -1020,12 +1150,12 @@ export default {
           } else if (color === 'b') {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
-            this.black_moves.push({ piece, finalMoves });
+            this.black_moves.push({ piece, finalMoves, protect });
             this.moves.push(finalMoves);
           } else {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
-            this.white_moves.push({ piece, finalMoves });
+            this.white_moves.push({ piece, finalMoves, protect });
             this.moves.push(finalMoves);
           }
         }
@@ -1041,6 +1171,7 @@ export default {
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
+      let protect = [];
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
@@ -1077,6 +1208,7 @@ export default {
                 diagonal();
               } else {
                 if (square.id === obj) {
+                  protect.push(obj);
                   if (square.firstElementChild) {
                     m = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -1110,12 +1242,12 @@ export default {
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves });
+        this.black_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves });
+        this.white_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       }
     },
@@ -1129,6 +1261,7 @@ export default {
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
+      let protect = [];
       let objectNumber = 0;
       let m = 1;
       function straight() {
@@ -1164,6 +1297,7 @@ export default {
                 straight();
               } else {
                 if (square.id === obj) {
+                  protect.push(obj);
                   if (square.firstElementChild) {
                     m = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -1192,12 +1326,12 @@ export default {
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves });
+        this.black_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves });
+        this.white_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       }
     },
@@ -1212,6 +1346,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
+      let protect = [];
 
       let objectNumber = 0;
       let m = 1;
@@ -1248,6 +1383,7 @@ export default {
                 diagonal();
               } else {
                 if (square.id === obj) {
+                  protect.push(obj);
                   if (square.firstElementChild) {
                     m = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -1310,6 +1446,7 @@ export default {
                 straight();
               } else {
                 if (square.id === obj) {
+                  protect.push(obj);
                   if (square.firstElementChild) {
                     n = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -1339,12 +1476,12 @@ export default {
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves });
+        this.black_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves });
+        this.white_moves.push({ piece, finalMoves, protect });
         this.moves.push(finalMoves);
       }
     },
@@ -1355,6 +1492,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
+      let protect = [];
 
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
@@ -1374,6 +1512,7 @@ export default {
           objects.forEach((obj) => {
             squares.forEach((square) => {
               if (square.id === obj) {
+                protect.push(obj);
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === 'black') {
                     finalMoves.push(obj);
@@ -1389,6 +1528,10 @@ export default {
       if (!check) {
         this.moves.push(finalMoves);
       }
+      // might create a problem with defence!
+      if (!this.white_checked) {
+        this.white_moves.push({ finalMoves, protect });
+      }
     },
     get_black_king_moves(selectedPiece, check) {
       const squares = document.querySelectorAll('.square');
@@ -1397,6 +1540,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
+      let protect = [];
 
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
@@ -1416,6 +1560,7 @@ export default {
           objects.forEach((obj) => {
             squares.forEach((square) => {
               if (square.id === obj) {
+                protect.push(obj);
                 if (square.firstElementChild) {
                   if (square.firstElementChild.classList[0] === 'white') {
                     finalMoves.push(obj);
@@ -1430,6 +1575,14 @@ export default {
       }
       if (!check) {
         this.moves.push(finalMoves);
+      }
+      if (check) {
+        this.black_king_moves = [];
+        this.black_king_moves = finalMoves;
+      }
+      //  might create a problem with defence!
+      if (!this.black_checked) {
+        this.black_moves.push({ finalMoves, protect });
       }
     },
   },
@@ -1458,13 +1611,13 @@ export default {
 .black_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(26, 160, 77);
+  background-color: rgb(231, 85, 0);
 }
 
 .white_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(0, 255, 115);
+  background-color: rgb(240, 169, 122);
 }
 
 img {
