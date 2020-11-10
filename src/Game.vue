@@ -419,7 +419,8 @@ export default {
 
       dangerous_white_piece: '',
       dangerous_black_piece: '',
-
+      can_take_dangerous_black_piece: false,
+      can_take_dangerous_white_piece: false,
       white_dominant_without_pawns: '',
       white_dominant_straight_pawns: '',
       white_dominant_take_pawns: '',
@@ -472,7 +473,12 @@ export default {
         squares.forEach((s) => {
           if (s.id === this.wK_position) {
             s.classList.add('kingDanger');
-          } else if (!n) {
+          }
+        });
+      } else {
+        const squares = document.querySelectorAll('.square');
+        squares.forEach((s) => {
+          if (s.id === this.wK_position) {
             s.classList.remove('kingDanger');
           }
         });
@@ -584,6 +590,7 @@ export default {
       const arr40 = [];
       const arr50 = [];
       const arr60 = [];
+      // const arr70 = [];
       this.black_moves.forEach((move) => {
         arr10.push(move.finalMoves);
         arr20.push(move.fine);
@@ -593,6 +600,7 @@ export default {
         arr50.push(move.finalMoves);
         arr50.push(move.newMoves);
         arr60.push(move.protect);
+        // arr70.push(move.protect);
       });
 
       this.black_dominant_without_pawns = [
@@ -611,6 +619,9 @@ export default {
         ...new Set(arr50.flat(1).filter((x) => x !== undefined)),
       ];
       this.black_protection = [...new Set(arr60.flat(1))];
+      // this.black_dominant_everything_take_without_king = [
+      //   ...new Set(arr70.flat(1).filter((x) => x !== undefined)),
+      // ];
     },
     get_dangerous_piece() {
       this.white_moves.forEach((obj) => {
@@ -686,8 +697,10 @@ export default {
       } else {
         this.black_checked = false;
       }
+      let l = '';
       this.black_dominant_everything_straight.forEach((e) => {
         if (e === this.wK_position) {
+          l = e;
           squares.forEach((sq) => {
             if (sq.firstChild !== null && sq.firstChild.id === e) {
               this.white_checked = true;
@@ -695,6 +708,11 @@ export default {
           });
         }
       });
+      if (l === this.wK_position) {
+        return;
+      } else {
+        this.white_checked = false;
+      }
     },
     track_kings_position() {
       const squares = document.querySelectorAll('.square');
@@ -713,6 +731,10 @@ export default {
       let originalPiece = piece;
       let vario =
         piece == 'white' ? this.white_king_moves : this.black_king_moves;
+      let vario2 =
+        piece == 'white'
+          ? this.white_dominant_everything_take
+          : this.black_dominant_everything_take;
       let arr = [];
       const squares = document.querySelectorAll('.square');
       let h = [...new Set(vario.flat(2))];
@@ -746,6 +768,22 @@ export default {
         this.white_place_to_go = false;
       } else {
         this.white_place_to_go = true;
+      }
+      if (originalPiece === 'black') {
+        let b = vario2.filter((x) => x === this.dangerous_white_piece.piece);
+        if (b.length >= 1) {
+          this.can_take_dangerous_white_piece = true;
+        } else {
+          this.can_take_dangerous_white_piece = false;
+        }
+      }
+      if (originalPiece === 'white') {
+        let b = vario2.filter((x) => x === this.dangerous_black_piece.piece);
+        if (b.length >= 1) {
+          this.can_take_dangerous_black_piece = true;
+        } else {
+          this.can_take_dangerous_black_piece = false;
+        }
       }
     },
 
@@ -943,7 +981,11 @@ export default {
                       self.check_if_king_can_take_unprotected_piece('black');
 
                       self.white_dominant_everything_straight.forEach((e) => {
-                        if (e === self.bK_position && !self.black_place_to_go) {
+                        if (
+                          e === self.bK_position &&
+                          !self.black_place_to_go &&
+                          !self.can_take_dangerous_white_piece
+                        ) {
                           console.log('checkmate white win!');
                         }
                       });
@@ -978,7 +1020,11 @@ export default {
                       self.check_if_king_can_take_unprotected_piece('white');
 
                       self.black_dominant_everything_straight.forEach((e) => {
-                        if (e === self.wK_position && !self.white_place_to_go) {
+                        if (
+                          e === self.wK_position &&
+                          !self.white_place_to_go &&
+                          !self.can_take_dangerous_black_piece
+                        ) {
                           console.log('checkmate black win!');
                         }
                       });
