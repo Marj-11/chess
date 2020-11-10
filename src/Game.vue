@@ -970,9 +970,13 @@ export default {
                       self.black_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
                         div.classList.add('black');
-                        squares.forEach((s) => {
-                          if (s2 === s.id) {
-                            s.appendChild(div);
+                        self.dangerous_white_piece.finalMoves.forEach((s) => {
+                          if (s2 === s) {
+                            squares.forEach((k) => {
+                              if (s2 === k.id) {
+                                k.appendChild(div);
+                              }
+                            });
                           }
                         });
                       });
@@ -1008,9 +1012,13 @@ export default {
                       self.white_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
                         div.classList.add('white');
-                        squares.forEach((s) => {
-                          if (s2 === s.id) {
-                            s.appendChild(div);
+                        self.dangerous_black_piece.finalMoves.forEach((s) => {
+                          if (s2 === s) {
+                            squares.forEach((k) => {
+                              if (s2 === k.id) {
+                                k.appendChild(div);
+                              }
+                            });
                           }
                         });
                       });
