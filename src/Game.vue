@@ -248,14 +248,14 @@ export default {
       //   },
       //   {
       //     imageUrl: 'bB.png',
-      //     start_position: 'c5',
-      //     new_position: 'c5',
+      //     start_position: 'f8',
+      //     new_position: 'f8',
       //     captured: false,
       //   },
       //   {
       //     imageUrl: 'bQ.png',
-      //     start_position: 'h4',
-      //     new_position: 'h4',
+      //     start_position: 'a5',
+      //     new_position: 'a5',
       //     captured: false,
       //   },
       //   {
@@ -278,7 +278,7 @@ export default {
       //   },
       //   {
       //     imageUrl: 'bP.png',
-      //     start_position: 'c7',
+      //     start_position: 'c6',
       //     new_position: 'c7',
       //     captured: false,
       //   },
@@ -344,15 +344,15 @@ export default {
       //   },
       //   {
       //     imageUrl: 'wB.png',
-      //     start_position: 'f1',
-      //     new_position: 'f1',
-      //     captured: true,
+      //     start_position: 'c4',
+      //     new_position: 'c4',
+      //     captured: false,
       //   },
       //   {
       //     imageUrl: 'wQ.png',
-      //     start_position: 'd1',
-      //     new_position: 'd1',
-      //     captured: true,
+      //     start_position: 'f3',
+      //     new_position: 'f3',
+      //     captured: false,
       //   },
       //   {
       //     imageUrl: 'wK.png',
@@ -738,10 +738,14 @@ export default {
 
       if (originalPiece === 'black' && final.length === 0) {
         this.black_place_to_go = false;
+      } else {
+        this.black_place_to_go = true;
       }
 
       if (originalPiece === 'white' && final.length === 0) {
         this.white_place_to_go = false;
+      } else {
+        this.white_place_to_go = true;
       }
     },
 
@@ -934,10 +938,9 @@ export default {
                           }
                         });
                       });
-
-                      self.check_if_king_can_take_unprotected_piece('black');
                       get_moves();
                       self.get_dominant_protection();
+                      self.check_if_king_can_take_unprotected_piece('black');
 
                       self.white_dominant_everything_straight.forEach((e) => {
                         if (e === self.bK_position && !self.black_place_to_go) {
@@ -959,6 +962,7 @@ export default {
                       get_moves();
                       self.get_dominant_protection();
 
+                      self.check_if_king_can_take_unprotected_piece('white');
                       self.white_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
                         div.classList.add('white');
@@ -968,10 +972,10 @@ export default {
                           }
                         });
                       });
-
                       self.check_if_king_can_take_unprotected_piece('white');
                       get_moves();
                       self.get_dominant_protection();
+                      self.check_if_king_can_take_unprotected_piece('white');
 
                       self.black_dominant_everything_straight.forEach((e) => {
                         if (e === self.wK_position && !self.white_place_to_go) {
@@ -1806,7 +1810,10 @@ export default {
               if (square.id === obj) {
                 protect.push(obj);
                 if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === 'black') {
+                  if (
+                    square.firstElementChild.classList[0] === 'black' ||
+                    square.firstElementChild.tagName === 'DIV'
+                  ) {
                     finalMoves.push(obj);
                   }
                 } else {
@@ -1823,6 +1830,7 @@ export default {
       this.white_king_moves = [];
       this.white_king_moves = finalMoves;
       // might create a problem with defence!
+
       if (!this.white_checked) {
         this.white_moves.push({ finalMoves, protect });
       }
@@ -1856,7 +1864,10 @@ export default {
               if (square.id === obj) {
                 protect.push(obj);
                 if (square.firstElementChild) {
-                  if (square.firstElementChild.classList[0] === 'white') {
+                  if (
+                    square.firstElementChild.classList[0] === 'white' ||
+                    square.firstElementChild.tagName === 'DIV'
+                  ) {
                     finalMoves.push(obj);
                   }
                 } else {
