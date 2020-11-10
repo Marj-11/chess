@@ -215,6 +215,199 @@ export default {
           captured: false,
         },
       ],
+      // entries: [
+      //   {
+      //     imageUrl: 'bR.png',
+      //     start_position: 'a8',
+      //     new_position: 'a8',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bR.png',
+      //     start_position: 'h8',
+      //     new_position: 'h8',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bN.png',
+      //     start_position: 'b8',
+      //     new_position: 'b8',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bN.png',
+      //     start_position: 'g8',
+      //     new_position: 'g8',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bB.png',
+      //     start_position: 'c8',
+      //     new_position: 'c8',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bB.png',
+      //     start_position: 'c5',
+      //     new_position: 'c5',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bQ.png',
+      //     start_position: 'h4',
+      //     new_position: 'h4',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bK.png',
+      //     start_position: 'e8',
+      //     new_position: 'e8',
+      //     black_checkmate: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'a7',
+      //     new_position: 'a7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'b7',
+      //     new_position: 'b7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'c7',
+      //     new_position: 'c7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'd7',
+      //     new_position: 'd7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'e7',
+      //     new_position: 'e7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'f7',
+      //     new_position: 'f7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'g7',
+      //     new_position: 'g7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'bP.png',
+      //     start_position: 'h7',
+      //     new_position: 'h7',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wR.png',
+      //     start_position: 'a1',
+      //     new_position: 'a1',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wR.png',
+      //     start_position: 'c1',
+      //     new_position: 'c1',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wN.png',
+      //     start_position: 'b1',
+      //     new_position: 'b1',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wN.png',
+      //     start_position: 'g1',
+      //     new_position: 'g1',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wB.png',
+      //     start_position: 'c1',
+      //     new_position: 'c1',
+      //     captured: true,
+      //   },
+      //   {
+      //     imageUrl: 'wB.png',
+      //     start_position: 'f1',
+      //     new_position: 'f1',
+      //     captured: true,
+      //   },
+      //   {
+      //     imageUrl: 'wQ.png',
+      //     start_position: 'd1',
+      //     new_position: 'd1',
+      //     captured: true,
+      //   },
+      //   {
+      //     imageUrl: 'wK.png',
+      //     start_position: 'e1',
+      //     new_position: 'e1',
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'a2',
+      //     new_position: 'a2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'b2',
+      //     new_position: 'b2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'c2',
+      //     new_position: 'c2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'd2',
+      //     new_position: 'd2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'e2',
+      //     new_position: 'e2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'f2',
+      //     new_position: 'f2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'g2',
+      //     new_position: 'g2',
+      //     captured: false,
+      //   },
+      //   {
+      //     imageUrl: 'wP.png',
+      //     start_position: 'h2',
+      //     new_position: 'h2',
+      //     captured: false,
+      //   },
+      // ],
       moves: [],
       white_moves: [],
       black_moves: [],
@@ -223,6 +416,9 @@ export default {
       black_dominant_take_pawns: '',
       black_dominant_everything_straight: '',
       black_dominant_everything_take: '',
+
+      dangerous_white_piece: '',
+      dangerous_black_piece: '',
 
       white_dominant_without_pawns: '',
       white_dominant_straight_pawns: '',
@@ -240,20 +436,16 @@ export default {
       white_checked: false,
       black_checked: false,
 
-      can_take_black_dangerous: false,
-      can_take_white_dangerous: false,
-
       white_checkmate: false,
       black_checkmate: false,
-
-      dangerous_white_piece: '',
-      dangerous_black_piece: '',
 
       black_king_moves: [],
       white_king_moves: [],
 
-      black_place_to_go: false,
-      white_place_to_go: false,
+      black_place_to_go: true,
+      white_place_to_go: true,
+
+      protected_pieces: [],
     };
   },
   watch: {
@@ -345,7 +537,6 @@ export default {
       });
     },
     get_dominant_protection() {
-      const squares = document.querySelectorAll('.square');
       this.white_dominant_everything_straight = [];
       this.white_dominant_everything_take = [];
       const arr1 = [];
@@ -354,6 +545,7 @@ export default {
       const arr4 = [];
       const arr5 = [];
       const arr6 = [];
+
       this.white_moves.forEach((move) => {
         arr1.push(move.finalMoves);
         arr2.push(move.fine);
@@ -365,11 +557,21 @@ export default {
         arr6.push(move.protect);
       });
 
-      this.white_dominant_without_pawns = [...new Set(arr1.flat(1))];
-      this.white_dominant_straight_pawns = [...new Set(arr2.flat(1))];
-      this.white_dominant_take_pawns = [...new Set(arr3.flat(1))];
-      this.white_dominant_everything_straight = [...new Set(arr4.flat(1))];
-      this.white_dominant_everything_take = [...new Set(arr5.flat(1))];
+      this.white_dominant_without_pawns = [
+        ...new Set(arr1.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.white_dominant_straight_pawns = [
+        ...new Set(arr2.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.white_dominant_take_pawns = [
+        ...new Set(arr3.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.white_dominant_everything_straight = [
+        ...new Set(arr4.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.white_dominant_everything_take = [
+        ...new Set(arr5.flat(1).filter((x) => x !== undefined)),
+      ];
       this.white_protection = [...new Set(arr6.flat(1))];
 
       ///////
@@ -393,54 +595,22 @@ export default {
         arr60.push(move.protect);
       });
 
-      this.black_dominant_without_pawns = [...new Set(arr10.flat(1))];
-      this.black_dominant_straight_pawns = [...new Set(arr20.flat(1))];
-      this.black_dominant_take_pawns = [...new Set(arr30.flat(1))];
-      this.black_dominant_everything_straight = [...new Set(arr40.flat(1))];
-      this.black_dominant_everything_take = [...new Set(arr50.flat(1))];
+      this.black_dominant_without_pawns = [
+        ...new Set(arr10.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.black_dominant_straight_pawns = [
+        ...new Set(arr20.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.black_dominant_take_pawns = [
+        ...new Set(arr30.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.black_dominant_everything_straight = [
+        ...new Set(arr40.flat(1).filter((x) => x !== undefined)),
+      ];
+      this.black_dominant_everything_take = [
+        ...new Set(arr50.flat(1).filter((x) => x !== undefined)),
+      ];
       this.black_protection = [...new Set(arr60.flat(1))];
-    },
-    check_kings() {
-      let r = '';
-      const squares = document.querySelectorAll('.square');
-      this.white_dominant_everything_straight.forEach((e) => {
-        if (e === this.bK_position) {
-          r = e;
-          squares.forEach((sq) => {
-            if (sq.firstChild !== null && sq.firstChild.id === e) {
-              this.black_checked = true;
-            }
-          });
-        }
-      });
-      if (r === this.bK_position) {
-        return;
-      } else {
-        this.black_checked = false;
-      }
-      this.black_dominant_everything_straight.forEach((e) => {
-        if (e === this.wK_position) {
-          squares.forEach((sq) => {
-            if (sq.firstChild !== null && sq.firstChild.id === e) {
-              this.white_checked = true;
-              // this.can_take_black_dangerous = true;
-            }
-          });
-        }
-      });
-    },
-    track_kings_position() {
-      const squares = document.querySelectorAll('.square');
-      squares.forEach((square) => {
-        if (square.firstChild !== null && square.firstChild.alt === 'wK') {
-          this.wK_position = square.id;
-        } else if (
-          square.firstChild !== null &&
-          square.firstChild.alt === 'bK'
-        ) {
-          this.bK_position = square.id;
-        }
-      });
     },
     get_dangerous_piece() {
       this.white_moves.forEach((obj) => {
@@ -468,6 +638,113 @@ export default {
         //  else fine or take pawns
       });
     },
+    protect_pieces() {
+      const squares = document.querySelectorAll('.square');
+
+      this.black_protection.forEach((p) => {
+        if (p !== undefined) {
+          squares.forEach((e) => {
+            if (
+              e.firstChild !== null &&
+              e.firstChild.classList == 'black' &&
+              p === e.firstChild.id
+            ) {
+              e.firstChild.classList.add('protected');
+            }
+          });
+        }
+      });
+      this.white_protection.forEach((p) => {
+        if (p !== undefined) {
+          squares.forEach((e) => {
+            if (
+              e.firstChild !== null &&
+              e.firstChild.classList == 'white' &&
+              p === e.firstChild.id
+            ) {
+              e.firstChild.classList.add('protected');
+            }
+          });
+        }
+      });
+    },
+    check_kings() {
+      let r = '';
+      const squares = document.querySelectorAll('.square');
+      this.white_dominant_everything_straight.forEach((e) => {
+        if (e === this.bK_position) {
+          r = e;
+          squares.forEach((sq) => {
+            if (sq.firstChild !== null && sq.firstChild.id === e) {
+              this.black_checked = true;
+            }
+          });
+        }
+      });
+      if (r === this.bK_position) {
+        return;
+      } else {
+        this.black_checked = false;
+      }
+      this.black_dominant_everything_straight.forEach((e) => {
+        if (e === this.wK_position) {
+          squares.forEach((sq) => {
+            if (sq.firstChild !== null && sq.firstChild.id === e) {
+              this.white_checked = true;
+            }
+          });
+        }
+      });
+    },
+    track_kings_position() {
+      const squares = document.querySelectorAll('.square');
+      squares.forEach((square) => {
+        if (square.firstChild !== null && square.firstChild.alt === 'wK') {
+          this.wK_position = square.id;
+        } else if (
+          square.firstChild !== null &&
+          square.firstChild.alt === 'bK'
+        ) {
+          this.bK_position = square.id;
+        }
+      });
+    },
+    check_if_king_can_take_unprotected_piece(piece) {
+      let originalPiece = piece;
+      let vario =
+        piece == 'white' ? this.white_king_moves : this.black_king_moves;
+      let arr = [];
+      const squares = document.querySelectorAll('.square');
+      let h = [...new Set(vario.flat(2))];
+      h.forEach((e) => {
+        squares.forEach((s) => {
+          if (
+            e === s.id &&
+            s.firstChild !== null &&
+            s.firstChild.classList.contains('protected')
+          ) {
+            arr.push(s.firstChild.id);
+          }
+        });
+      });
+
+      let alternative =
+        originalPiece == 'white'
+          ? this.black_dominant_everything_take
+          : this.white_dominant_everything_take;
+
+      let difference = h.filter((x) => !arr.includes(x));
+      let final = difference.filter((x) => !alternative.includes(x));
+
+      if (originalPiece === 'black' && final.length === 0) {
+        this.black_place_to_go = false;
+      }
+
+      if (originalPiece === 'white' && final.length === 0) {
+        this.white_place_to_go = false;
+      }
+    },
+
     //######################################################
     //######################################################
     //###################### mouse down ####################
@@ -495,6 +772,7 @@ export default {
       if (piece.tagName == 'DIV') {
         return;
       }
+
       if (event.button == 0) {
         let new_piece = this.selected_piece(piece, square);
         this.available_moves(new_piece);
@@ -525,6 +803,7 @@ export default {
             }
           });
         });
+
         //######################################################
         //######################################################
         //###################### mouse event ###################
@@ -632,30 +911,19 @@ export default {
 
                     self.get_dominant_protection();
 
+                    self.protect_pieces();
                     // track wK & bK
                     self.track_kings_position();
 
                     // checking kings
                     self.check_kings();
 
+                    // check if king can take unprotected piece
+
                     if (self.black_checked) {
                       self.get_dangerous_piece();
                       get_moves();
                       self.get_dominant_protection();
-                      self.can_take_white_dangerous = false;
-                      self.black_dominant_everything_take.forEach((e) => {
-                        if (e === self.dangerous_white_piece.piece) {
-                          self.can_take_white_dangerous = true;
-                        }
-                      });
-
-                      self.black_king_moves.forEach((e) => {
-                        if (self.white_dominant_everything_take.includes(e)) {
-                          return;
-                        } else {
-                          self.black_place_to_go = true;
-                        }
-                      });
 
                       self.black_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
@@ -667,22 +935,48 @@ export default {
                         });
                       });
 
+                      self.check_if_king_can_take_unprotected_piece('black');
                       get_moves();
                       self.get_dominant_protection();
 
                       self.white_dominant_everything_straight.forEach((e) => {
-                        if (
-                          e === self.bK_position &&
-                          !self.can_take_white_dangerous &&
-                          !self.black_place_to_go
-                        ) {
-                          console.log('checkmate');
+                        if (e === self.bK_position && !self.black_place_to_go) {
+                          console.log('checkmate white win!');
                         }
-                        console.log(
-                          e === self.bK_position,
-                          self.can_take_white_dangerous,
-                          self.black_place_to_go
-                        );
+                      });
+
+                      squares.forEach((s) => {
+                        if (
+                          s.hasChildNodes() &&
+                          s.firstChild.tagName === 'DIV'
+                        ) {
+                          s.innerHTML = '';
+                        }
+                      });
+                    }
+                    if (self.white_checked) {
+                      self.get_dangerous_piece();
+                      get_moves();
+                      self.get_dominant_protection();
+
+                      self.white_dominant_everything_straight.forEach((s2) => {
+                        let div = document.createElement('div');
+                        div.classList.add('white');
+                        squares.forEach((s) => {
+                          if (s2 === s.id) {
+                            s.appendChild(div);
+                          }
+                        });
+                      });
+
+                      self.check_if_king_can_take_unprotected_piece('white');
+                      get_moves();
+                      self.get_dominant_protection();
+
+                      self.black_dominant_everything_straight.forEach((e) => {
+                        if (e === self.wK_position && !self.white_place_to_go) {
+                          console.log('checkmate black win!');
+                        }
                       });
 
                       squares.forEach((s) => {
@@ -704,8 +998,6 @@ export default {
                     piece.style.top = '0px';
                     piece.style.left = '0px';
                   }
-
-                  // console.log(self.black_dominant_everything_straight);
                 };
               }
             }
@@ -1528,6 +1820,8 @@ export default {
       if (!check) {
         this.moves.push(finalMoves);
       }
+      this.white_king_moves = [];
+      this.white_king_moves = finalMoves;
       // might create a problem with defence!
       if (!this.white_checked) {
         this.white_moves.push({ finalMoves, protect });
@@ -1576,10 +1870,10 @@ export default {
       if (!check) {
         this.moves.push(finalMoves);
       }
-      if (check) {
-        this.black_king_moves = [];
-        this.black_king_moves = finalMoves;
-      }
+
+      this.black_king_moves = [];
+      this.black_king_moves = finalMoves;
+
       //  might create a problem with defence!
       if (!this.black_checked) {
         this.black_moves.push({ finalMoves, protect });
