@@ -4,7 +4,8 @@
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
-        "start": "vue-cli-service start"
+        "build": "vue-cli-service buildy",
+        "start": "node server.js"
     },
     "dependencies": {
         "stockfish": "^10.0.2",
