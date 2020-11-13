@@ -6,6 +6,8 @@
       :class="[field.class, field.color]"
       :id="field.id"
     ></div>
+    <audio ref="moving" src="@/assets/knock.mp3"></audio>
+    <audio ref="capture" src="@/assets/capture.mp3"></audio>
   </div>
 </template>
 
@@ -13,10 +15,10 @@
 export default {
   data() {
     return {
-      // imageUrl:
-      //   "https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/",
       imageUrl:
-        'https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/',
+        'https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/',
+      // imageUrl:
+      //   'https://raw.githubusercontent.com/Marj-11/chess/master/wikipedia/',
       fields: [],
       x: ['8', '7', '6', '5', '4', '3', '2', '1'],
       y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
@@ -215,199 +217,7 @@ export default {
           captured: false,
         },
       ],
-      // entries: [
-      //   {
-      //     imageUrl: 'bR.png',
-      //     start_position: 'a8',
-      //     new_position: 'a8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bR.png',
-      //     start_position: 'h8',
-      //     new_position: 'h8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bN.png',
-      //     start_position: 'b8',
-      //     new_position: 'b8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bN.png',
-      //     start_position: 'g8',
-      //     new_position: 'g8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bB.png',
-      //     start_position: 'c8',
-      //     new_position: 'c8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bB.png',
-      //     start_position: 'f8',
-      //     new_position: 'f8',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bQ.png',
-      //     start_position: 'a5',
-      //     new_position: 'a5',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bK.png',
-      //     start_position: 'e8',
-      //     new_position: 'e8',
-      //     black_checkmate: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'a7',
-      //     new_position: 'a7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'b7',
-      //     new_position: 'b7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'c6',
-      //     new_position: 'c7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'd7',
-      //     new_position: 'd7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'e7',
-      //     new_position: 'e7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'f7',
-      //     new_position: 'f7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'g7',
-      //     new_position: 'g7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'bP.png',
-      //     start_position: 'h7',
-      //     new_position: 'h7',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wR.png',
-      //     start_position: 'a1',
-      //     new_position: 'a1',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wR.png',
-      //     start_position: 'c1',
-      //     new_position: 'c1',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wN.png',
-      //     start_position: 'b1',
-      //     new_position: 'b1',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wN.png',
-      //     start_position: 'g1',
-      //     new_position: 'g1',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wB.png',
-      //     start_position: 'c1',
-      //     new_position: 'c1',
-      //     captured: true,
-      //   },
-      //   {
-      //     imageUrl: 'wB.png',
-      //     start_position: 'c4',
-      //     new_position: 'c4',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wQ.png',
-      //     start_position: 'f3',
-      //     new_position: 'f3',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wK.png',
-      //     start_position: 'e1',
-      //     new_position: 'e1',
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'a2',
-      //     new_position: 'a2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'b2',
-      //     new_position: 'b2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'c2',
-      //     new_position: 'c2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'd2',
-      //     new_position: 'd2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'e2',
-      //     new_position: 'e2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'f2',
-      //     new_position: 'f2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'g2',
-      //     new_position: 'g2',
-      //     captured: false,
-      //   },
-      //   {
-      //     imageUrl: 'wP.png',
-      //     start_position: 'h2',
-      //     new_position: 'h2',
-      //     captured: false,
-      //   },
-      // ],
+      recorded_entries: [],
       moves: [],
       white_moves: [],
       black_moves: [],
@@ -461,9 +271,7 @@ export default {
       } else {
         const squares = document.querySelectorAll('.square');
         squares.forEach((s) => {
-          if (s.id === this.bK_position) {
-            s.classList.remove('kingDanger');
-          }
+          s.classList.remove('kingDanger');
         });
       }
     },
@@ -478,9 +286,7 @@ export default {
       } else {
         const squares = document.querySelectorAll('.square');
         squares.forEach((s) => {
-          if (s.id === this.wK_position) {
-            s.classList.remove('kingDanger');
-          }
+          s.classList.remove('kingDanger');
         });
       }
     },
@@ -521,10 +327,12 @@ export default {
       });
     },
     render_new_position() {
+      this.moving();
       const squares = document.querySelectorAll('.square');
       squares.forEach((child) => {
         child.innerHTML = '';
       });
+
       squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
         let img = new Image();
@@ -541,6 +349,14 @@ export default {
           }
         });
       });
+    },
+    moving() {
+      let audio = this.$refs.moving;
+      audio.play();
+    },
+    capture() {
+      let audio = this.$refs.capture;
+      audio.play();
     },
     get_dominant_protection() {
       this.white_dominant_everything_straight = [];
@@ -818,10 +634,13 @@ export default {
       if (event.button == 0) {
         let new_piece = this.selected_piece(piece, square);
         this.available_moves(new_piece);
-        piece.style.width = '70px';
+
+        piece.style.width = 'calc(var(--square_size) / 7)';
         piece.style.zIndex = 2;
         piece.style.cursor = 'grabbing';
-        piece.style.position = 'absolute';
+        square.style.display = 'flex';
+        // piece.style.marginTop = event.clientY - 450 + 'px';
+        // piece.style.marginLeft = event.clientX - 500 + 'px';
 
         this.moves[0].forEach((allowed) => {
           squares.forEach((s) => {
@@ -867,25 +686,25 @@ export default {
 
         function onMouseMove(event) {
           moveAt(event.pageX, event.pageY);
-          if (
-            event.pageX < 150 ||
-            event.pageX > 900 ||
-            event.pageY < 20 ||
-            event.pageY > 550
-          ) {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onmouseup);
-            piece.style.width = '62px';
-            piece.style.cursor = 'grab';
-            square.style.display = 'flex';
-            piece.setAttribute('id', square.id);
-            square.appendChild(piece);
-            square.style.justifyContent = 'center';
-            square.style.position = 'relative';
-            piece.style.position = 'absolute';
-            piece.style.top = '0px';
-            piece.style.left = '0px';
-          }
+          // if (
+          //   event.pageX < 150 ||
+          //   event.pageX > 900 ||
+          //   event.pageY < 20 ||
+          //   event.pageY > 550
+          // ) {
+          //   document.removeEventListener('mousemove', onMouseMove);
+          //   document.addEventListener('mouseup', onmouseup);
+          //   piece.style.width = '62px';
+          //   piece.style.cursor = 'grab';
+          //   square.style.display = 'flex';
+          //   piece.setAttribute('id', square.id);
+          //   square.appendChild(piece);
+          //   square.style.justifyContent = 'center';
+          //   square.style.position = 'relative';
+          //   piece.style.position = 'absolute';
+          //   piece.style.top = '0px';
+          //   piece.style.left = '0px';
+          // }
           piece.hidden = true;
           let elemBelow = document.elementFromPoint(
             event.clientX,
@@ -915,6 +734,11 @@ export default {
                 piece.onmouseup = function(e) {
                   e.preventDefault();
 
+                  squares.forEach((s) => {
+                    s.classList.remove('droppable');
+                    s.classList.remove('mark');
+                    s.classList.remove('target');
+                  });
                   if (currentDroppable) {
                     if (piece.alt.charAt(0) === 'b') {
                       self.whiteToPlay = true;
@@ -924,24 +748,17 @@ export default {
 
                     document.removeEventListener('mousemove', onMouseMove);
                     piece.onmouseup = null;
-                    piece.style.width = '62px';
+                    piece.style.width = 'calc(var(--square_size) / 8)';
                     piece.style.cursor = 'grab';
                     piece.style.zIndex = 1;
-
+                    square.style.position = 'relative';
+                    piece.style.position = 'absolute';
+                    piece.style.top = '0px';
+                    piece.style.left = '0px';
                     const takenPiece = currentDroppable.firstChild;
-                    Object.values(entries).forEach((entryPiece) => {
-                      if (
-                        takenPiece !== null &&
-                        takenPiece.id === entryPiece.new_position
-                      ) {
-                        entryPiece.captured = true;
-                        render();
-                      } else if (piece.id === entryPiece.new_position) {
-                        entryPiece.new_position = currentDroppable.id;
-                        render();
-                      }
-                    });
 
+                    // self.recorded_entries.push(self.entries);
+                    // console.log(self.recorded_entries);
                     currentDroppable.style.position = 'relative';
                     piece.style.position = 'absolute';
                     piece.style.top = '0px';
@@ -961,6 +778,29 @@ export default {
                     self.check_kings();
 
                     // check if king can take unprotected piece
+                    Object.values(entries).forEach((entryPiece) => {
+                      if (
+                        takenPiece !== null &&
+                        takenPiece.id === entryPiece.new_position
+                      ) {
+                        entryPiece.captured = true;
+                        self.capture();
+                        render();
+                      } else if (piece.id === entryPiece.new_position) {
+                        entryPiece.new_position = currentDroppable.id;
+                        render();
+                      }
+                    });
+                    get_moves();
+
+                    self.get_dominant_protection();
+
+                    self.protect_pieces();
+                    // track wK & bK
+                    self.track_kings_position();
+
+                    // checking kings
+                    self.check_kings();
 
                     if (self.black_checked) {
                       self.get_dangerous_piece();
@@ -970,15 +810,21 @@ export default {
                       self.black_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
                         div.classList.add('black');
-                        self.dangerous_white_piece.finalMoves.forEach((s) => {
-                          if (s2 === s) {
-                            squares.forEach((k) => {
-                              if (s2 === k.id) {
-                                k.appendChild(div);
-                              }
-                            });
-                          }
-                        });
+                        if (
+                          self.dangerous_white_piece.finalMoves === undefined
+                        ) {
+                          return;
+                        } else {
+                          self.dangerous_white_piece.finalMoves.forEach((s) => {
+                            if (s2 === s) {
+                              squares.forEach((k) => {
+                                if (s2 === k.id) {
+                                  k.appendChild(div);
+                                }
+                              });
+                            }
+                          });
+                        }
                       });
                       get_moves();
                       self.get_dominant_protection();
@@ -1012,15 +858,22 @@ export default {
                       self.white_dominant_everything_straight.forEach((s2) => {
                         let div = document.createElement('div');
                         div.classList.add('white');
-                        self.dangerous_black_piece.finalMoves.forEach((s) => {
-                          if (s2 === s) {
-                            squares.forEach((k) => {
-                              if (s2 === k.id) {
-                                k.appendChild(div);
-                              }
-                            });
-                          }
-                        });
+
+                        if (
+                          self.dangerous_black_piece.finalMoves === undefined
+                        ) {
+                          return;
+                        } else {
+                          self.dangerous_black_piece.finalMoves.forEach((s) => {
+                            if (s2 === s) {
+                              squares.forEach((k) => {
+                                if (s2 === k.id) {
+                                  k.appendChild(div);
+                                }
+                              });
+                            }
+                          });
+                        }
                       });
                       self.check_if_king_can_take_unprotected_piece('white');
                       get_moves();
@@ -1048,7 +901,7 @@ export default {
                     }
                   } else {
                     document.removeEventListener('mousemove', onMouseMove);
-                    piece.style.width = '62px';
+                    piece.style.width = 'calc(var(--square_size) / 8)';
                     piece.style.zIndex = 1;
                     piece.style.cursor = 'grab';
                     square.style.position = 'relative';
@@ -1068,7 +921,7 @@ export default {
           document.removeEventListener('mousemove', onMouseMove);
           piece.style.zIndex = 1;
           piece.onmouseup = null;
-          piece.style.width = '62px';
+          piece.style.width = 'calc(var(--square_size) / 8)';
           piece.style.cursor = 'grab';
           square.style.position = 'relative';
           piece.style.position = 'absolute';
@@ -1093,9 +946,9 @@ export default {
         }
 
         function leaveDroppable(elem) {
-          // if (elem == null) {
-          //   return;
-          // }
+          if (elem == null) {
+            return;
+          }
 
           elem.style.borderColor = 'transparent';
         }
@@ -1970,21 +1823,21 @@ export default {
 .black_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(231, 85, 0);
+  background-color: rgb(34, 128, 190);
 }
 
 .white_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
-  background-color: rgb(240, 169, 122);
+  background-color: rgb(162, 210, 255);
 }
 
 img {
-  width: 62px;
+  width: calc(var(--square_size) / 8);
   cursor: grab;
   z-index: 1;
   margin-top: -1.5px;
-  margin-left: -1px;
+  margin-left: -2px;
 }
 .whiteS {
   border: 2px transparent solid;
@@ -1993,24 +1846,34 @@ img {
 .mark::after {
   display: block;
   content: ' ';
-  margin: 18.5px auto;
-  width: 22px;
-  height: 22px;
-  background: rgba(85, 85, 85, 0.5);
+  margin: calc(var(--square_size) / 30) auto;
+  width: calc(var(--square_size) / 20);
+  height: calc(var(--square_size) / 20);
+  background: rgba(29, 29, 29, 0.8);
   border-radius: 50%;
   z-index: 0;
 }
 .target::after {
   display: block;
   content: ' ';
-  margin: 2px auto;
-  width: 55px;
-  height: 55px;
-  background: rgba(29, 29, 29, 0.4);
+  margin: calc(var(--square_size) / 200) auto;
+  width: calc(var(--square_size) / 10);
+  height: calc(var(--square_size) / 10);
+  background: rgba(29, 29, 29, 0.8);
   border-radius: 50%;
   z-index: 0;
 }
 .kingDanger {
   background-color: red;
+}
+@media (max-width: 600px) {
+  :root {
+    --square_size: 300px;
+  }
+}
+@media (max-width: 400px) {
+  :root {
+    --square_size: 280px;
+  }
 }
 </style>
