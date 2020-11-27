@@ -6,8 +6,33 @@
       :class="[field.class, field.color]"
       :id="field.id"
     ></div>
+    <div class="wrapping">
+      <div class="promotWhitePawn">
+        <img
+          @mousedown="replacePiece"
+          v-bind:src="imageUrl + 'wQQ.png'"
+          alt="queen"
+        />
+        <img
+          @mousedown="replacePiece"
+          v-bind:src="imageUrl + 'wRr.png'"
+          alt="rook"
+        />
+        <img
+          @mousedown="replacePiece"
+          v-bind:src="imageUrl + 'wNN.png'"
+          alt="knight"
+        />
+        <img
+          @mousedown="replacePiece"
+          v-bind:src="imageUrl + 'wBB.png'"
+          alt="bishop"
+        />
+      </div>
+    </div>
     <audio ref="moving" src="@/assets/knock.mp3"></audio>
     <audio ref="capture" src="@/assets/capture.mp3"></audio>
+    <audio ref="castle" src="@/assets/castle.mp3"></audio>
   </div>
 </template>
 
@@ -15,6 +40,10 @@
 export default {
   data() {
     return {
+      white_kingside_castling: true,
+      white_queenside_castling: true,
+      black_kingside_castling: true,
+      black_queenside_castling: true,
       imageUrl:
         'https://raw.githubusercontent.com/Marj-11/chess-final/master/src/assets/',
       // imageUrl:
@@ -26,192 +55,192 @@ export default {
       class: ['square', 'whiteS'],
       entries: [
         {
-          imageUrl: 'bR.png',
+          imageUrl: 'bRl.png',
           start_position: 'a8',
           new_position: 'a8',
           captured: false,
         },
         {
-          imageUrl: 'bR.png',
+          imageUrl: 'bRr.png',
           start_position: 'h8',
           new_position: 'h8',
           captured: false,
         },
         {
-          imageUrl: 'bN.png',
+          imageUrl: 'bNN.png',
           start_position: 'b8',
           new_position: 'b8',
-          captured: false,
+          captured: true,
         },
         {
-          imageUrl: 'bN.png',
+          imageUrl: 'bNN.png',
           start_position: 'g8',
           new_position: 'g8',
           captured: false,
         },
         {
-          imageUrl: 'bB.png',
+          imageUrl: 'bBB.png',
           start_position: 'c8',
           new_position: 'c8',
           captured: false,
         },
         {
-          imageUrl: 'bB.png',
+          imageUrl: 'bBB.png',
           start_position: 'f8',
           new_position: 'f8',
           captured: false,
         },
         {
-          imageUrl: 'bQ.png',
+          imageUrl: 'bQQ.png',
           start_position: 'd8',
           new_position: 'd8',
           captured: false,
         },
         {
-          imageUrl: 'bK.png',
+          imageUrl: 'bKK.png',
           start_position: 'e8',
           new_position: 'e8',
           black_checkmate: false,
         },
         {
-          imageUrl: 'bP.png',
+          imageUrl: 'bPP.png',
           start_position: 'a7',
           new_position: 'a7',
           captured: false,
         },
         {
-          imageUrl: 'bP.png',
-          start_position: 'b7',
-          new_position: 'b7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'c7',
-          new_position: 'c7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'd7',
-          new_position: 'd7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'e7',
-          new_position: 'e7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'f7',
-          new_position: 'f7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'g7',
-          new_position: 'g7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bP.png',
-          start_position: 'h7',
-          new_position: 'h7',
-          captured: false,
-        },
-        {
-          imageUrl: 'wR.png',
-          start_position: 'a1',
-          new_position: 'a1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wR.png',
-          start_position: 'h1',
-          new_position: 'h1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wN.png',
-          start_position: 'b1',
-          new_position: 'b1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wN.png',
-          start_position: 'g1',
-          new_position: 'g1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wB.png',
-          start_position: 'c1',
-          new_position: 'c1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wB.png',
-          start_position: 'f1',
-          new_position: 'f1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wQ.png',
-          start_position: 'd1',
-          new_position: 'd1',
-          captured: false,
-        },
-        {
-          imageUrl: 'wK.png',
-          start_position: 'e1',
-          new_position: 'e1',
-        },
-        {
-          imageUrl: 'wP.png',
-          start_position: 'a2',
-          new_position: 'a2',
-          captured: false,
-        },
-        {
-          imageUrl: 'wP.png',
+          imageUrl: 'bPP.png',
           start_position: 'b2',
           new_position: 'b2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'bPP.png',
+          start_position: 'c7',
+          new_position: 'c7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bPP.png',
+          start_position: 'd7',
+          new_position: 'd7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bPP.png',
+          start_position: 'e7',
+          new_position: 'e7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bPP.png',
+          start_position: 'f7',
+          new_position: 'f7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bPP.png',
+          start_position: 'g7',
+          new_position: 'g7',
+          captured: false,
+        },
+        {
+          imageUrl: 'bPP.png',
+          start_position: 'h7',
+          new_position: 'h7',
+          captured: false,
+        },
+        {
+          imageUrl: 'wRl.png',
+          start_position: 'a1',
+          new_position: 'a1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wRr.png',
+          start_position: 'h1',
+          new_position: 'h1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wNN.png',
+          start_position: 'b1',
+          new_position: 'b1',
+          captured: true,
+        },
+        {
+          imageUrl: 'wNN.png',
+          start_position: 'g1',
+          new_position: 'g1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wBB.png',
+          start_position: 'c1',
+          new_position: 'c1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wBB.png',
+          start_position: 'f1',
+          new_position: 'f1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wQQ.png',
+          start_position: 'd1',
+          new_position: 'd1',
+          captured: false,
+        },
+        {
+          imageUrl: 'wKK.png',
+          start_position: 'e1',
+          new_position: 'e1',
+        },
+        {
+          imageUrl: 'wPP.png',
+          start_position: 'a2',
+          new_position: 'a2',
+          captured: false,
+        },
+        {
+          imageUrl: 'wPP.png',
+          start_position: 'b7',
+          new_position: 'b7',
+          captured: false,
+        },
+        {
+          imageUrl: 'wPP.png',
           start_position: 'c2',
           new_position: 'c2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'wPP.png',
           start_position: 'd2',
           new_position: 'd2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'wPP.png',
           start_position: 'e2',
           new_position: 'e2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'wPP.png',
           start_position: 'f2',
           new_position: 'f2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'wPP.png',
           start_position: 'g2',
           new_position: 'g2',
           captured: false,
         },
         {
-          imageUrl: 'wP.png',
+          imageUrl: 'wPP.png',
           start_position: 'h2',
           new_position: 'h2',
           captured: false,
@@ -257,6 +286,16 @@ export default {
       white_place_to_go: true,
 
       protected_pieces: [],
+      white_kingside_castling_king_or_rook: false,
+      white_queenside_castling_king_or_rook: false,
+      black_kingside_castling_king_or_rook: false,
+      black_queenside_castling_king_or_rook: false,
+      white_newPosition: [],
+      black_newPosition: [],
+      black_defence: [],
+      white_defence: [],
+      black_figures: [],
+      black_pawns: [],
     };
   },
   watch: {
@@ -309,22 +348,47 @@ export default {
     },
     placePieces() {
       const squares = document.querySelectorAll('.square');
+
       squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
+
         let img = new Image();
         Object.values(this.entries).forEach((piece) => {
           if (square.id === piece.start_position && !piece.captured) {
             img.src = this.imageUrl + piece.imageUrl;
-            img.alt = piece.imageUrl.substring(0, 2);
+            img.alt = piece.imageUrl.substring(0, 3);
             img.id = square.id;
             img.draggable = true;
             img.style.position = 'absolute';
             img.classList =
-              img.src.charAt(img.src.length - 6) == 'b' ? 'black' : 'white';
+              img.src.charAt(img.src.length - 7) == 'b' ? 'black' : 'white';
             square.appendChild(img);
           }
         });
       });
+    },
+
+    replacePiece(e) {
+      const piece =
+        e.path[0].alt === 'queen'
+          ? 'wQQ.png'
+          : e.path[0].alt === 'rook'
+          ? 'wRr.png'
+          : e.path[0].alt === 'knight'
+          ? 'wNN.png'
+          : e.path[0].alt === 'bishop'
+          ? 'wBB.png'
+          : '';
+      Object.values(this.entries).forEach((entryPiece) => {
+        if (
+          entryPiece.new_position.substring(1) === '8' &&
+          entryPiece.imageUrl === 'wPP.png'
+        ) {
+          entryPiece.imageUrl = piece;
+        }
+      });
+      this.render_new_position();
+      document.querySelector('.wrapping').style.display = 'none';
     },
     render_new_position() {
       this.moving();
@@ -332,23 +396,212 @@ export default {
       squares.forEach((child) => {
         child.innerHTML = '';
       });
-
       squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
         let img = new Image();
         Object.values(this.entries).forEach((piece) => {
           if (square.id === piece.new_position && !piece.captured) {
             img.src = this.imageUrl + piece.imageUrl;
-            img.alt = piece.imageUrl.substring(0, 2);
+            img.alt = piece.imageUrl.substring(0, 3);
             img.id = square.id;
             img.draggable = true;
             img.style.position = 'absolute';
             img.classList =
-              img.src.charAt(img.src.length - 6) == 'b' ? 'black' : 'white';
+              img.src.charAt(img.src.length - 7) == 'b' ? 'black' : 'white';
             square.appendChild(img);
           }
         });
       });
+      // this.castling(entryPiece);
+    },
+    castling(entryPiece) {
+      // white kingside
+
+      if (
+        (entryPiece.imageUrl === 'wRr.png' &&
+          entryPiece.new_position !== 'h1') ||
+        (entryPiece.imageUrl === 'wKK.png' &&
+          entryPiece.new_position !== 'e1' &&
+          entryPiece.new_position !== 'g1')
+      ) {
+        this.white_kingside_castling_king_or_rook = true;
+      }
+      const occupied1 = Boolean(
+        this.black_dominant_everything_take.find((val) => {
+          return val === 'f1' || val === 'g1';
+        })
+      );
+      const whitePieces = Boolean(
+        this.entries.find((val) => {
+          return val.new_position === 'f1' || val.new_position === 'g1';
+        })
+      );
+      const whitePieces1 = Boolean(
+        this.entries.find((val) => {
+          return (
+            val.new_position === 'd1' ||
+            val.new_position === 'b1' ||
+            val.new_position === 'c1'
+          );
+        })
+      );
+      if (
+        this.white_kingside_castling_king_or_rook ||
+        occupied1 ||
+        this.white_checked ||
+        whitePieces
+      ) {
+        this.white_kingside_castling = false;
+      } else if (!occupied1) {
+        this.white_kingside_castling = true;
+      }
+      // white queenside
+      if (
+        (entryPiece.imageUrl === 'wRl.png' &&
+          entryPiece.new_position !== 'a1') ||
+        (entryPiece.imageUrl === 'wKK.png' &&
+          entryPiece.new_position !== 'e1' &&
+          entryPiece.new_position !== 'c1')
+      ) {
+        this.white_queenside_castling_king_or_rook = true;
+      }
+      const occupied2 = Boolean(
+        this.black_dominant_everything_take.find((val) => {
+          return val == 'b1' || val === 'c1' || val === 'd1';
+        })
+      );
+
+      if (
+        this.white_queenside_castling_king_or_rook ||
+        occupied2 ||
+        this.white_checked ||
+        whitePieces1
+      ) {
+        this.white_queenside_castling = false;
+      } else if (!occupied2) {
+        this.white_queenside_castling = true;
+      }
+      // other side
+      // black kingside
+      if (
+        (entryPiece.imageUrl === 'bRr.png' &&
+          entryPiece.new_position !== 'h8') ||
+        (entryPiece.imageUrl === 'bKK.png' &&
+          entryPiece.new_position !== 'e8' &&
+          entryPiece.new_position !== 'g8')
+      ) {
+        this.black_kingside_castling_king_or_rook = true;
+      }
+      const occupied3 = Boolean(
+        this.white_dominant_everything_take.find((val) => {
+          return val == 'f8' || val === 'g8';
+        })
+      );
+      const blackPieces = Boolean(
+        this.entries.find((val) => {
+          return val.new_position === 'f8' || val.new_position === 'g8';
+        })
+      );
+      const blackPieces1 = Boolean(
+        this.entries.find((val) => {
+          return (
+            val.new_position === 'd8' ||
+            val.new_position === 'b8' ||
+            val.new_position === 'c8'
+          );
+        })
+      );
+      if (
+        this.black_kingside_castling_king_or_rook ||
+        occupied3 ||
+        blackPieces ||
+        this.black_checked
+      ) {
+        this.black_kingside_castling = false;
+      } else if (!occupied3) {
+        this.black_kingside_castling = true;
+      }
+      // black queenside
+      if (
+        (entryPiece.imageUrl === 'bRl.png' &&
+          entryPiece.new_position !== 'a8') ||
+        (entryPiece.imageUrl === 'bKK.png' &&
+          entryPiece.new_position !== 'e8' &&
+          entryPiece.new_position !== 'c8')
+      ) {
+        this.black_queenside_castling_king_or_rook = true;
+      }
+      const occupied4 = Boolean(
+        this.white_dominant_everything_take.find((val) => {
+          return val == 'b8' || val === 'c8' || val === 'd8';
+        })
+      );
+
+      if (
+        this.black_queenside_castling_king_or_rook ||
+        occupied4 ||
+        this.black_checked ||
+        blackPieces1
+      ) {
+        this.black_queenside_castling = false;
+      } else if (!occupied4) {
+        this.black_queenside_castling = true;
+      }
+
+      if (
+        !this.white_kingside_castling_king_or_rook &&
+        entryPiece.imageUrl === 'wKK.png' &&
+        entryPiece.new_position === 'g1'
+      ) {
+        this.castle('wKK');
+      }
+      if (
+        !this.white_queenside_castling_king_or_rook &&
+        entryPiece.imageUrl === 'wKK.png' &&
+        entryPiece.new_position === 'c1'
+      ) {
+        this.castle('wKQ');
+      }
+      if (
+        !this.black_kingside_castling_king_or_rook &&
+        entryPiece.imageUrl === 'bKK.png' &&
+        entryPiece.new_position === 'g8'
+      ) {
+        this.castle('bKK');
+      }
+      if (
+        !this.black_queenside_castling_king_or_rook &&
+        entryPiece.imageUrl === 'bKK.png' &&
+        entryPiece.new_position === 'c8'
+      ) {
+        this.castle('bKQ');
+      }
+    },
+    castle(castleType) {
+      if (castleType === 'wKK') {
+        const found = this.entries.find((e) => e.imageUrl === 'wRr.png');
+        found.new_position = 'f1';
+        this.castlingSound();
+        this.render_new_position();
+      }
+      if (castleType === 'wKQ') {
+        const found = this.entries.find((e) => e.imageUrl === 'wRl.png');
+        found.new_position = 'd1';
+        this.castlingSound();
+        this.render_new_position();
+      }
+      if (castleType === 'bKK') {
+        const found = this.entries.find((e) => e.imageUrl === 'bRr.png');
+        found.new_position = 'f8';
+        this.castlingSound();
+        this.render_new_position();
+      }
+      if (castleType === 'bKQ') {
+        const found = this.entries.find((e) => e.imageUrl === 'bRl.png');
+        found.new_position = 'd8';
+        this.castlingSound();
+        this.render_new_position();
+      }
     },
     moving() {
       let audio = this.$refs.moving;
@@ -356,6 +609,10 @@ export default {
     },
     capture() {
       let audio = this.$refs.capture;
+      audio.play();
+    },
+    castlingSound() {
+      let audio = this.$refs.castle;
       audio.play();
     },
     get_dominant_protection() {
@@ -367,6 +624,7 @@ export default {
       const arr4 = [];
       const arr5 = [];
       const arr6 = [];
+      const arr7 = [];
 
       this.white_moves.forEach((move) => {
         arr1.push(move.finalMoves);
@@ -377,6 +635,11 @@ export default {
         arr5.push(move.finalMoves);
         arr5.push(move.newMoves);
         arr6.push(move.protect);
+      });
+      this.entries.forEach((entry) => {
+        if (entry.imageUrl.substring(0, 1) === 'w') {
+          arr7.push(entry.new_position);
+        }
       });
 
       this.white_dominant_without_pawns = [
@@ -395,6 +658,7 @@ export default {
         ...new Set(arr5.flat(1).filter((x) => x !== undefined)),
       ];
       this.white_protection = [...new Set(arr6.flat(1))];
+      this.white_newPosition = [...new Set(arr7.flat(1))];
 
       ///////
 
@@ -406,7 +670,9 @@ export default {
       const arr40 = [];
       const arr50 = [];
       const arr60 = [];
-      // const arr70 = [];
+      const arr70 = [];
+      const arr80 = [];
+      const arr90 = [];
       this.black_moves.forEach((move) => {
         arr10.push(move.finalMoves);
         arr20.push(move.fine);
@@ -416,7 +682,17 @@ export default {
         arr50.push(move.finalMoves);
         arr50.push(move.newMoves);
         arr60.push(move.protect);
-        // arr70.push(move.protect);
+        if (Object.keys(move).includes('fine')) {
+          arr80.push(move);
+        }
+        if (Object.keys(move).includes('finalMoves')) {
+          arr90.push(move);
+        }
+      });
+      this.entries.forEach((entry) => {
+        if (entry.imageUrl.substring(0, 1) === 'b') {
+          arr70.push(entry.new_position);
+        }
       });
 
       this.black_dominant_without_pawns = [
@@ -435,9 +711,9 @@ export default {
         ...new Set(arr50.flat(1).filter((x) => x !== undefined)),
       ];
       this.black_protection = [...new Set(arr60.flat(1))];
-      // this.black_dominant_everything_take_without_king = [
-      //   ...new Set(arr70.flat(1).filter((x) => x !== undefined)),
-      // ];
+      this.black_newPosition = [...new Set(arr70.flat(1))];
+      this.black_pawns = arr80;
+      this.black_figures = arr90;
     },
     get_dangerous_piece() {
       this.white_moves.forEach((obj) => {
@@ -533,11 +809,11 @@ export default {
     track_kings_position() {
       const squares = document.querySelectorAll('.square');
       squares.forEach((square) => {
-        if (square.firstChild !== null && square.firstChild.alt === 'wK') {
+        if (square.firstChild !== null && square.firstChild.alt === 'wKK') {
           this.wK_position = square.id;
         } else if (
           square.firstChild !== null &&
-          square.firstChild.alt === 'bK'
+          square.firstChild.alt === 'bKK'
         ) {
           this.bK_position = square.id;
         }
@@ -545,15 +821,15 @@ export default {
     },
     check_if_king_can_take_unprotected_piece(piece) {
       let originalPiece = piece;
-      let vario =
+      let king_moves =
         piece == 'white' ? this.white_king_moves : this.black_king_moves;
-      let vario2 =
+      let dominant_take =
         piece == 'white'
           ? this.white_dominant_everything_take
           : this.black_dominant_everything_take;
       let arr = [];
       const squares = document.querySelectorAll('.square');
-      let h = [...new Set(vario.flat(2))];
+      let h = [...new Set(king_moves.flat(2))];
       h.forEach((e) => {
         squares.forEach((s) => {
           if (
@@ -586,7 +862,10 @@ export default {
         this.white_place_to_go = true;
       }
       if (originalPiece === 'black') {
-        let b = vario2.filter((x) => x === this.dangerous_white_piece.piece);
+        let b = dominant_take.filter(
+          (x) => x === this.dangerous_white_piece.piece
+        );
+
         if (b.length >= 1) {
           this.can_take_dangerous_white_piece = true;
         } else {
@@ -594,7 +873,9 @@ export default {
         }
       }
       if (originalPiece === 'white') {
-        let b = vario2.filter((x) => x === this.dangerous_black_piece.piece);
+        let b = dominant_take.filter(
+          (x) => x === this.dangerous_black_piece.piece
+        );
         if (b.length >= 1) {
           this.can_take_dangerous_black_piece = true;
         } else {
@@ -602,7 +883,166 @@ export default {
         }
       }
     },
+    check_for_black_checkmate() {
+      const squares = document.querySelectorAll('.square');
+      this.get_dangerous_piece();
+      this.get_moves();
+      this.get_dominant_protection();
+      const blockers_black_pawns = [];
+      const blockers_black_figures = [];
 
+      const output_black_pawns_attackers = [];
+      let output_black_pawns_blockers = [];
+      let output_black_figures_blockers = [];
+      const output_black_figures_attackers = [];
+
+      this.black_pawns.forEach((pawn) => {
+        this.dangerous_white_piece.finalMoves.forEach((s) => {
+          if (pawn.fine.includes(s)) {
+            blockers_black_pawns.push(pawn);
+          }
+        });
+        if (pawn.newMoves.includes(this.dangerous_white_piece.piece)) {
+          output_black_pawns_attackers.push(
+            pawn.piece,
+            this.dangerous_white_piece.piece
+          );
+        }
+      });
+
+      blockers_black_pawns.forEach((r) => {
+        r.fine.forEach((e) => {
+          squares.forEach((square) => {
+            let div = document.createElement('div');
+            div.classList.add('black');
+            if (e === square.id) {
+              square.appendChild(div);
+              this.get_moves();
+              this.get_dominant_protection();
+              this.check_kings();
+              if (!this.black_checked) {
+                output_black_pawns_blockers = [r.piece, e];
+              }
+              squares.forEach((s) => {
+                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+                  s.innerHTML = '';
+                }
+              });
+            }
+          });
+        });
+      });
+      ///////////////////////////////////////////////////////
+      this.black_figures.forEach((figure) => {
+        this.dangerous_white_piece.finalMoves.forEach((s) => {
+          if (figure.finalMoves.includes(s)) {
+            blockers_black_figures.push(figure);
+          }
+        });
+        if (figure.finalMoves.includes(this.dangerous_white_piece.piece)) {
+          output_black_figures_attackers.push(
+            figure.piece,
+            this.dangerous_white_piece.piece
+          );
+        }
+      });
+      blockers_black_figures.forEach((r) => {
+        r.finalMoves.forEach((e) => {
+          squares.forEach((square) => {
+            let div = document.createElement('div');
+            div.classList.add('black');
+            if (e === square.id) {
+              square.appendChild(div);
+              this.get_moves();
+              this.get_dominant_protection();
+              this.check_kings();
+              if (!this.black_checked) {
+                output_black_figures_blockers = [r.piece, e];
+              }
+              squares.forEach((s) => {
+                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+                  s.innerHTML = '';
+                }
+              });
+            }
+          });
+        });
+      });
+      ///////////////////////////////////////////////////////
+
+      this.black_defence.push(
+        output_black_pawns_attackers,
+        output_black_pawns_blockers,
+        output_black_figures_blockers,
+        output_black_figures_attackers
+      );
+
+      // console.log(output_black_pawns_blockers);
+      // this.get_moves();
+      // this.get_dominant_protection();
+      // this.check_if_king_can_take_unprotected_piece('black');
+
+      // this.white_dominant_everything_straight.forEach((e) => {
+      //   if (
+      //     e === this.bK_position &&
+      //     !this.black_place_to_go &&
+      //     !this.can_take_dangerous_white_piece
+      //   ) {
+      //     console.log('checkmate white win!');
+      //   }
+      // });
+
+      // squares.forEach((s) => {
+      //   if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+      //     s.innerHTML = '';
+      //   }
+      // });
+    },
+    check_for_white_checkmate() {
+      this.get_dangerous_piece();
+      this.get_moves();
+      this.get_dominant_protection();
+
+      this.check_if_king_can_take_unprotected_piece('white');
+      this.white_dominant_everything_straight.forEach((s2) => {
+        let div = document.createElement('div');
+        div.classList.add('white');
+
+        if (this.dangerous_black_piece.finalMoves === undefined) {
+          return;
+        } else {
+          this.dangerous_black_piece.finalMoves.forEach((s) => {
+            if (s2 === s) {
+              squares.forEach((k) => {
+                if (s2 === k.id) {
+                  k.appendChild(div);
+                }
+              });
+            }
+          });
+        }
+      });
+      this.check_if_king_can_take_unprotected_piece('white');
+      this.get_moves();
+      this.get_dominant_protection();
+      this.check_if_king_can_take_unprotected_piece('white');
+
+      this.black_dominant_everything_straight.forEach((e) => {
+        if (
+          e === this.wK_position &&
+          !this.white_place_to_go &&
+          !this.can_take_dangerous_black_piece
+        ) {
+          console.log('checkmate black win!');
+        }
+      });
+
+      squares.forEach((s) => {
+        if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+          s.innerHTML = '';
+        }
+      });
+    },
     //######################################################
     //######################################################
     //###################### mouse down ####################
@@ -611,9 +1051,6 @@ export default {
     //######################################################
 
     mouseDown(event) {
-      let entries = this.entries;
-      let render = this.render_new_position; // function
-
       const chess = document.querySelector('.chessboard');
       chess.addEventListener('contextmenu', (event) => event.preventDefault());
       event.preventDefault();
@@ -638,32 +1075,73 @@ export default {
         piece.style.width = 'calc(var(--square_size) / 7)';
         piece.style.zIndex = 2;
         piece.style.cursor = 'grabbing';
-        square.style.display = 'flex';
-        // piece.style.marginTop = event.clientY - 450 + 'px';
-        // piece.style.marginLeft = event.clientX - 500 + 'px';
 
-        this.moves[0].forEach((allowed) => {
-          squares.forEach((s) => {
-            if (piece.classList[0] === 'white' && this.whiteToPlay) {
-              if (allowed === s.id) {
-                s.classList.add('droppable');
-                s.classList.add('mark');
-                if (s.firstElementChild) {
-                  s.classList.add('target');
-                }
+        // piece.style.position = 'absolute';
+
+        // piece.style.top = event.clientX + 'px';
+        // piece.style.left = event.clientY + 'px';
+
+        // console.log(this.black_defence);
+
+        let stuck = [];
+
+        this.black_defence.forEach((e) => {
+          if (e.length > 0) {
+            e.forEach((t) => {
+              if (piece.id === e[0]) {
+                stuck.push(e[1]);
               }
-            }
-            if (piece.classList[0] === 'black' && !this.whiteToPlay) {
-              if (allowed === s.id) {
-                s.classList.add('droppable');
-                s.classList.add('mark');
-                if (s.firstElementChild) {
-                  s.classList.add('target');
-                }
-              }
-            }
-          });
+            });
+          }
         });
+
+        if (this.black_checked) {
+          stuck.forEach((allowed) => {
+            squares.forEach((s) => {
+              if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+            });
+          });
+        } else {
+          this.moves[0].forEach((allowed) => {
+            squares.forEach((s) => {
+              if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+            });
+          });
+        }
 
         //######################################################
         //######################################################
@@ -674,43 +1152,48 @@ export default {
         let self = this;
 
         let currentDroppable = null;
+        let currentDroppable1 = null;
         let shiftX = event.clientX - piece.getBoundingClientRect().left;
         let shiftY = event.clientY - piece.getBoundingClientRect().top;
+
+        const whiteGroup = document.querySelector('.wrapping');
 
         moveAt(event.pageX, event.pageY);
         function moveAt(pageX, pageY) {
           square.style.position = null;
           piece.style.left = pageX - shiftX + 'px';
           piece.style.top = pageY - shiftY + 'px';
+
+          whiteGroup.style.left = pageX - shiftX + 'px';
+          whiteGroup.style.top = pageY - shiftY + 'px';
+          whiteGroup.style.display = 'none';
         }
 
         function onMouseMove(event) {
+          const element = document.querySelector('.chessboard');
+          var rect = element.getBoundingClientRect();
+
           moveAt(event.pageX, event.pageY);
-          // if (
-          //   event.pageX < 150 ||
-          //   event.pageX > 900 ||
-          //   event.pageY < 20 ||
-          //   event.pageY > 550
-          // ) {
-          //   document.removeEventListener('mousemove', onMouseMove);
-          //   document.addEventListener('mouseup', onmouseup);
-          //   piece.style.width = '62px';
-          //   piece.style.cursor = 'grab';
-          //   square.style.display = 'flex';
-          //   piece.setAttribute('id', square.id);
-          //   square.appendChild(piece);
-          //   square.style.justifyContent = 'center';
-          //   square.style.position = 'relative';
-          //   piece.style.position = 'absolute';
-          //   piece.style.top = '0px';
-          //   piece.style.left = '0px';
-          // }
+
+          if (event.pageX < rect.left - 8) {
+            piece.style.left = rect.left - 34 + 'px';
+          }
+          if (event.pageY < rect.top - 8) {
+            piece.style.top = rect.top - 34 + 'px';
+          }
+          if (event.pageY > rect.bottom - 10) {
+            piece.style.top = rect.bottom - 40 + 'px';
+          }
+          if (event.pageX > rect.right + 2) {
+            piece.style.left = rect.right - 34 + 'px';
+          }
+
           piece.hidden = true;
-          let elemBelow = document.elementFromPoint(
-            event.clientX,
-            event.clientY
-          );
+
+          let elemBelow = document.elementFromPoint(event.pageX, event.pageY);
+
           piece.hidden = false;
+
           //######################################################
           //######################################################
           //######################################################
@@ -718,7 +1201,34 @@ export default {
           //######################################################
           //######################################################
           //######################################################
+          if (!elemBelow) {
+            elemBelow = document.createElement('div');
+          }
+
           let droppableBelow = elemBelow.closest('.droppable');
+
+          let normalSquare = elemBelow.closest('.square');
+
+          if (currentDroppable1 != normalSquare) {
+            if (currentDroppable1) {
+              leave(currentDroppable1);
+            }
+            currentDroppable1 = normalSquare;
+            enter(currentDroppable1);
+          }
+
+          function enter(elem) {
+            if (elem == null) {
+              return;
+            }
+            elem.style.borderColor = 'white';
+          }
+          function leave(elem) {
+            if (elem == null) {
+              return;
+            }
+            elem.style.borderColor = 'transparent';
+          }
 
           if (currentDroppable != droppableBelow) {
             if (currentDroppable) {
@@ -731,13 +1241,14 @@ export default {
                 (piece.classList[0] === 'black' && !self.whiteToPlay)
               ) {
                 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                piece.onmouseup = function(e) {
+                window.onmouseup = function(e) {
                   e.preventDefault();
 
                   squares.forEach((s) => {
                     s.classList.remove('droppable');
                     s.classList.remove('mark');
                     s.classList.remove('target');
+                    s.style.borderColor = 'transparent';
                   });
                   if (currentDroppable) {
                     if (piece.alt.charAt(0) === 'b') {
@@ -747,7 +1258,7 @@ export default {
                     }
 
                     document.removeEventListener('mousemove', onMouseMove);
-                    piece.onmouseup = null;
+                    window.onmouseup = null;
                     piece.style.width = 'calc(var(--square_size) / 8)';
                     piece.style.cursor = 'grab';
                     piece.style.zIndex = 1;
@@ -756,42 +1267,45 @@ export default {
                     piece.style.top = '0px';
                     piece.style.left = '0px';
                     const takenPiece = currentDroppable.firstChild;
-
-                    // self.recorded_entries.push(self.entries);
-                    // console.log(self.recorded_entries);
                     currentDroppable.style.position = 'relative';
-                    piece.style.position = 'absolute';
-                    piece.style.top = '0px';
-                    piece.style.left = '0px';
                     currentDroppable.style.boxSizing = 'border-box';
                     currentDroppable.style.borderColor = 'transparent';
 
-                    get_moves();
-
+                    self.get_moves();
                     self.get_dominant_protection();
-
                     self.protect_pieces();
-                    // track wK & bK
                     self.track_kings_position();
-
-                    // checking kings
                     self.check_kings();
 
                     // check if king can take unprotected piece
-                    Object.values(entries).forEach((entryPiece) => {
+                    Object.values(self.entries).forEach((entryPiece) => {
                       if (
                         takenPiece !== null &&
                         takenPiece.id === entryPiece.new_position
                       ) {
                         entryPiece.captured = true;
                         self.capture();
-                        render();
+                        self.get_moves();
+                        self.get_dominant_protection();
+
+                        self.render_new_position();
                       } else if (piece.id === entryPiece.new_position) {
+                        // castling
                         entryPiece.new_position = currentDroppable.id;
-                        render();
+                        self.get_moves();
+                        self.get_dominant_protection();
+
+                        self.render_new_position(entryPiece);
                       }
                     });
-                    get_moves();
+                    // promoting pawns
+                    if (
+                      currentDroppable.firstChild.alt === 'wPP' &&
+                      currentDroppable.firstChild.id.substring('1') === '8'
+                    ) {
+                      whiteGroup.style.display = 'block';
+                    }
+                    self.get_moves();
 
                     self.get_dominant_protection();
 
@@ -803,101 +1317,10 @@ export default {
                     self.check_kings();
 
                     if (self.black_checked) {
-                      self.get_dangerous_piece();
-                      get_moves();
-                      self.get_dominant_protection();
-
-                      self.black_dominant_everything_straight.forEach((s2) => {
-                        let div = document.createElement('div');
-                        div.classList.add('black');
-                        if (
-                          self.dangerous_white_piece.finalMoves === undefined
-                        ) {
-                          return;
-                        } else {
-                          self.dangerous_white_piece.finalMoves.forEach((s) => {
-                            if (s2 === s) {
-                              squares.forEach((k) => {
-                                if (s2 === k.id) {
-                                  k.appendChild(div);
-                                }
-                              });
-                            }
-                          });
-                        }
-                      });
-                      get_moves();
-                      self.get_dominant_protection();
-                      self.check_if_king_can_take_unprotected_piece('black');
-
-                      self.white_dominant_everything_straight.forEach((e) => {
-                        if (
-                          e === self.bK_position &&
-                          !self.black_place_to_go &&
-                          !self.can_take_dangerous_white_piece
-                        ) {
-                          console.log('checkmate white win!');
-                        }
-                      });
-
-                      squares.forEach((s) => {
-                        if (
-                          s.hasChildNodes() &&
-                          s.firstChild.tagName === 'DIV'
-                        ) {
-                          s.innerHTML = '';
-                        }
-                      });
+                      self.check_for_black_checkmate();
                     }
                     if (self.white_checked) {
-                      self.get_dangerous_piece();
-                      get_moves();
-                      self.get_dominant_protection();
-
-                      self.check_if_king_can_take_unprotected_piece('white');
-                      self.white_dominant_everything_straight.forEach((s2) => {
-                        let div = document.createElement('div');
-                        div.classList.add('white');
-
-                        if (
-                          self.dangerous_black_piece.finalMoves === undefined
-                        ) {
-                          return;
-                        } else {
-                          self.dangerous_black_piece.finalMoves.forEach((s) => {
-                            if (s2 === s) {
-                              squares.forEach((k) => {
-                                if (s2 === k.id) {
-                                  k.appendChild(div);
-                                }
-                              });
-                            }
-                          });
-                        }
-                      });
-                      self.check_if_king_can_take_unprotected_piece('white');
-                      get_moves();
-                      self.get_dominant_protection();
-                      self.check_if_king_can_take_unprotected_piece('white');
-
-                      self.black_dominant_everything_straight.forEach((e) => {
-                        if (
-                          e === self.wK_position &&
-                          !self.white_place_to_go &&
-                          !self.can_take_dangerous_black_piece
-                        ) {
-                          console.log('checkmate black win!');
-                        }
-                      });
-
-                      squares.forEach((s) => {
-                        if (
-                          s.hasChildNodes() &&
-                          s.firstChild.tagName === 'DIV'
-                        ) {
-                          s.innerHTML = '';
-                        }
-                      });
+                      self.check_for_white_checkmate();
                     }
                   } else {
                     document.removeEventListener('mousemove', onMouseMove);
@@ -912,12 +1335,13 @@ export default {
                 };
               }
             }
+
             enterDroppable(currentDroppable);
           }
         }
 
         document.addEventListener('mousemove', onMouseMove);
-        piece.onmouseup = function() {
+        window.onmouseup = function() {
           document.removeEventListener('mousemove', onMouseMove);
           piece.style.zIndex = 1;
           piece.onmouseup = null;
@@ -927,6 +1351,9 @@ export default {
           piece.style.position = 'absolute';
           piece.style.top = '0px';
           piece.style.left = '0px';
+          squares.forEach((s) => {
+            s.style.borderColor = 'transparent';
+          });
         };
 
         //######################################################
@@ -940,7 +1367,6 @@ export default {
           if (elem == null) {
             return;
           }
-          // enterMethod();
 
           elem.style.borderColor = 'white';
         }
@@ -958,93 +1384,6 @@ export default {
         };
       }
       let self = this;
-      function get_moves() {
-        self.white_moves = [];
-        self.black_moves = [];
-        let check = true;
-        const forbiden = [
-          'a1',
-          'a2',
-          'a3',
-          'a4',
-          'a5',
-          'a6',
-          'a7',
-          'a8',
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'h7',
-          'h8',
-          'a1',
-          'b1',
-          'c1',
-          'd1',
-          'e1',
-          'f1',
-          'g1',
-          'h1',
-          'a8',
-          'b8',
-          'c8',
-          'd8',
-          'e8',
-          'f8',
-          'g8',
-          'h8',
-        ];
-        squares.forEach((square) => {
-          if (square.firstElementChild === null) {
-            return;
-          }
-
-          let selected_piece_position = square.firstElementChild.id;
-          let selected_piece_initial = square.firstElementChild.alt;
-          let selectedPiece = {
-            selected_piece_initial,
-            selected_piece_position,
-          };
-          if (selectedPiece.selected_piece_initial === 'wP') {
-            self.get_white_pawn_moves(selectedPiece, check);
-          }
-          if (selectedPiece.selected_piece_initial === 'wN') {
-            self.get_knight_moves(selectedPiece, check, 'w');
-          }
-          if (selectedPiece.selected_piece_initial === 'wB') {
-            self.get_bishop_moves(selectedPiece, forbiden, check, 'w');
-          }
-          if (selectedPiece.selected_piece_initial === 'wR') {
-            self.get_rook_moves(selectedPiece, forbiden, check, 'w');
-          }
-          if (selectedPiece.selected_piece_initial === 'wQ') {
-            self.get_queen_moves(selectedPiece, forbiden, check, 'w');
-          }
-          if (selectedPiece.selected_piece_initial === 'wK') {
-            self.get_white_king_moves(selectedPiece, check);
-          }
-          if (selectedPiece.selected_piece_initial === 'bP') {
-            self.get_black_pawn_moves(selectedPiece, check);
-          }
-          if (selectedPiece.selected_piece_initial === 'bN') {
-            self.get_knight_moves(selectedPiece, check, 'b');
-          }
-          if (selectedPiece.selected_piece_initial === 'bB') {
-            self.get_bishop_moves(selectedPiece, forbiden, check, 'b');
-          }
-          if (selectedPiece.selected_piece_initial === 'bR') {
-            self.get_rook_moves(selectedPiece, forbiden, check, 'b');
-          }
-          if (selectedPiece.selected_piece_initial === 'bQ') {
-            self.get_queen_moves(selectedPiece, forbiden, check, 'b');
-          }
-          if (selectedPiece.selected_piece_initial === 'bK') {
-            self.get_black_king_moves(selectedPiece, check, 'b');
-          }
-        });
-      }
     },
 
     //######################################################
@@ -1057,7 +1396,102 @@ export default {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////METHODS/////////////////////////////////////////////////////////
+    get_moves() {
+      const squares = document.querySelectorAll('.square');
+      this.white_moves = [];
+      this.black_moves = [];
+      let check = true;
+      const forbiden = [
+        'a1',
+        'a2',
+        'a3',
+        'a4',
+        'a5',
+        'a6',
+        'a7',
+        'a8',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'h7',
+        'h8',
+        'a1',
+        'b1',
+        'c1',
+        'd1',
+        'e1',
+        'f1',
+        'g1',
+        'h1',
+        'a8',
+        'b8',
+        'c8',
+        'd8',
+        'e8',
+        'f8',
+        'g8',
+        'h8',
+      ];
+      squares.forEach((square) => {
+        if (square.firstElementChild === null) {
+          return;
+        }
 
+        let selected_piece_position = square.firstElementChild.id;
+        let selected_piece_initial = square.firstElementChild.alt;
+        let selectedPiece = {
+          selected_piece_initial,
+          selected_piece_position,
+        };
+
+        if (selectedPiece.selected_piece_initial === 'wPP') {
+          this.get_white_pawn_moves(selectedPiece, check);
+        }
+        if (selectedPiece.selected_piece_initial === 'wNN') {
+          this.get_knight_moves(selectedPiece, check, 'w');
+        }
+        if (selectedPiece.selected_piece_initial === 'wBB') {
+          this.get_bishop_moves(selectedPiece, forbiden, check, 'w');
+        }
+        if (
+          selectedPiece.selected_piece_initial === 'wRr' ||
+          selectedPiece.selected_piece_initial === 'wRl'
+        ) {
+          this.get_rook_moves(selectedPiece, forbiden, check, 'w');
+        }
+
+        if (selectedPiece.selected_piece_initial === 'wQQ') {
+          this.get_queen_moves(selectedPiece, forbiden, check, 'w');
+        }
+        if (selectedPiece.selected_piece_initial === 'wKK') {
+          this.get_white_king_moves(selectedPiece, check);
+        }
+        if (selectedPiece.selected_piece_initial === 'bPP') {
+          this.get_black_pawn_moves(selectedPiece, check);
+        }
+        if (selectedPiece.selected_piece_initial === 'bNN') {
+          this.get_knight_moves(selectedPiece, check, 'b');
+        }
+        if (selectedPiece.selected_piece_initial === 'bBB') {
+          this.get_bishop_moves(selectedPiece, forbiden, check, 'b');
+        }
+        if (
+          selectedPiece.selected_piece_initial === 'bRr' ||
+          selectedPiece.selected_piece_initial === 'bRl'
+        ) {
+          this.get_rook_moves(selectedPiece, forbiden, check, 'b');
+        }
+        if (selectedPiece.selected_piece_initial === 'bQQ') {
+          this.get_queen_moves(selectedPiece, forbiden, check, 'b');
+        }
+        if (selectedPiece.selected_piece_initial === 'bKK') {
+          this.get_black_king_moves(selectedPiece, check, 'b');
+        }
+      });
+    },
     selected_piece(new_piece, position_square) {
       let selected_piece_position = position_square.id;
       let selected_piece_initial = new_piece.alt;
@@ -1104,40 +1538,42 @@ export default {
         'g8',
         'h8',
       ];
-      if (selectedPiece.selected_piece_initial === 'wP') {
+      if (selectedPiece.selected_piece_initial === 'wPP') {
         this.get_white_pawn_moves(selectedPiece, check);
       }
-      if (selectedPiece.selected_piece_initial === 'bP') {
+      if (selectedPiece.selected_piece_initial === 'bPP') {
         this.get_black_pawn_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wN' ||
-        selectedPiece.selected_piece_initial === 'bN'
+        selectedPiece.selected_piece_initial === 'wNN' ||
+        selectedPiece.selected_piece_initial === 'bNN'
       ) {
         this.get_knight_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wB' ||
-        selectedPiece.selected_piece_initial === 'bB'
+        selectedPiece.selected_piece_initial === 'wBB' ||
+        selectedPiece.selected_piece_initial === 'bBB'
       ) {
         this.get_bishop_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wR' ||
-        selectedPiece.selected_piece_initial === 'bR'
+        selectedPiece.selected_piece_initial === 'wRr' ||
+        selectedPiece.selected_piece_initial === 'bRr' ||
+        selectedPiece.selected_piece_initial === 'wRl' ||
+        selectedPiece.selected_piece_initial === 'bRl'
       ) {
         this.get_rook_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wQ' ||
-        selectedPiece.selected_piece_initial === 'bQ'
+        selectedPiece.selected_piece_initial === 'wQQ' ||
+        selectedPiece.selected_piece_initial === 'bQQ'
       ) {
         this.get_queen_moves(selectedPiece, forbiden, check);
       }
-      if (selectedPiece.selected_piece_initial === 'wK') {
+      if (selectedPiece.selected_piece_initial === 'wKK') {
         this.get_white_king_moves(selectedPiece, check, check);
       }
-      if (selectedPiece.selected_piece_initial === 'bK') {
+      if (selectedPiece.selected_piece_initial === 'bKK') {
         this.get_black_king_moves(selectedPiece, check);
       }
     },
@@ -1310,7 +1746,7 @@ export default {
     get_knight_moves(selectedPiece, check, color) {
       const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wN' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === 'wNN' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -1367,7 +1803,7 @@ export default {
     get_bishop_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wB' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === 'wBB' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -1457,7 +1893,10 @@ export default {
     get_rook_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wR' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === 'wRr' ||
+        selectedPiece.selected_piece_initial === 'wRl'
+          ? 'black'
+          : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -1541,7 +1980,7 @@ export default {
     get_queen_moves(selectedPiece, forbiden, check, color) {
       const squares = document.querySelectorAll('.square');
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wQ' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === 'wQQ' ? 'black' : 'white';
       if (!check) {
         this.moves = [];
       }
@@ -1696,6 +2135,7 @@ export default {
 
       let finalMoves = [];
       let protect = [];
+      const magic = [];
 
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
@@ -1706,25 +2146,53 @@ export default {
             backward: `${letter}${num - 1}`,
             left: `${letters[i - 1]}${num}`,
             right: `${letters[i + 1]}${num}`,
+            castleLeft: `${letters[i - 2]}${num}`,
+            castleRight: `${letters[i + 2]}${num}`,
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
             downLeft: `${letters[i - 1]}${num - 1}`,
           };
-          const objects = Object.values(fields);
+
+          const objects = Object.entries(fields);
           objects.forEach((obj) => {
             squares.forEach((square) => {
-              if (square.id === obj) {
-                protect.push(obj);
+              if (square.id === obj[1]) {
+                protect.push(obj[1]);
                 if (square.firstElementChild) {
                   if (
                     square.firstElementChild.classList[0] === 'black' ||
                     square.firstElementChild.tagName === 'DIV'
                   ) {
-                    finalMoves.push(obj);
+                    finalMoves.push(obj[1]);
                   }
+                } else if (this.white_kingside_castling) {
+                  finalMoves.push(obj[1]);
                 } else {
-                  finalMoves.push(obj);
+                  if (obj[0] === 'castleRight') {
+                    return;
+                  } else {
+                    finalMoves.push(obj[1]);
+                  }
+                }
+
+                /////
+
+                if (square.firstElementChild) {
+                  if (
+                    square.firstElementChild.classList[0] === 'black' ||
+                    square.firstElementChild.tagName === 'DIV'
+                  ) {
+                    magic.push(obj[1]);
+                  }
+                } else if (this.white_queenside_castling) {
+                  magic.push(obj[1]);
+                } else {
+                  if (obj[0] === 'castleLeft') {
+                    return;
+                  } else {
+                    magic.push(obj[1]);
+                  }
                 }
               }
             });
@@ -1732,15 +2200,12 @@ export default {
         }
       }
       if (!check) {
-        this.moves.push(finalMoves);
+        this.moves.push(magic);
       }
       this.white_king_moves = [];
-      this.white_king_moves = finalMoves;
-      // might create a problem with defence!
+      this.white_king_moves = magic;
 
-      if (!this.white_checked) {
-        this.white_moves.push({ finalMoves, protect });
-      }
+      this.white_moves.push({ magic, protect });
     },
     get_black_king_moves(selectedPiece, check) {
       const squares = document.querySelectorAll('.square');
@@ -1750,6 +2215,7 @@ export default {
 
       let finalMoves = [];
       let protect = [];
+      const magic = [];
 
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
       for (let i = 0; i < letters.length; i++) {
@@ -1760,25 +2226,52 @@ export default {
             backward: `${letter}${num - 1}`,
             left: `${letters[i - 1]}${num}`,
             right: `${letters[i + 1]}${num}`,
+            castleLeft: `${letters[i - 2]}${num}`,
+            castleRight: `${letters[i + 2]}${num}`,
             upRight: `${letters[i + 1]}${num + 1}`,
             upLeft: `${letters[i - 1]}${num + 1}`,
             downRight: `${letters[i + 1]}${num - 1}`,
             downLeft: `${letters[i - 1]}${num - 1}`,
           };
-          const objects = Object.values(fields);
+          const objects = Object.entries(fields);
           objects.forEach((obj) => {
             squares.forEach((square) => {
-              if (square.id === obj) {
-                protect.push(obj);
+              if (square.id === obj[1]) {
+                protect.push(obj[1]);
                 if (square.firstElementChild) {
                   if (
                     square.firstElementChild.classList[0] === 'white' ||
                     square.firstElementChild.tagName === 'DIV'
                   ) {
-                    finalMoves.push(obj);
+                    finalMoves.push(obj[1]);
                   }
+                } else if (this.black_kingside_castling) {
+                  finalMoves.push(obj[1]);
                 } else {
-                  finalMoves.push(obj);
+                  if (obj[0] === 'castleRight') {
+                    return;
+                  } else {
+                    finalMoves.push(obj[1]);
+                  }
+                }
+
+                /////
+
+                if (square.firstElementChild) {
+                  if (
+                    square.firstElementChild.classList[0] === 'white' ||
+                    square.firstElementChild.tagName === 'DIV'
+                  ) {
+                    magic.push(obj[1]);
+                  }
+                } else if (this.black_queenside_castling) {
+                  magic.push(obj[1]);
+                } else {
+                  if (obj[0] === 'castleLeft') {
+                    return;
+                  } else {
+                    magic.push(obj[1]);
+                  }
                 }
               }
             });
@@ -1786,16 +2279,13 @@ export default {
         }
       }
       if (!check) {
-        this.moves.push(finalMoves);
+        this.moves.push(magic);
       }
 
       this.black_king_moves = [];
-      this.black_king_moves = finalMoves;
+      this.black_king_moves = magic;
 
-      //  might create a problem with defence!
-      if (!this.black_checked) {
-        this.black_moves.push({ finalMoves, protect });
-      }
+      this.black_moves.push({ magic, protect });
     },
   },
 
@@ -1819,7 +2309,22 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
 }
-
+/*  */
+.wrapping {
+  display: none;
+  position: absolute;
+}
+.promotWhitePawn {
+  display: flex;
+  flex-direction: column;
+}
+.promotWhitePawn img {
+  background-color: rgb(255, 169, 41);
+}
+.promotWhitePawn img:hover {
+  background-color: rgb(221, 107, 0);
+}
+/*  */
 .black_square {
   height: calc(var(--square_size) / 8);
   width: calc(var(--square_size) / 8);
