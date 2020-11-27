@@ -45,7 +45,7 @@ export default {
       black_kingside_castling: true,
       black_queenside_castling: true,
       imageUrl:
-        'https://github.com/Marj-11/chess-advanced/blob/master/src/assets/',
+        'https://raw.githubusercontent.com/Marj-11/chess-figures/master/',
       fields: [],
       x: ['8', '7', '6', '5', '4', '3', '2', '1'],
       y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
