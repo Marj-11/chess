@@ -96,8 +96,8 @@ export default {
         },
         {
           imageUrl: 'bKK.png',
-          start_position: 'e8',
-          new_position: 'e8',
+          start_position: 'e6',
+          new_position: 'e6',
           black_checkmate: false,
         },
         {
@@ -128,7 +128,7 @@ export default {
           imageUrl: 'bPP.png',
           start_position: 'e7',
           new_position: 'e7',
-          captured: false,
+          captured: true,
         },
         {
           imageUrl: 'bPP.png',
@@ -186,8 +186,8 @@ export default {
         },
         {
           imageUrl: 'wQQ.png',
-          start_position: 'd1',
-          new_position: 'd1',
+          start_position: 'd2',
+          new_position: 'd2',
           captured: false,
         },
         {
@@ -217,7 +217,7 @@ export default {
           imageUrl: 'wPP.png',
           start_position: 'd2',
           new_position: 'd2',
-          captured: false,
+          captured: true,
         },
         {
           imageUrl: 'wPP.png',
@@ -290,10 +290,14 @@ export default {
       black_queenside_castling_king_or_rook: false,
       white_newPosition: [],
       black_newPosition: [],
+
       black_defence: [],
       white_defence: [],
       black_figures: [],
       black_pawns: [],
+      white_figures: [],
+      white_pawns: [],
+      last_kings_moves: [],
     };
   },
   watch: {
@@ -623,6 +627,8 @@ export default {
       const arr5 = [];
       const arr6 = [];
       const arr7 = [];
+      const arr8 = [];
+      const arr9 = [];
 
       this.white_moves.forEach((move) => {
         arr1.push(move.finalMoves);
@@ -633,6 +639,12 @@ export default {
         arr5.push(move.finalMoves);
         arr5.push(move.newMoves);
         arr6.push(move.protect);
+        if (Object.keys(move).includes('fine')) {
+          arr8.push(move);
+        }
+        if (Object.keys(move).includes('finalMoves')) {
+          arr9.push(move);
+        }
       });
       this.entries.forEach((entry) => {
         if (entry.imageUrl.substring(0, 1) === 'w') {
@@ -657,7 +669,8 @@ export default {
       ];
       this.white_protection = [...new Set(arr6.flat(1))];
       this.white_newPosition = [...new Set(arr7.flat(1))];
-
+      this.white_pawns = arr8;
+      this.white_figures = arr9;
       ///////
 
       this.black_dominant_everything_straight = [];
@@ -847,7 +860,7 @@ export default {
 
       let difference = h.filter((x) => !arr.includes(x));
       let final = difference.filter((x) => !alternative.includes(x));
-
+      this.last_kings_moves = final;
       if (originalPiece === 'black' && final.length === 0) {
         this.black_place_to_go = false;
       } else {
@@ -883,9 +896,11 @@ export default {
     },
     check_for_black_checkmate() {
       const squares = document.querySelectorAll('.square');
-      this.get_dangerous_piece();
       this.get_moves();
+      this.get_dangerous_piece();
       this.get_dominant_protection();
+      this.check_if_king_can_take_unprotected_piece('black');
+      this.black_defence = [];
       const blockers_black_pawns = [];
       const blockers_black_figures = [];
 
@@ -901,13 +916,12 @@ export default {
           }
         });
         if (pawn.newMoves.includes(this.dangerous_white_piece.piece)) {
-          output_black_pawns_attackers.push(
+          output_black_pawns_attackers.push([
             pawn.piece,
-            this.dangerous_white_piece.piece
-          );
+            this.dangerous_white_piece.piece,
+          ]);
         }
       });
-
       blockers_black_pawns.forEach((r) => {
         r.fine.forEach((e) => {
           squares.forEach((square) => {
@@ -919,8 +933,9 @@ export default {
               this.get_dominant_protection();
               this.check_kings();
               if (!this.black_checked) {
-                output_black_pawns_blockers = [r.piece, e];
+                output_black_pawns_blockers.push([r.piece, e]);
               }
+
               squares.forEach((s) => {
                 if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
                   s.innerHTML = '';
@@ -931,6 +946,7 @@ export default {
         });
       });
       ///////////////////////////////////////////////////////
+
       this.black_figures.forEach((figure) => {
         this.dangerous_white_piece.finalMoves.forEach((s) => {
           if (figure.finalMoves.includes(s)) {
@@ -938,12 +954,13 @@ export default {
           }
         });
         if (figure.finalMoves.includes(this.dangerous_white_piece.piece)) {
-          output_black_figures_attackers.push(
+          output_black_figures_attackers.push([
             figure.piece,
-            this.dangerous_white_piece.piece
-          );
+            this.dangerous_white_piece.piece,
+          ]);
         }
       });
+
       blockers_black_figures.forEach((r) => {
         r.finalMoves.forEach((e) => {
           squares.forEach((square) => {
@@ -955,7 +972,133 @@ export default {
               this.get_dominant_protection();
               this.check_kings();
               if (!this.black_checked) {
-                output_black_figures_blockers = [r.piece, e];
+                output_black_figures_blockers.push([r.piece, e]);
+              }
+              squares.forEach((s) => {
+                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+                  s.innerHTML = '';
+                }
+              });
+            }
+          });
+        });
+      });
+
+      this.black_defence.push(
+        output_black_pawns_attackers,
+        output_black_pawns_blockers,
+        output_black_figures_blockers,
+        output_black_figures_attackers
+        // [this.bK_position, this.last_kings_moves]
+      );
+      const output = [];
+      this.black_defence.forEach((e) => {
+        if (typeof e[0] === 'string') {
+          output.push(e);
+        }
+        e.forEach((d) => {
+          if (typeof d === 'object') {
+            output.push(d);
+          }
+        });
+      });
+
+      const black_no_defence = Boolean(
+        this.black_defence.find((val) => {
+          return val.length > 0;
+        })
+      );
+
+      this.get_moves();
+      this.get_dominant_protection();
+      this.check_if_king_can_take_unprotected_piece('black');
+
+      this.white_dominant_everything_straight.forEach((e) => {
+        if (
+          !black_no_defence &&
+          !this.black_place_to_go &&
+          !this.can_take_dangerous_white_piece
+        ) {
+          console.log('checkmate white win!');
+        }
+      });
+      this.black_defence = output;
+    },
+    check_for_white_checkmate() {
+      const squares = document.querySelectorAll('.square');
+      this.get_dangerous_piece();
+      this.get_moves();
+      this.get_dominant_protection();
+      const blockers_white_pawns = [];
+      const blockers_white_figures = [];
+
+      const output_white_pawns_attackers = [];
+      let output_white_pawns_blockers = [];
+      let output_white_figures_blockers = [];
+      const output_white_figures_attackers = [];
+
+      this.white_pawns.forEach((pawn) => {
+        this.dangerous_black_piece.finalMoves.forEach((s) => {
+          if (pawn.fine.includes(s)) {
+            blockers_white_pawns.push(pawn);
+          }
+        });
+        if (pawn.newMoves.includes(this.dangerous_black_piece.piece)) {
+          output_white_pawns_attackers.push(
+            pawn.piece,
+            this.dangerous_black_piece.piece
+          );
+        }
+      });
+
+      blockers_white_pawns.forEach((r) => {
+        r.fine.forEach((e) => {
+          squares.forEach((square) => {
+            let div = document.createElement('div');
+            div.classList.add('black');
+            if (e === square.id) {
+              square.appendChild(div);
+              this.get_moves();
+              this.get_dominant_protection();
+              this.check_kings();
+              if (!this.white_checked) {
+                output_white_pawns_blockers = [r.piece, e];
+              }
+              squares.forEach((s) => {
+                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
+                  s.innerHTML = '';
+                }
+              });
+            }
+          });
+        });
+      });
+      ///////////////////////////////////////////////////////
+      this.white_figures.forEach((figure) => {
+        this.dangerous_black_piece.finalMoves.forEach((s) => {
+          if (figure.finalMoves.includes(s)) {
+            blockers_white_figures.push(figure);
+          }
+        });
+        if (figure.finalMoves.includes(this.dangerous_black_piece.piece)) {
+          output_white_figures_attackers.push(
+            figure.piece,
+            this.dangerous_black_piece.piece
+          );
+        }
+      });
+      blockers_white_figures.forEach((r) => {
+        r.finalMoves.forEach((e) => {
+          squares.forEach((square) => {
+            let div = document.createElement('div');
+            div.classList.add('black');
+            if (e === square.id) {
+              square.appendChild(div);
+              this.get_moves();
+              this.get_dominant_protection();
+              this.check_kings();
+              if (!this.white_checked) {
+                output_white_figures_blockers = [r.piece, e];
               }
               squares.forEach((s) => {
                 if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
@@ -968,76 +1111,29 @@ export default {
       });
       ///////////////////////////////////////////////////////
 
-      this.black_defence.push(
-        output_black_pawns_attackers,
-        output_black_pawns_blockers,
-        output_black_figures_blockers,
-        output_black_figures_attackers
+      this.white_defence.push(
+        output_white_pawns_attackers,
+        output_white_pawns_blockers,
+        output_white_figures_blockers,
+        output_white_figures_attackers
       );
 
-      // console.log(output_black_pawns_blockers);
-      // this.get_moves();
-      // this.get_dominant_protection();
-      // this.check_if_king_can_take_unprotected_piece('black');
-
-      // this.white_dominant_everything_straight.forEach((e) => {
-      //   if (
-      //     e === this.bK_position &&
-      //     !this.black_place_to_go &&
-      //     !this.can_take_dangerous_white_piece
-      //   ) {
-      //     console.log('checkmate white win!');
-      //   }
-      // });
-
-      // squares.forEach((s) => {
-      //   if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-      //     s.innerHTML = '';
-      //   }
-      // });
-    },
-    check_for_white_checkmate() {
-      this.get_dangerous_piece();
-      this.get_moves();
-      this.get_dominant_protection();
-
-      this.check_if_king_can_take_unprotected_piece('white');
-      this.white_dominant_everything_straight.forEach((s2) => {
-        let div = document.createElement('div');
-        div.classList.add('white');
-
-        if (this.dangerous_black_piece.finalMoves === undefined) {
-          return;
-        } else {
-          this.dangerous_black_piece.finalMoves.forEach((s) => {
-            if (s2 === s) {
-              squares.forEach((k) => {
-                if (s2 === k.id) {
-                  k.appendChild(div);
-                }
-              });
-            }
-          });
-        }
-      });
-      this.check_if_king_can_take_unprotected_piece('white');
+      const white_no_defence = Boolean(
+        this.white_defence.find((val) => {
+          return val.length > 0;
+        })
+      );
       this.get_moves();
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('white');
 
       this.black_dominant_everything_straight.forEach((e) => {
         if (
-          e === this.wK_position &&
+          !white_no_defence &&
           !this.white_place_to_go &&
           !this.can_take_dangerous_black_piece
         ) {
           console.log('checkmate black win!');
-        }
-      });
-
-      squares.forEach((s) => {
-        if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-          s.innerHTML = '';
         }
       });
     },
@@ -1079,22 +1175,51 @@ export default {
         // piece.style.top = event.clientX + 'px';
         // piece.style.left = event.clientY + 'px';
 
-        // console.log(this.black_defence);
-
-        let stuck = [];
-
+        let black_only_defence = [];
         this.black_defence.forEach((e) => {
+          if (e.length > 0) {
+            if (piece.id === e[0]) {
+              black_only_defence.push(e[1]);
+            }
+          }
+        });
+
+        let white_only_defence = [];
+        this.white_defence.forEach((e) => {
           if (e.length > 0) {
             e.forEach((t) => {
               if (piece.id === e[0]) {
-                stuck.push(e[1]);
+                white_only_defence.push(e[1]);
               }
             });
           }
         });
 
         if (this.black_checked) {
-          stuck.forEach((allowed) => {
+          black_only_defence.forEach((allowed) => {
+            squares.forEach((s) => {
+              if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (allowed === s.id) {
+                  s.classList.add('droppable');
+                  s.classList.add('mark');
+                  if (s.firstElementChild) {
+                    s.classList.add('target');
+                  }
+                }
+              }
+            });
+          });
+        } else if (this.white_checked) {
+          white_only_defence.forEach((allowed) => {
             squares.forEach((s) => {
               if (piece.classList[0] === 'white' && this.whiteToPlay) {
                 if (allowed === s.id) {
