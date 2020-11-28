@@ -922,6 +922,7 @@ export default {
           ]);
         }
       });
+
       blockers_black_pawns.forEach((r) => {
         r.fine.forEach((e) => {
           squares.forEach((square) => {
@@ -946,6 +947,10 @@ export default {
         });
       });
       ///////////////////////////////////////////////////////
+      this.get_moves();
+      this.get_dangerous_piece();
+      this.get_dominant_protection();
+      this.check_if_king_can_take_unprotected_piece('black');
 
       this.black_figures.forEach((figure) => {
         this.dangerous_white_piece.finalMoves.forEach((s) => {
@@ -1022,6 +1027,7 @@ export default {
           console.log('checkmate white win!');
         }
       });
+
       this.black_defence = output;
     },
     check_for_white_checkmate() {
@@ -1029,6 +1035,7 @@ export default {
       this.get_dangerous_piece();
       this.get_moves();
       this.get_dominant_protection();
+      this.white_defence = [];
       const blockers_white_pawns = [];
       const blockers_white_figures = [];
 
@@ -1044,10 +1051,10 @@ export default {
           }
         });
         if (pawn.newMoves.includes(this.dangerous_black_piece.piece)) {
-          output_white_pawns_attackers.push(
+          output_white_pawns_attackers.push([
             pawn.piece,
-            this.dangerous_black_piece.piece
-          );
+            this.dangerous_black_piece.piece,
+          ]);
         }
       });
 
@@ -1074,6 +1081,10 @@ export default {
         });
       });
       ///////////////////////////////////////////////////////
+      this.get_moves();
+      this.get_dangerous_piece();
+      this.get_dominant_protection();
+      this.check_if_king_can_take_unprotected_piece('black');
       this.white_figures.forEach((figure) => {
         this.dangerous_black_piece.finalMoves.forEach((s) => {
           if (figure.finalMoves.includes(s)) {
@@ -1081,10 +1092,10 @@ export default {
           }
         });
         if (figure.finalMoves.includes(this.dangerous_black_piece.piece)) {
-          output_white_figures_attackers.push(
+          output_white_figures_attackers.push([
             figure.piece,
-            this.dangerous_black_piece.piece
-          );
+            this.dangerous_black_piece.piece,
+          ]);
         }
       });
       blockers_white_figures.forEach((r) => {
@@ -1110,19 +1121,31 @@ export default {
         });
       });
       ///////////////////////////////////////////////////////
-
       this.white_defence.push(
         output_white_pawns_attackers,
         output_white_pawns_blockers,
         output_white_figures_blockers,
         output_white_figures_attackers
+        // [this.wK_position, this.last_kings_moves]
       );
+      const output = [];
+      this.white_defence.forEach((e) => {
+        if (typeof e[0] === 'string') {
+          output.push(e);
+        }
+        e.forEach((d) => {
+          if (typeof d === 'object') {
+            output.push(d);
+          }
+        });
+      });
 
       const white_no_defence = Boolean(
         this.white_defence.find((val) => {
           return val.length > 0;
         })
       );
+
       this.get_moves();
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('white');
@@ -1136,6 +1159,8 @@ export default {
           console.log('checkmate black win!');
         }
       });
+
+      this.white_defence = output;
     },
     //######################################################
     //######################################################
