@@ -2147,6 +2147,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
 
       let finalMoves = [];
+      let secretAgent = [];
       let protect = [];
 
       let objectNumber = 0;
@@ -2213,6 +2214,74 @@ export default {
           }
         }
       }
+      let objectNumberSecret = 0;
+      let j = 1;
+      function diagonalSecret() {
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + j]}${num - j}`,
+              two: `${letters[i + j]}${num + j}`,
+              three: `${letters[i - j]}${num + j}`,
+              four: `${letters[i - j]}${num - j}`,
+            };
+            j++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumberSecret]];
+              if (obj == undefined) {
+                return obj == 'undefined';
+              }
+              if (obj.substring(0, 1) === 'u') {
+                objectNumberSecret++;
+                objectNumberSecret++;
+                j = 1;
+                diagonalSecret();
+              }
+              if (
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
+              ) {
+                objectNumberSecret++;
+                j = 1;
+                diagonalSecret();
+              } else {
+                let ss =
+                  square.firstElementChild === null
+                    ? square.firstElementChild
+                    : square.firstElementChild.alt;
+                if (square.id === obj) {
+                  protect.push(obj);
+                  if (square.firstElementChild && ss !== 'wKK') {
+                    j = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      secretAgent.push(obj);
+                      objectNumberSecret++;
+
+                      diagonalSecret();
+                    } else {
+                      objectNumberSecret++;
+                      diagonalSecret();
+                    }
+                  } else {
+                    forbiden.forEach((forbid) => {
+                      if (obj === forbid) {
+                        objectNumberSecret++;
+                        j = 1;
+                        diagonalSecret();
+                      }
+                    });
+                    secretAgent.push(obj);
+                    diagonalSecret();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
       let objectNumberStraight = 0;
       let n = 1;
       function straight() {
@@ -2248,6 +2317,7 @@ export default {
               } else {
                 if (square.id === obj) {
                   protect.push(obj);
+
                   if (square.firstElementChild) {
                     n = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
@@ -2269,9 +2339,73 @@ export default {
           }
         }
       }
+      let objectNumberStraightSecret = 0;
+      let q = 1;
+      function secretStraight() {
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + q]}${num}`,
+              two: `${letter}${num + q}`,
+              three: `${letters[i - q]}${num}`,
+              four: `${letter}${num - q}`,
+            };
+            q++;
+            squares.forEach((square) => {
+              const obj =
+                objects[Object.keys(objects)[objectNumberStraightSecret]];
+              if (obj == undefined) {
+                return obj == 'undefined';
+              }
+              if (obj.substring(0, 1) === 'u') {
+                objectNumberStraightSecret++;
+                q = 1;
+                secretStraight();
+              }
+              if (
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
+              ) {
+                objectNumberStraightSecret++;
+                q = 1;
+                secretStraight();
+              } else {
+                let ss =
+                  square.firstElementChild === null
+                    ? square.firstElementChild
+                    : square.firstElementChild.alt;
+                if (square.id === obj) {
+                  protect.push(obj);
 
+                  if (square.firstElementChild && ss !== 'wKK') {
+                    n = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      secretAgent.push(obj);
+                      objectNumberStraightSecret++;
+                      secretStraight();
+                    } else {
+                      objectNumberStraightSecret++;
+                      n = 1;
+                      secretStraight();
+                    }
+                  } else {
+                    secretAgent.push(obj);
+                    secretStraight();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
       diagonal();
       straight();
+      secretStraight();
+      diagonalSecret();
+      console.log(secretAgent);
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
@@ -2306,15 +2440,12 @@ export default {
             left: `${letters[i - 1]}${num}`,
             right: `${letters[i + 1]}${num}`,
             castleLeft: `${
-              !this.white_queenside_castling_king_or_rook &&
-              !this.white_kingside_castling_king_or_rook &&
-              !this.white_checked
+              !this.white_queenside_castling_king_or_rook
                 ? letters[i - 2] + num
                 : null
             }`,
             castleRight: `${
-              !this.white_kingside_castling_king_or_rook &&
-              !this.white_queenside_castling_king_or_rook
+              !this.white_kingside_castling_king_or_rook
                 ? letters[i + 2] + num
                 : null
             }`,
