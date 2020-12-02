@@ -72,14 +72,14 @@ export default {
         },
         {
           imageUrl: 'bNN.png',
-          start_position: 'a6',
-          new_position: 'a6',
+          start_position: 'b4',
+          new_position: 'b4',
           captured: false,
         },
         {
           imageUrl: 'bBB.png',
-          start_position: 'c6',
-          new_position: 'c6',
+          start_position: 'e4',
+          new_position: 'e4',
           captured: false,
         },
         {
@@ -90,8 +90,8 @@ export default {
         },
         {
           imageUrl: 'bQQ.png',
-          start_position: 'b5',
-          new_position: 'b5',
+          start_position: 'h2',
+          new_position: 'h2',
           captured: false,
         },
         {
@@ -241,7 +241,7 @@ export default {
           imageUrl: 'wPP.png',
           start_position: 'h2',
           new_position: 'h2',
-          captured: false,
+          captured: true,
         },
       ],
       recorded_entries: [],
@@ -297,7 +297,10 @@ export default {
       black_pawns: [],
       white_figures: [],
       white_pawns: [],
-      last_kings_moves: [],
+
+      secretAgentFinal: [],
+      blackSecretMoves: [],
+      whiteSecretMoves: [],
     };
   },
   watch: {
@@ -833,15 +836,23 @@ export default {
 
       let difference = h.filter((x) => !arr.includes(x));
       let final = difference.filter((x) => !alternative.includes(x));
-      this.last_kings_moves = final;
 
-      if (originalPiece === 'black' && final.length === 0) {
+      const bb = final.filter((b) => {
+        return !this.whiteSecretMoves.includes(b);
+      });
+      const ww = final.filter((w) => {
+        return !this.blackSecretMoves.includes(w);
+      });
+      this.last_black_kings_moves = bb;
+      this.last_white_kings_moves = ww;
+
+      if (originalPiece === 'black' && bb.length === 0) {
         this.black_place_to_go = false;
       } else {
         this.black_place_to_go = true;
       }
 
-      if (originalPiece === 'white' && final.length === 0) {
+      if (originalPiece === 'white' && ww.length === 0) {
         this.white_place_to_go = false;
       } else {
         this.white_place_to_go = true;
@@ -874,6 +885,32 @@ export default {
       this.get_dangerous_piece();
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('black');
+
+      // squares.forEach((f) => {
+      //   if (f.id === this.dangerous_white_piece.piece) {
+      //     if (
+      //       f.firstElementChild.alt === 'wQQ' ||
+      //       f.firstElementChild.alt === 'bQQ'
+      //     ) {
+      //       this.get_queen_moves();
+      //     }
+      // if (
+      //   f.firstElementChild.alt === 'bRl' ||
+      //   f.firstElementChild.alt === 'bRr' ||
+      //   f.firstElementChild.alt === 'wRl' ||
+      //   f.firstElementChild.alt === 'wRr'
+      // ) {
+      //   this.get_rook_moves();
+      // }
+      //  if (
+      //   f.firstElementChild.alt === 'bBB' ||
+      //   f.firstElementChild.alt === 'wBB'
+      // ) {
+      //   this.get_bishop_moves();
+      // }
+      //   }
+      // });
+
       this.black_defence = [];
       const blockers_black_pawns = [];
       const blockers_black_figures = [];
@@ -968,7 +1005,6 @@ export default {
         output_black_pawns_blockers,
         output_black_figures_blockers,
         output_black_figures_attackers
-        // [this.bK_position, this.last_kings_moves]
       );
       const output = [];
       this.black_defence.forEach((e) => {
@@ -992,6 +1028,9 @@ export default {
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('black');
 
+      this.check_kings();
+      this.black_defence = output;
+
       this.white_dominant_everything_straight.forEach((e) => {
         if (
           !black_no_defence &&
@@ -1001,8 +1040,6 @@ export default {
           console.log('checkmate white win!');
         }
       });
-      this.check_kings();
-      this.black_defence = output;
     },
     check_for_white_checkmate() {
       const squares = document.querySelectorAll('.square');
@@ -1125,6 +1162,8 @@ export default {
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('white');
 
+      this.check_kings();
+      this.white_defence = output;
       this.black_dominant_everything_straight.forEach((e) => {
         if (
           !white_no_defence &&
@@ -1134,8 +1173,6 @@ export default {
           console.log('checkmate black win!');
         }
       });
-      this.check_kings();
-      this.white_defence = output;
     },
     //######################################################
     //######################################################
@@ -1184,7 +1221,7 @@ export default {
           }
         });
         if (piece.alt === 'bKK') {
-          black_only_defence = this.last_kings_moves;
+          black_only_defence = this.last_black_kings_moves;
         }
         let white_only_defence = [];
         this.white_defence.forEach((e) => {
@@ -1196,8 +1233,9 @@ export default {
             });
           }
         });
+
         if (piece.alt === 'wKK') {
-          white_only_defence = this.last_kings_moves;
+          white_only_defence = this.last_white_kings_moves;
         }
 
         if (this.black_checked) {
@@ -1970,6 +2008,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
       let protect = [];
+      let secretAgent = [];
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
@@ -2034,7 +2073,87 @@ export default {
           }
         }
       }
+      let objectNumberSecret = 0;
+      let j = 1;
+      function diagonalSecret() {
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + j]}${num - j}`,
+              two: `${letters[i + j]}${num + j}`,
+              three: `${letters[i - j]}${num + j}`,
+              four: `${letters[i - j]}${num - j}`,
+            };
+            j++;
+            squares.forEach((square) => {
+              const obj = objects[Object.keys(objects)[objectNumberSecret]];
+              if (obj == undefined) {
+                return obj == 'undefined';
+              }
+              if (obj.substring(0, 1) === 'u') {
+                objectNumberSecret++;
+                objectNumberSecret++;
+                j = 1;
+                diagonalSecret();
+              }
+              if (
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
+              ) {
+                objectNumberSecret++;
+                j = 1;
+                diagonalSecret();
+              } else {
+                let ss =
+                  square.firstElementChild === null
+                    ? square.firstElementChild
+                    : square.firstElementChild.alt;
+                if (square.id === obj) {
+                  if (
+                    square.firstElementChild &&
+                    ss !== 'wKK' &&
+                    square.firstElementChild &&
+                    ss !== 'bKK'
+                  ) {
+                    j = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      secretAgent.push(obj);
+                      objectNumberSecret++;
+
+                      diagonalSecret();
+                    } else {
+                      objectNumberSecret++;
+                      diagonalSecret();
+                    }
+                  } else {
+                    forbiden.forEach((forbid) => {
+                      if (obj === forbid) {
+                        objectNumberSecret++;
+                        j = 1;
+                        diagonalSecret();
+                      }
+                    });
+                    secretAgent.push(obj);
+                    diagonalSecret();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
       diagonal();
+      // diagonalSecret();
+      // if (color === 'w') {
+      //   this.whiteSecretMoves = [];
+      //   this.whiteSecretMoves = secretAgent;
+      // } else {
+      //   this.blackSecretMoves = [];
+      //   this.blackSecretMoves = secretAgent;
+      // }
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
@@ -2063,6 +2182,7 @@ export default {
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves = [];
       let protect = [];
+      let secretAgent = [];
       let objectNumber = 0;
       let m = 1;
       function straight() {
@@ -2121,7 +2241,80 @@ export default {
           }
         }
       }
+      let objectNumberStraightSecret = 0;
+      let q = 1;
+      function secretStraight() {
+        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        for (let i = 0; i < letters.length; i++) {
+          const element = letters[i];
+          if (element === letter) {
+            const objects = {
+              one: `${letters[i + q]}${num}`,
+              two: `${letter}${num + q}`,
+              three: `${letters[i - q]}${num}`,
+              four: `${letter}${num - q}`,
+            };
+            q++;
+            squares.forEach((square) => {
+              const obj =
+                objects[Object.keys(objects)[objectNumberStraightSecret]];
+              if (obj == undefined) {
+                return obj == 'undefined';
+              }
+              if (obj.substring(0, 1) === 'u') {
+                objectNumberStraightSecret++;
+                q = 1;
+                secretStraight();
+              }
+              if (
+                obj.substring(1, 2) === '0' ||
+                obj.substring(1, 2) === '10' ||
+                obj.substring(1, 2) === '9'
+              ) {
+                objectNumberStraightSecret++;
+                q = 1;
+                secretStraight();
+              } else {
+                let ss =
+                  square.firstElementChild === null
+                    ? square.firstElementChild
+                    : square.firstElementChild.alt;
+                if (square.id === obj) {
+                  if (
+                    square.firstElementChild &&
+                    ss !== 'wKK' &&
+                    square.firstElementChild &&
+                    ss !== 'bKK'
+                  ) {
+                    q = 1;
+                    if (square.firstElementChild.classList[0] === colorClass) {
+                      secretAgent.push(obj);
+                      objectNumberStraightSecret++;
+                      secretStraight();
+                    } else {
+                      objectNumberStraightSecret++;
+                      q = 1;
+                      secretStraight();
+                    }
+                  } else {
+                    secretAgent.push(obj);
+                    secretStraight();
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
       straight();
+      // secretStraight();
+      // if (color === 'w') {
+      //   this.whiteSecretMoves = [];
+      //   this.whiteSecretMoves = secretAgent;
+      // } else {
+      //   this.blackSecretMoves = [];
+      //   this.blackSecretMoves = secretAgent;
+      // }
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
@@ -2145,7 +2338,6 @@ export default {
       }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-
       let finalMoves = [];
       let secretAgent = [];
       let protect = [];
@@ -2253,8 +2445,12 @@ export default {
                     ? square.firstElementChild
                     : square.firstElementChild.alt;
                 if (square.id === obj) {
-                  protect.push(obj);
-                  if (square.firstElementChild && ss !== 'wKK') {
+                  if (
+                    square.firstElementChild &&
+                    ss !== 'wKK' &&
+                    square.firstElementChild &&
+                    ss !== 'bKK'
+                  ) {
                     j = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
                       secretAgent.push(obj);
@@ -2378,17 +2574,20 @@ export default {
                     ? square.firstElementChild
                     : square.firstElementChild.alt;
                 if (square.id === obj) {
-                  protect.push(obj);
-
-                  if (square.firstElementChild && ss !== 'wKK') {
-                    n = 1;
+                  if (
+                    square.firstElementChild &&
+                    ss !== 'wKK' &&
+                    square.firstElementChild &&
+                    ss !== 'bKK'
+                  ) {
+                    q = 1;
                     if (square.firstElementChild.classList[0] === colorClass) {
                       secretAgent.push(obj);
                       objectNumberStraightSecret++;
                       secretStraight();
                     } else {
                       objectNumberStraightSecret++;
-                      n = 1;
+                      q = 1;
                       secretStraight();
                     }
                   } else {
@@ -2405,7 +2604,15 @@ export default {
       straight();
       secretStraight();
       diagonalSecret();
-      console.log(secretAgent);
+
+      if (color === 'w') {
+        this.whiteSecretMoves = [];
+        this.whiteSecretMoves = secretAgent;
+      } else {
+        this.blackSecretMoves = [];
+        this.blackSecretMoves = secretAgent;
+      }
+
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
@@ -2481,7 +2688,8 @@ export default {
                 if (square.firstElementChild) {
                   if (
                     square.firstElementChild.tagName === 'DIV' ||
-                    square.firstElementChild.classList[0] === 'black'
+                    (square.firstElementChild.classList[0] === 'black' &&
+                      square.firstElementChild.classList[1] !== 'protected')
                   ) {
                     magic.push(obj[1]);
                   }
@@ -2546,7 +2754,8 @@ export default {
                 if (square.firstElementChild) {
                   if (
                     square.firstElementChild.classList[0] === 'white' ||
-                    square.firstElementChild.tagName === 'DIV'
+                    (square.firstElementChild.tagName === 'DIV' &&
+                      square.firstElementChild.classList[1] !== 'protected')
                   ) {
                     finalMoves.push(obj[1]);
                   }
