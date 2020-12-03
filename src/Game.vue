@@ -31,7 +31,7 @@
       </div>
     </div>
     <audio ref="moving" src="@/assets/knock.mp3"></audio>
-    <audio ref="capture" src="@/assets/capture.mp3"></audio>
+    <audio ref="capture" src="@/assets/capture1.mp3"></audio>
     <audio ref="castle" src="@/assets/castle.mp3"></audio>
   </div>
 </template>
@@ -203,8 +203,8 @@ export default {
         },
         {
           imageUrl: 'wPP.png',
-          start_position: 'b2',
-          new_position: 'b2',
+          start_position: 'b7',
+          new_position: 'b7',
           captured: false,
         },
         {
@@ -373,7 +373,7 @@ export default {
       });
     },
     replacePiece(e) {
-      const piece =
+      const newPiece =
         e.path[0].alt === 'queen'
           ? 'wQQ.png'
           : e.path[0].alt === 'rook'
@@ -388,10 +388,26 @@ export default {
           entryPiece.new_position.substring(1) === '8' &&
           entryPiece.imageUrl === 'wPP.png'
         ) {
-          entryPiece.imageUrl = piece;
+          entryPiece.imageUrl = newPiece;
         }
       });
+
+      // this.get_moves();
+
+      // this.get_dominant_protection();
       this.render_new_position('replace');
+      // this.get_moves();
+
+      // this.get_dominant_protection();
+      // this.protect_pieces();
+      // // track wK & bK
+      // this.track_kings_position();
+
+      // // checking kings
+      // this.check_kings();
+
+      // this.check_for_black_checkmate();
+
       document.querySelector('.wrapping').style.display = 'none';
     },
     render_new_position(sound) {
