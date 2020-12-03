@@ -6,27 +6,51 @@
       :class="[field.class, field.color]"
       :id="field.id"
     ></div>
-    <div class="wrapping">
+    <div v-show="whiteGroup === true" class="wrappingWhite">
       <div class="promotWhitePawn">
         <img
-          @mousedown="replacePiece"
+          @click="replacePiece"
           v-bind:src="imageUrl + 'wQQ.png'"
-          alt="queen"
+          alt="Wqueen"
         />
         <img
-          @mousedown="replacePiece"
+          @click="replacePiece"
           v-bind:src="imageUrl + 'wRr.png'"
-          alt="rook"
+          alt="Wrook"
         />
         <img
-          @mousedown="replacePiece"
+          @click="replacePiece"
           v-bind:src="imageUrl + 'wNN.png'"
-          alt="knight"
+          alt="Wknight"
         />
         <img
-          @mousedown="replacePiece"
+          @click="replacePiece"
           v-bind:src="imageUrl + 'wBB.png'"
-          alt="bishop"
+          alt="Wbishop"
+        />
+      </div>
+    </div>
+    <div v-show="blackGroup === true" class="wrappingBlack">
+      <div class="promotBlackPawn">
+        <img
+          @click="replacePiece"
+          v-bind:src="imageUrl + 'bQQ.png'"
+          alt="Bqueen"
+        />
+        <img
+          @click="replacePiece"
+          v-bind:src="imageUrl + 'bRr.png'"
+          alt="Brook"
+        />
+        <img
+          @click="replacePiece"
+          v-bind:src="imageUrl + 'bNN.png'"
+          alt="Bknight"
+        />
+        <img
+          @click="replacePiece"
+          v-bind:src="imageUrl + 'bBB.png'"
+          alt="Bbishop"
         />
       </div>
     </div>
@@ -110,12 +134,12 @@ export default {
           imageUrl: 'bPP.png',
           start_position: 'b7',
           new_position: 'b7',
-          captured: false,
+          captured: true,
         },
         {
           imageUrl: 'bPP.png',
-          start_position: 'c7',
-          new_position: 'c7',
+          start_position: 'b2',
+          new_position: 'b2',
           captured: false,
         },
         {
@@ -301,6 +325,9 @@ export default {
       secretAgentFinal: [],
       blackSecretMoves: [],
       whiteSecretMoves: [],
+      whiteGroup: false,
+      blackGroup: false,
+      currentDroppable: '',
     };
   },
   watch: {
@@ -374,41 +401,88 @@ export default {
     },
     replacePiece(e) {
       const newPiece =
-        e.path[0].alt === 'queen'
+        e.path[0].alt === 'Wqueen'
           ? 'wQQ.png'
-          : e.path[0].alt === 'rook'
+          : e.path[0].alt === 'Wrook'
           ? 'wRr.png'
-          : e.path[0].alt === 'knight'
+          : e.path[0].alt === 'Wknight'
           ? 'wNN.png'
-          : e.path[0].alt === 'bishop'
+          : e.path[0].alt === 'Wbishop'
           ? 'wBB.png'
+          : e.path[0].alt === 'Bqueen'
+          ? 'bQQ.png'
+          : e.path[0].alt === 'Brook'
+          ? 'bRr.png'
+          : e.path[0].alt === 'Bknight'
+          ? 'bNN.png'
+          : e.path[0].alt === 'Bbishop'
+          ? 'bBB.png'
           : '';
+
+      // const whiteGroup = document.querySelector('.wrapping');
+      this.get_moves();
+      this.get_dominant_protection();
+      this.protect_pieces();
+      this.track_kings_position();
+      this.check_kings();
+      let piece;
       Object.values(this.entries).forEach((entryPiece) => {
         if (
-          entryPiece.new_position.substring(1) === '8' &&
-          entryPiece.imageUrl === 'wPP.png'
+          (entryPiece.new_position.substring(1) === '7' &&
+            entryPiece.imageUrl === 'wPP.png') ||
+          (entryPiece.new_position.substring(1) === '2' &&
+            entryPiece.imageUrl === 'bPP.png')
         ) {
           entryPiece.imageUrl = newPiece;
+          entryPiece.new_position = this.currentDroppable.id;
+          entryPiece.start_position = this.currentDroppable.id;
+          entryPiece.captured = false;
+          piece = this.currentDroppable.id;
         }
       });
 
-      // this.get_moves();
+      const takenPiece = this.currentDroppable.firstChild;
 
-      // this.get_dominant_protection();
-      this.render_new_position('replace');
-      // this.get_moves();
+      this.get_moves();
+      this.get_dominant_protection();
+      this.protect_pieces();
 
-      // this.get_dominant_protection();
-      // this.protect_pieces();
-      // // track wK & bK
-      // this.track_kings_position();
+      // check if king can take unprotected piece
+      Object.values(this.entries).forEach((entryPiece) => {
+        if (takenPiece !== null && takenPiece.id === entryPiece.new_position) {
+          entryPiece.captured = false;
+          this.get_moves();
+          this.get_dominant_protection();
+          this.render_new_position('capture');
+        } else if (piece === entryPiece.new_position) {
+          entryPiece.new_position = this.currentDroppable.id;
+          this.get_moves();
+          this.get_dominant_protection();
+          this.render_new_position('move');
+        }
+      });
 
-      // // checking kings
-      // this.check_kings();
+      // console.log(this.currentDroppable);
+      this.get_moves();
 
-      // this.check_for_black_checkmate();
+      this.get_dominant_protection();
 
-      document.querySelector('.wrapping').style.display = 'none';
+      this.protect_pieces();
+      // track wK & bK
+      this.track_kings_position();
+
+      // checking kings
+      this.check_kings();
+
+      if (this.black_checked) {
+        this.check_for_black_checkmate();
+      }
+      if (this.white_checked) {
+        this.check_for_white_checkmate();
+      }
+      // console.log(this.entries);
+      this.whiteGroup = false;
+      this.blackGroup = false;
     },
     render_new_position(sound) {
       if (sound === 'move') {
@@ -444,6 +518,7 @@ export default {
           }
         });
       });
+      // console.log(this.entries);
     },
     castling(entryPiece) {
       // white kingside
@@ -1046,7 +1121,6 @@ export default {
 
       this.check_kings();
       this.black_defence = output;
-
       this.white_dominant_everything_straight.forEach((e) => {
         if (
           !black_no_defence &&
@@ -1198,405 +1272,438 @@ export default {
     //######################################################
 
     mouseDown(event) {
-      const chess = document.querySelector('.chessboard');
-      chess.addEventListener('contextmenu', (event) => event.preventDefault());
-      event.preventDefault();
-      const squares = document.querySelectorAll('.square');
+      if (!this.whiteGroup && !this.blackGroup) {
+        const chess = document.querySelector('.chessboard');
+        chess.addEventListener('contextmenu', (event) =>
+          event.preventDefault()
+        );
 
-      squares.forEach((s) => {
-        s.classList.remove('droppable');
-        s.classList.remove('mark');
-        s.classList.remove('target');
-      });
-      const square = event.path[1];
-      let piece = square.firstElementChild;
+        event.preventDefault();
+        const squares = document.querySelectorAll('.square');
 
-      if (piece.tagName == 'DIV') {
-        return;
-      }
-
-      if (event.button == 0) {
-        let new_piece = this.selected_piece(piece, square);
-        this.available_moves(new_piece);
-
-        piece.style.width = 'calc(var(--square_size) / 7)';
-        piece.style.zIndex = 2;
-        piece.style.cursor = 'grabbing';
-
-        // piece.style.position = 'absolute';
-
-        // piece.style.top = event.clientX + 'px';
-        // piece.style.left = event.clientY + 'px';
-
-        let black_only_defence = [];
-        this.black_defence.forEach((e) => {
-          if (e.length > 0) {
-            if (piece.id === e[0]) {
-              black_only_defence.push(e[1]);
-            }
-          }
+        squares.forEach((s) => {
+          s.classList.remove('droppable');
+          s.classList.remove('mark');
+          s.classList.remove('target');
         });
-        if (piece.alt === 'bKK') {
-          black_only_defence = this.last_black_kings_moves;
+
+        const square = event.path[1];
+
+        let piece = square.firstElementChild;
+        if (piece.tagName == 'DIV') {
+          return;
         }
-        let white_only_defence = [];
-        this.white_defence.forEach((e) => {
-          if (e.length > 0) {
-            e.forEach((t) => {
+        if (event.button == 0) {
+          let new_piece = this.selected_piece(piece, square);
+          this.available_moves(new_piece);
+
+          piece.style.width = 'calc(var(--square_size) / 7)';
+          piece.style.zIndex = 2;
+          piece.style.cursor = 'grabbing';
+
+          // piece.style.position = 'absolute';
+
+          // piece.style.top = event.clientX + 'px';
+          // piece.style.left = event.clientY + 'px';
+
+          let black_only_defence = [];
+          this.black_defence.forEach((e) => {
+            if (e.length > 0) {
               if (piece.id === e[0]) {
-                white_only_defence.push(e[1]);
+                black_only_defence.push(e[1]);
               }
+            }
+          });
+          if (piece.alt === 'bKK') {
+            black_only_defence = this.last_black_kings_moves;
+          }
+          let white_only_defence = [];
+          this.white_defence.forEach((e) => {
+            if (e.length > 0) {
+              e.forEach((t) => {
+                if (piece.id === e[0]) {
+                  white_only_defence.push(e[1]);
+                }
+              });
+            }
+          });
+
+          if (piece.alt === 'wKK') {
+            white_only_defence = this.last_white_kings_moves;
+          }
+
+          if (this.black_checked) {
+            black_only_defence.forEach((allowed) => {
+              squares.forEach((s) => {
+                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+              });
+            });
+          } else if (this.white_checked) {
+            white_only_defence.forEach((allowed) => {
+              squares.forEach((s) => {
+                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+              });
+            });
+          } else {
+            this.moves.forEach((allowed) => {
+              squares.forEach((s) => {
+                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                  if (allowed === s.id) {
+                    s.classList.add('droppable');
+                    s.classList.add('mark');
+                    if (s.firstElementChild) {
+                      s.classList.add('target');
+                    }
+                  }
+                }
+              });
             });
           }
-        });
 
-        if (piece.alt === 'wKK') {
-          white_only_defence = this.last_white_kings_moves;
-        }
+          //######################################################
+          //######################################################
+          //###################### mouse event ###################
+          //######################################################
+          //######################################################
+          //######################################################
+          let self = this;
 
-        if (this.black_checked) {
-          black_only_defence.forEach((allowed) => {
-            squares.forEach((s) => {
-              if (piece.classList[0] === 'white' && this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-            });
-          });
-        } else if (this.white_checked) {
-          white_only_defence.forEach((allowed) => {
-            squares.forEach((s) => {
-              if (piece.classList[0] === 'white' && this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-            });
-          });
-        } else {
-          this.moves.forEach((allowed) => {
-            squares.forEach((s) => {
-              if (piece.classList[0] === 'white' && this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-              if (piece.classList[0] === 'black' && !this.whiteToPlay) {
-                if (allowed === s.id) {
-                  s.classList.add('droppable');
-                  s.classList.add('mark');
-                  if (s.firstElementChild) {
-                    s.classList.add('target');
-                  }
-                }
-              }
-            });
-          });
-        }
-
-        //######################################################
-        //######################################################
-        //###################### mouse event ###################
-        //######################################################
-        //######################################################
-        //######################################################
-        let self = this;
-
-        let currentDroppable = null;
-        let currentDroppable1 = null;
-        let shiftX = event.clientX - piece.getBoundingClientRect().left;
-        let shiftY = event.clientY - piece.getBoundingClientRect().top;
-
-        const whiteGroup = document.querySelector('.wrapping');
-
-        moveAt(event.pageX, event.pageY);
-        function moveAt(pageX, pageY) {
-          square.style.position = null;
-          piece.style.left = pageX - shiftX + 'px';
-          piece.style.top = pageY - shiftY + 'px';
-
-          whiteGroup.style.left = pageX - shiftX + 'px';
-          whiteGroup.style.top = pageY - shiftY + 'px';
-          whiteGroup.style.display = 'none';
-        }
-
-        function onMouseMove(event) {
-          const element = document.querySelector('.chessboard');
-          var rect = element.getBoundingClientRect();
+          let currentDroppable = null;
+          let currentDroppable1 = null;
+          let shiftX = event.clientX - piece.getBoundingClientRect().left;
+          let shiftY = event.clientY - piece.getBoundingClientRect().top;
 
           moveAt(event.pageX, event.pageY);
+          function moveAt(pageX, pageY) {
+            square.style.position = null;
+            piece.style.left = pageX - shiftX + 'px';
+            piece.style.top = pageY - shiftY + 'px';
 
-          if (event.pageX < rect.left - 8) {
-            piece.style.left = rect.left - 34 + 'px';
-          }
-          if (event.pageY < rect.top - 8) {
-            piece.style.top = rect.top - 34 + 'px';
-          }
-          if (event.pageY > rect.bottom - 10) {
-            piece.style.top = rect.bottom - 40 + 'px';
-          }
-          if (event.pageX > rect.right + 2) {
-            piece.style.left = rect.right - 34 + 'px';
+            // whiteGroup.style.display = 'none';
           }
 
-          piece.hidden = true;
+          function onMouseMove(event) {
+            const element = document.querySelector('.chessboard');
+            var rect = element.getBoundingClientRect();
 
-          let elemBelow = document.elementFromPoint(event.pageX, event.pageY);
+            moveAt(event.pageX, event.pageY);
 
-          piece.hidden = false;
-
-          //######################################################
-          //######################################################
-          //######################################################
-          //################# mouse event ends ###################
-          //######################################################
-          //######################################################
-          //######################################################
-          if (!elemBelow) {
-            elemBelow = document.createElement('div');
-          }
-
-          let droppableBelow = elemBelow.closest('.droppable');
-
-          let normalSquare = elemBelow.closest('.square');
-
-          if (currentDroppable1 != normalSquare) {
-            if (currentDroppable1) {
-              leave(currentDroppable1);
+            if (event.pageX < rect.left - 8) {
+              piece.style.left = rect.left - 34 + 'px';
             }
-            currentDroppable1 = normalSquare;
-            enter(currentDroppable1);
+            if (event.pageY < rect.top - 8) {
+              piece.style.top = rect.top - 34 + 'px';
+            }
+            if (event.pageY > rect.bottom - 10) {
+              piece.style.top = rect.bottom - 40 + 'px';
+            }
+            if (event.pageX > rect.right + 2) {
+              piece.style.left = rect.right - 34 + 'px';
+            }
+
+            piece.hidden = true;
+
+            let elemBelow = document.elementFromPoint(event.pageX, event.pageY);
+
+            piece.hidden = false;
+
+            //######################################################
+            //######################################################
+            //######################################################
+            //################# mouse event ends ###################
+            //######################################################
+            //######################################################
+            //######################################################
+            if (!elemBelow) {
+              elemBelow = document.createElement('div');
+            }
+
+            let droppableBelow = elemBelow.closest('.droppable');
+
+            let normalSquare = elemBelow.closest('.square');
+
+            if (currentDroppable1 != normalSquare) {
+              if (currentDroppable1) {
+                leave(currentDroppable1);
+              }
+              currentDroppable1 = normalSquare;
+              enter(currentDroppable1);
+            }
+
+            function enter(elem) {
+              if (elem == null) {
+                return;
+              }
+              elem.style.borderColor = 'white';
+            }
+            function leave(elem) {
+              if (elem == null) {
+                return;
+              }
+              elem.style.borderColor = 'transparent';
+            }
+
+            if (currentDroppable != droppableBelow) {
+              if (currentDroppable) {
+                leaveDroppable(currentDroppable);
+              }
+              currentDroppable = droppableBelow;
+              self.currentDroppable = currentDroppable;
+              if (currentDroppable) {
+                if (
+                  (piece.classList[0] === 'white' && self.whiteToPlay) ||
+                  (piece.classList[0] === 'black' && !self.whiteToPlay)
+                ) {
+                  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                  window.onmouseup = function(e) {
+                    e.preventDefault();
+                    squares.forEach((s) => {
+                      s.classList.remove('droppable');
+                      s.classList.remove('mark');
+                      s.classList.remove('target');
+                      s.style.borderColor = 'transparent';
+                    });
+                    if (currentDroppable) {
+                      if (piece.alt.charAt(0) === 'b') {
+                        self.whiteToPlay = true;
+                      } else {
+                        self.whiteToPlay = false;
+                      }
+                      // castling
+                      if (
+                        !self.white_kingside_castling_king_or_rook &&
+                        currentDroppable.id === 'g1' &&
+                        piece.id === 'e1' &&
+                        piece.alt === 'wKK'
+                      ) {
+                        self.castle('wKK');
+                      }
+                      if (
+                        !self.white_queenside_castling_king_or_rook &&
+                        currentDroppable.id === 'c1' &&
+                        piece.id === 'e1' &&
+                        piece.alt === 'wKK'
+                      ) {
+                        self.castle('wKQ');
+                      }
+                      if (
+                        !self.black_kingside_castling_king_or_rook &&
+                        currentDroppable.id === 'g8' &&
+                        piece.id === 'e8' &&
+                        piece.alt === 'bKK'
+                      ) {
+                        self.castle('bKK');
+                      }
+                      if (
+                        !self.black_queenside_castling_king_or_rook &&
+                        currentDroppable.id === 'c8' &&
+                        piece.id === 'e8' &&
+                        piece.alt === 'bKK'
+                      ) {
+                        self.castle('bKQ');
+                      }
+
+                      // promoting pawns
+                      if (
+                        piece.alt === 'wPP' &&
+                        piece.id.substring('1') === '7'
+                      ) {
+                        self.whiteGroup = true;
+                        const whiteGroup = document.querySelector(
+                          '.wrappingWhite'
+                        );
+                        currentDroppable.appendChild(whiteGroup);
+                        whiteGroup.style.zIndex = 100000;
+                        document.removeEventListener('mousemove', onMouseMove);
+                        window.onmouseup = null;
+                        piece.style.display = 'none';
+                        // square.style.position = 'relative';
+                        // const takenPiece = currentDroppable.firstChild;
+                        // currentDroppable.style.position = 'relative';
+                        // currentDroppable.style.boxSizing = 'border-box';
+                        // currentDroppable.style.borderColor = 'transparent';
+                      } else if (
+                        piece.alt === 'bPP' &&
+                        piece.id.substring('1') === '2'
+                      ) {
+                        self.blackGroup = true;
+                        const blackGroup = document.querySelector(
+                          '.wrappingBlack'
+                        );
+                        currentDroppable.appendChild(blackGroup);
+                        blackGroup.style.zIndex = 100000;
+                        document.removeEventListener('mousemove', onMouseMove);
+                        window.onmouseup = null;
+                        piece.style.display = 'none';
+                        // square.style.position = 'relative';
+                        // const takenPiece = currentDroppable.firstChild;
+                        // currentDroppable.style.position = 'relative';
+                        // currentDroppable.style.boxSizing = 'border-box';
+                        // currentDroppable.style.borderColor = 'transparent';
+                      } else {
+                        document.removeEventListener('mousemove', onMouseMove);
+                        window.onmouseup = null;
+                        piece.style.width = 'calc(var(--square_size) / 8)';
+                        piece.style.cursor = 'grab';
+                        piece.style.zIndex = 1;
+                        square.style.position = 'relative';
+                        piece.style.position = 'absolute';
+                        piece.style.top = '0px';
+                        piece.style.left = '0px';
+                        const takenPiece = currentDroppable.firstChild;
+                        currentDroppable.style.position = 'relative';
+                        currentDroppable.style.boxSizing = 'border-box';
+                        currentDroppable.style.borderColor = 'transparent';
+
+                        self.get_moves();
+                        self.get_dominant_protection();
+                        self.protect_pieces();
+                        self.track_kings_position();
+                        self.check_kings();
+
+                        // check if king can take unprotected piece
+                        Object.values(self.entries).forEach((entryPiece) => {
+                          if (
+                            takenPiece !== null &&
+                            takenPiece.id === entryPiece.new_position
+                          ) {
+                            entryPiece.captured = true;
+
+                            self.get_moves();
+                            self.get_dominant_protection();
+                            self.render_new_position('capture');
+                            self.castling(entryPiece);
+                          } else if (piece.id === entryPiece.new_position) {
+                            entryPiece.new_position = currentDroppable.id;
+                            self.get_moves();
+                            self.get_dominant_protection();
+                            self.render_new_position('move');
+                            self.castling(entryPiece);
+                          }
+                        });
+
+                        self.get_moves();
+
+                        self.get_dominant_protection();
+
+                        self.protect_pieces();
+                        // track wK & bK
+                        self.track_kings_position();
+
+                        // checking kings
+                        self.check_kings();
+
+                        if (self.black_checked) {
+                          self.check_for_black_checkmate();
+                        }
+                        if (self.white_checked) {
+                          self.check_for_white_checkmate();
+                        }
+                      }
+                    } else {
+                      document.removeEventListener('mousemove', onMouseMove);
+                      piece.style.width = 'calc(var(--square_size) / 8)';
+                      piece.style.zIndex = 1;
+                      piece.style.cursor = 'grab';
+                      square.style.position = 'relative';
+                      piece.style.position = 'absolute';
+                      piece.style.top = '0px';
+                      piece.style.left = '0px';
+                    }
+                  };
+                }
+              }
+            }
           }
 
-          function enter(elem) {
+          document.addEventListener('mousemove', onMouseMove);
+          window.onmouseup = function() {
+            document.removeEventListener('mousemove', onMouseMove);
+            piece.style.zIndex = 1;
+            piece.onmouseup = null;
+            piece.style.width = 'calc(var(--square_size) / 8)';
+            piece.style.cursor = 'grab';
+            square.style.position = 'relative';
+            piece.style.position = 'absolute';
+            piece.style.top = '0px';
+            piece.style.left = '0px';
+            squares.forEach((s) => {
+              s.style.borderColor = 'transparent';
+            });
+          };
+
+          //######################################################
+          //######################################################
+          //######################################################
+          //############## internal functions ####################
+          //######################################################
+          //######################################################
+          //######################################################
+          function enterDroppable(elem) {
             if (elem == null) {
               return;
             }
+
             elem.style.borderColor = 'white';
           }
-          function leave(elem) {
+
+          function leaveDroppable(elem) {
             if (elem == null) {
               return;
             }
+
             elem.style.borderColor = 'transparent';
           }
 
-          if (currentDroppable != droppableBelow) {
-            if (currentDroppable) {
-              leaveDroppable(currentDroppable);
-            }
-            currentDroppable = droppableBelow;
-            if (currentDroppable) {
-              if (
-                (piece.classList[0] === 'white' && self.whiteToPlay) ||
-                (piece.classList[0] === 'black' && !self.whiteToPlay)
-              ) {
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                window.onmouseup = function(e) {
-                  e.preventDefault();
-                  squares.forEach((s) => {
-                    s.classList.remove('droppable');
-                    s.classList.remove('mark');
-                    s.classList.remove('target');
-                    s.style.borderColor = 'transparent';
-                  });
-                  if (currentDroppable) {
-                    if (piece.alt.charAt(0) === 'b') {
-                      self.whiteToPlay = true;
-                    } else {
-                      self.whiteToPlay = false;
-                    }
-                    // castling
-                    if (
-                      !self.white_kingside_castling_king_or_rook &&
-                      currentDroppable.id === 'g1' &&
-                      piece.id === 'e1' &&
-                      piece.alt === 'wKK'
-                    ) {
-                      self.castle('wKK');
-                    }
-                    if (
-                      !self.white_queenside_castling_king_or_rook &&
-                      currentDroppable.id === 'c1' &&
-                      piece.id === 'e1' &&
-                      piece.alt === 'wKK'
-                    ) {
-                      self.castle('wKQ');
-                    }
-                    if (
-                      !self.black_kingside_castling_king_or_rook &&
-                      currentDroppable.id === 'g8' &&
-                      piece.id === 'e8' &&
-                      piece.alt === 'bKK'
-                    ) {
-                      self.castle('bKK');
-                    }
-                    if (
-                      !self.black_queenside_castling_king_or_rook &&
-                      currentDroppable.id === 'c8' &&
-                      piece.id === 'e8' &&
-                      piece.alt === 'bKK'
-                    ) {
-                      self.castle('bKQ');
-                    }
-
-                    document.removeEventListener('mousemove', onMouseMove);
-                    window.onmouseup = null;
-                    piece.style.width = 'calc(var(--square_size) / 8)';
-                    piece.style.cursor = 'grab';
-                    piece.style.zIndex = 1;
-                    square.style.position = 'relative';
-                    piece.style.position = 'absolute';
-                    piece.style.top = '0px';
-                    piece.style.left = '0px';
-                    const takenPiece = currentDroppable.firstChild;
-                    currentDroppable.style.position = 'relative';
-                    currentDroppable.style.boxSizing = 'border-box';
-                    currentDroppable.style.borderColor = 'transparent';
-
-                    self.get_moves();
-                    self.get_dominant_protection();
-                    self.protect_pieces();
-                    self.track_kings_position();
-                    self.check_kings();
-
-                    // check if king can take unprotected piece
-                    Object.values(self.entries).forEach((entryPiece) => {
-                      if (
-                        takenPiece !== null &&
-                        takenPiece.id === entryPiece.new_position
-                      ) {
-                        entryPiece.captured = true;
-
-                        self.get_moves();
-                        self.get_dominant_protection();
-                        self.render_new_position('capture');
-                        self.castling(entryPiece);
-                      } else if (piece.id === entryPiece.new_position) {
-                        entryPiece.new_position = currentDroppable.id;
-                        self.get_moves();
-                        self.get_dominant_protection();
-                        self.render_new_position('move');
-                        self.castling(entryPiece);
-                      }
-                    });
-                    // promoting pawns
-                    if (
-                      currentDroppable.firstChild.alt === 'wPP' &&
-                      currentDroppable.firstChild.id.substring('1') === '8'
-                    ) {
-                      whiteGroup.style.display = 'block';
-                    }
-                    self.get_moves();
-
-                    self.get_dominant_protection();
-
-                    self.protect_pieces();
-                    // track wK & bK
-                    self.track_kings_position();
-
-                    // checking kings
-                    self.check_kings();
-
-                    if (self.black_checked) {
-                      self.check_for_black_checkmate();
-                    }
-                    if (self.white_checked) {
-                      self.check_for_white_checkmate();
-                    }
-                  } else {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    piece.style.width = 'calc(var(--square_size) / 8)';
-                    piece.style.zIndex = 1;
-                    piece.style.cursor = 'grab';
-                    square.style.position = 'relative';
-                    piece.style.position = 'absolute';
-                    piece.style.top = '0px';
-                    piece.style.left = '0px';
-                  }
-                };
-              }
-            }
-
-            enterDroppable(currentDroppable);
-          }
+          piece.ondragstart = function() {
+            return false;
+          };
         }
-
-        document.addEventListener('mousemove', onMouseMove);
-        window.onmouseup = function() {
-          document.removeEventListener('mousemove', onMouseMove);
-          piece.style.zIndex = 1;
-          piece.onmouseup = null;
-          piece.style.width = 'calc(var(--square_size) / 8)';
-          piece.style.cursor = 'grab';
-          square.style.position = 'relative';
-          piece.style.position = 'absolute';
-          piece.style.top = '0px';
-          piece.style.left = '0px';
-          squares.forEach((s) => {
-            s.style.borderColor = 'transparent';
-          });
-        };
-
-        //######################################################
-        //######################################################
-        //######################################################
-        //############## internal functions ####################
-        //######################################################
-        //######################################################
-        //######################################################
-        function enterDroppable(elem) {
-          if (elem == null) {
-            return;
-          }
-
-          elem.style.borderColor = 'white';
-        }
-
-        function leaveDroppable(elem) {
-          if (elem == null) {
-            return;
-          }
-
-          elem.style.borderColor = 'transparent';
-        }
-
-        piece.ondragstart = function() {
-          return false;
-        };
+        let self = this;
       }
-      let self = this;
     },
 
     //######################################################
@@ -2620,13 +2727,10 @@ export default {
       straight();
       secretStraight();
       diagonalSecret();
-
       if (color === 'w') {
-        this.whiteSecretMoves = [];
-        this.whiteSecretMoves = secretAgent;
+        this.whiteSecretMoves.push(...new Set(secretAgent));
       } else {
-        this.blackSecretMoves = [];
-        this.blackSecretMoves = secretAgent;
+        this.blackSecretMoves.push(...new Set(secretAgent));
       }
 
       if (!check) {
@@ -2845,8 +2949,12 @@ export default {
   flex-wrap: wrap;
 }
 /*  */
-.wrapping {
-  display: none;
+.wrappingWhite {
+  display: block;
+  position: absolute;
+}
+.wrappingBlack {
+  display: block;
   position: absolute;
 }
 .promotWhitePawn {
@@ -2858,6 +2966,18 @@ export default {
 }
 .promotWhitePawn img:hover {
   background-color: rgb(221, 107, 0);
+}
+.promotBlackPawn {
+  display: flex;
+  flex-direction: column-reverse;
+  position: absolute;
+  bottom: -60px;
+}
+.promotBlackPawn img {
+  background-color: rgb(79, 255, 123);
+}
+.promotBlackPawn img:hover {
+  background-color: rgb(0, 211, 63);
 }
 /*  */
 .black_square {
