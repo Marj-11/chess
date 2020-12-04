@@ -90,92 +90,46 @@ export default {
         },
         {
           imageUrl: 'bNN.png',
-          start_position: 'h6',
-          new_position: 'h6',
+          start_position: 'b8',
+          new_position: 'b8',
           captured: false,
         },
         {
           imageUrl: 'bNN.png',
-          start_position: 'b4',
-          new_position: 'b4',
+          start_position: 'g8',
+          new_position: 'g8',
           captured: false,
         },
         {
           imageUrl: 'bBB.png',
-          start_position: 'e4',
-          new_position: 'e4',
+          start_position: 'c8',
+          new_position: 'c8',
           captured: false,
         },
+
         {
           imageUrl: 'bBB.png',
-          start_position: 'g5',
-          new_position: 'g5',
+          start_position: 'f8',
+          new_position: 'f8',
           captured: false,
         },
         {
           imageUrl: 'bQQ.png',
-          start_position: 'h2',
-          new_position: 'h2',
+          start_position: 'h4',
+          new_position: 'h4',
           captured: false,
         },
         {
           imageUrl: 'bKK.png',
-          start_position: 'e8',
-          new_position: 'e8',
-          black_checkmate: false,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'a7',
-          new_position: 'a7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'b7',
-          new_position: 'b7',
-          captured: true,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'b2',
-          new_position: 'b2',
-          captured: false,
-        },
-        {
-          imageUrl: 'bPP.png',
           start_position: 'd7',
           new_position: 'd7',
-          captured: false,
+          black_checkmate: false,
         },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'e7',
-          new_position: 'e7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'f7',
-          new_position: 'f7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'g7',
-          new_position: 'g7',
-          captured: false,
-        },
-        {
-          imageUrl: 'bPP.png',
-          start_position: 'h7',
-          new_position: 'h7',
-          captured: false,
-        },
+
         {
           imageUrl: 'wRl.png',
-          start_position: 'a1',
-          new_position: 'a1',
+          start_position: 'b5',
+          new_position: 'b5',
           captured: false,
         },
         {
@@ -186,86 +140,38 @@ export default {
         },
         {
           imageUrl: 'wNN.png',
-          start_position: 'c3',
-          new_position: 'c3',
-          captured: false,
-        },
-        {
-          imageUrl: 'wNN.png',
-          start_position: 'f3',
-          new_position: 'f3',
-          captured: false,
-        },
-        {
-          imageUrl: 'wBB.png',
-          start_position: 'f4',
-          new_position: 'f4',
-          captured: false,
-        },
-        {
-          imageUrl: 'wBB.png',
-          start_position: 'g4',
-          new_position: 'g4',
-          captured: false,
-        },
-        {
-          imageUrl: 'wQQ.png',
           start_position: 'd4',
           new_position: 'd4',
           captured: false,
         },
         {
-          imageUrl: 'wKK.png',
-          start_position: 'e1',
-          new_position: 'e1',
-        },
-        {
-          imageUrl: 'wPP.png',
-          start_position: 'a2',
-          new_position: 'a2',
+          imageUrl: 'wNN.png',
+          start_position: 'g1',
+          new_position: 'g1',
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'b7',
-          new_position: 'b7',
-          captured: false,
-        },
-        {
-          imageUrl: 'wPP.png',
-          start_position: 'c2',
-          new_position: 'c2',
-          captured: false,
-        },
-        {
-          imageUrl: 'wPP.png',
+          imageUrl: 'wBB.png',
           start_position: 'd2',
           new_position: 'd2',
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'e2',
-          new_position: 'e2',
+          imageUrl: 'wBB.png',
+          start_position: 'f1',
+          new_position: 'f1',
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'f2',
-          new_position: 'f2',
+          imageUrl: 'wQQ.png',
+          start_position: 'a4',
+          new_position: 'a4',
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'g2',
-          new_position: 'g2',
-          captured: false,
-        },
-        {
-          imageUrl: 'wPP.png',
-          start_position: 'h2',
-          new_position: 'h2',
-          captured: true,
+          imageUrl: 'wKK.png',
+          start_position: 'd1',
+          new_position: 'd1',
         },
       ],
       recorded_entries: [],
@@ -277,7 +183,6 @@ export default {
       black_dominant_take_pawns: '',
       black_dominant_everything_straight: '',
       black_dominant_everything_take: '',
-
       dangerous_white_piece: '',
       dangerous_black_piece: '',
       can_take_dangerous_black_piece: false,
@@ -289,24 +194,17 @@ export default {
       white_dominant_everything_take: '',
       white_protection: [],
       black_protection: [],
-
       wK_position: '',
       bK_position: '',
-
       whiteToPlay: true,
-
       white_checked: false,
       black_checked: false,
-
       white_checkmate: false,
       black_checkmate: false,
-
       black_king_moves: [],
       white_king_moves: [],
-
       black_place_to_go: true,
       white_place_to_go: true,
-
       protected_pieces: [],
       white_kingside_castling_king_or_rook: false,
       white_queenside_castling_king_or_rook: false,
@@ -314,14 +212,12 @@ export default {
       black_queenside_castling_king_or_rook: false,
       white_newPosition: [],
       black_newPosition: [],
-
       black_defence: [],
       white_defence: [],
       black_figures: [],
       black_pawns: [],
       white_figures: [],
       white_pawns: [],
-
       secretAgentFinal: [],
       blackSecretMoves: [],
       whiteSecretMoves: [],
@@ -990,31 +886,6 @@ export default {
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('black');
 
-      // squares.forEach((f) => {
-      //   if (f.id === this.dangerous_white_piece.piece) {
-      //     if (
-      //       f.firstElementChild.alt === 'wQQ' ||
-      //       f.firstElementChild.alt === 'bQQ'
-      //     ) {
-      //       this.get_queen_moves();
-      //     }
-      // if (
-      //   f.firstElementChild.alt === 'bRl' ||
-      //   f.firstElementChild.alt === 'bRr' ||
-      //   f.firstElementChild.alt === 'wRl' ||
-      //   f.firstElementChild.alt === 'wRr'
-      // ) {
-      //   this.get_rook_moves();
-      // }
-      //  if (
-      //   f.firstElementChild.alt === 'bBB' ||
-      //   f.firstElementChild.alt === 'wBB'
-      // ) {
-      //   this.get_bishop_moves();
-      // }
-      //   }
-      // });
-
       this.black_defence = [];
       const blockers_black_pawns = [];
       const blockers_black_figures = [];
@@ -1278,13 +1149,6 @@ export default {
         }
       });
     },
-    //######################################################
-    //######################################################
-    //###################### mouse down ####################
-    //######################################################
-    //######################################################
-    //######################################################
-
     mouseDown(event) {
       if (!this.whiteGroup && !this.blackGroup) {
         const chess = document.querySelector('.chessboard');
@@ -1721,17 +1585,6 @@ export default {
         let self = this;
       }
     },
-
-    //######################################################
-    //######################################################
-    //##################end mouse down######################
-    //######################################################
-    //######################################################
-    //######################################################
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    ////////////////////////////////////////////////METHODS/////////////////////////////////////////////////////////
     get_moves() {
       const squares = document.querySelectorAll('.square');
       this.white_moves = [];
@@ -2214,18 +2067,20 @@ export default {
       }
 
       diagonal();
-
+      const initial = selectedPiece.selected_piece_initial;
+      const id = selectedPiece.selected_piece_position;
+      const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves, protect });
+        this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves, protect });
+        this.white_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       }
     },
@@ -2303,18 +2158,20 @@ export default {
       }
 
       straight();
-
+      const initial = selectedPiece.selected_piece_initial;
+      const id = selectedPiece.selected_piece_position;
+      const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves, protect });
+        this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves, protect });
+        this.white_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       }
     },
@@ -2456,18 +2313,20 @@ export default {
 
       diagonal();
       straight();
-
+      const initial = selectedPiece.selected_piece_initial;
+      const id = selectedPiece.selected_piece_position;
+      const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
       } else if (color === 'b') {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.black_moves.push({ piece, finalMoves, protect });
+        this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       } else {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
-        this.white_moves.push({ piece, finalMoves, protect });
+        this.white_moves.push({ piece, finalMoves, protect, initial, id, alt });
         this.moves.push(finalMoves);
       }
     },
@@ -2650,201 +2509,224 @@ export default {
 
       this.black_moves.push({ output, protect });
     },
-    get_hidden_moves(dangerousPiece) {
+    get_hidden_moves(dangerousDrop) {
       const squares = document.querySelectorAll('.square');
+
       const colorClass =
-        dangerousPiece.alt.substring(0, 1) === 'b' ? 'black' : 'white';
-      const letter = dangerousPiece.id.charAt(0);
-      const num = parseInt(dangerousPiece.id.charAt(1));
+        dangerousDrop.alt.substring(0, 1) === 'b' ? 'black' : 'white';
+
+      const dangerousMain =
+        colorClass === 'white'
+          ? this.dangerous_white_piece
+          : this.dangerous_black_piece;
+
+      let letter;
+      let num;
+      let arr = [dangerousMain, dangerousDrop];
       let secretAgent = [];
-      const forbiden = [
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'h7',
-        'h8',
-        'a1',
-        'b1',
-        'c1',
-        'd1',
-        'e1',
-        'f1',
-        'g1',
-        'h1',
-        'a8',
-        'b8',
-        'c8',
-        'd8',
-        'e8',
-        'f8',
-        'g8',
-        'h8',
-      ];
-      let objectNumberSecret = 0;
-      let j = 1;
-      function diagonalSecret() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-        for (let i = 0; i < letters.length; i++) {
-          const element = letters[i];
-          if (element === letter) {
-            const objects = {
-              one: `${letters[i + j]}${num - j}`,
-              two: `${letters[i + j]}${num + j}`,
-              three: `${letters[i - j]}${num + j}`,
-              four: `${letters[i - j]}${num - j}`,
-            };
-            j++;
-            squares.forEach((square) => {
-              const obj = objects[Object.keys(objects)[objectNumberSecret]];
-              if (obj == undefined) {
-                return obj == 'undefined';
-              }
-              if (obj.substring(0, 1) === 'u') {
-                objectNumberSecret++;
-                objectNumberSecret++;
-                j = 1;
-                diagonalSecret();
-              }
-              if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
-              ) {
-                objectNumberSecret++;
-                j = 1;
-                diagonalSecret();
-              } else {
-                let ss =
-                  square.firstElementChild === null
-                    ? square.firstElementChild
-                    : square.firstElementChild.alt;
-                if (square.id === obj) {
-                  if (
-                    square.firstElementChild &&
-                    ss !== 'wKK' &&
-                    square.firstElementChild &&
-                    ss !== 'bKK'
-                  ) {
+
+      if (dangerousDrop.alt.substring(0, 3) === dangerousMain.initial) {
+        letter = dangerousDrop.id.charAt(0);
+        num = parseInt(dangerousDrop.id.charAt(1));
+      } else {
+        for (let i = 0; i < arr.length; i++) {
+          const ele = arr[i];
+          letter = ele.id.charAt(0);
+          num = parseInt(ele.id.charAt(1));
+          const forbiden = [
+            'a1',
+            'a2',
+            'a3',
+            'a4',
+            'a5',
+            'a6',
+            'a7',
+            'a8',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'h7',
+            'h8',
+            'a1',
+            'b1',
+            'c1',
+            'd1',
+            'e1',
+            'f1',
+            'g1',
+            'h1',
+            'a8',
+            'b8',
+            'c8',
+            'd8',
+            'e8',
+            'f8',
+            'g8',
+            'h8',
+          ];
+          let objectNumberSecret = 0;
+          let j = 1;
+          function diagonalSecret() {
+            const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            for (let i = 0; i < letters.length; i++) {
+              const element = letters[i];
+              if (element === letter) {
+                const objects = {
+                  one: `${letters[i + j]}${num - j}`,
+                  two: `${letters[i + j]}${num + j}`,
+                  three: `${letters[i - j]}${num + j}`,
+                  four: `${letters[i - j]}${num - j}`,
+                };
+                j++;
+                squares.forEach((square) => {
+                  const obj = objects[Object.keys(objects)[objectNumberSecret]];
+                  if (obj == undefined) {
+                    return obj == 'undefined';
+                  }
+                  if (obj.substring(0, 1) === 'u') {
+                    objectNumberSecret++;
+                    objectNumberSecret++;
                     j = 1;
-                    if (square.firstElementChild.classList[0] === colorClass) {
-                      secretAgent.push(obj);
-                      objectNumberSecret++;
-                      diagonalSecret();
-                    } else {
-                      objectNumberSecret++;
-                      diagonalSecret();
-                    }
-                  } else {
-                    forbiden.forEach((forbid) => {
-                      if (obj === forbid) {
-                        objectNumberSecret++;
-                        j = 1;
-                        diagonalSecret();
-                      }
-                    });
-                    secretAgent.push(obj);
                     diagonalSecret();
                   }
-                }
-              }
-            });
-          }
-        }
-      }
-      let objectNumberStraightSecret = 0;
-      let q = 1;
-      function secretStraight() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-        for (let i = 0; i < letters.length; i++) {
-          const element = letters[i];
-          if (element === letter) {
-            const objects = {
-              one: `${letters[i + q]}${num}`,
-              two: `${letter}${num + q}`,
-              three: `${letters[i - q]}${num}`,
-              four: `${letter}${num - q}`,
-            };
-            q++;
-            squares.forEach((square) => {
-              const obj =
-                objects[Object.keys(objects)[objectNumberStraightSecret]];
-              if (obj == undefined) {
-                return obj == 'undefined';
-              }
-              if (obj.substring(0, 1) === 'u') {
-                objectNumberStraightSecret++;
-                q = 1;
-                secretStraight();
-              }
-              if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
-              ) {
-                objectNumberStraightSecret++;
-                q = 1;
-                secretStraight();
-              } else {
-                let ss =
-                  square.firstElementChild === null
-                    ? square.firstElementChild
-                    : square.firstElementChild.alt;
-                if (square.id === obj) {
                   if (
-                    square.firstElementChild &&
-                    ss !== 'wKK' &&
-                    square.firstElementChild &&
-                    ss !== 'bKK'
+                    obj.substring(1, 2) === '0' ||
+                    obj.substring(1, 2) === '10' ||
+                    obj.substring(1, 2) === '9'
                   ) {
-                    q = 1;
-                    if (square.firstElementChild.classList[0] === colorClass) {
-                      secretAgent.push(obj);
-                      objectNumberStraightSecret++;
-                      secretStraight();
-                    } else {
-                      objectNumberStraightSecret++;
-                      q = 1;
-                      secretStraight();
-                    }
+                    objectNumberSecret++;
+                    j = 1;
+                    diagonalSecret();
                   } else {
-                    secretAgent.push(obj);
+                    let ss =
+                      square.firstElementChild === null
+                        ? square.firstElementChild
+                        : square.firstElementChild.alt;
+                    if (square.id === obj) {
+                      if (
+                        square.firstElementChild &&
+                        ss !== 'wKK' &&
+                        square.firstElementChild &&
+                        ss !== 'bKK'
+                      ) {
+                        j = 1;
+                        if (
+                          square.firstElementChild.classList[0] === colorClass
+                        ) {
+                          secretAgent.push(obj);
+                          objectNumberSecret++;
+                          diagonalSecret();
+                        } else {
+                          objectNumberSecret++;
+                          diagonalSecret();
+                        }
+                      } else {
+                        forbiden.forEach((forbid) => {
+                          if (obj === forbid) {
+                            objectNumberSecret++;
+                            j = 1;
+                            diagonalSecret();
+                          }
+                        });
+                        secretAgent.push(obj);
+                        diagonalSecret();
+                      }
+                    }
+                  }
+                });
+              }
+            }
+          }
+          let objectNumberStraightSecret = 0;
+          let q = 1;
+          function secretStraight() {
+            const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+            for (let i = 0; i < letters.length; i++) {
+              const element = letters[i];
+              if (element === letter) {
+                const objects = {
+                  one: `${letters[i + q]}${num}`,
+                  two: `${letter}${num + q}`,
+                  three: `${letters[i - q]}${num}`,
+                  four: `${letter}${num - q}`,
+                };
+                q++;
+                squares.forEach((square) => {
+                  const obj =
+                    objects[Object.keys(objects)[objectNumberStraightSecret]];
+                  if (obj == undefined) {
+                    return obj == 'undefined';
+                  }
+                  if (obj.substring(0, 1) === 'u') {
+                    objectNumberStraightSecret++;
+                    q = 1;
                     secretStraight();
                   }
-                }
+                  if (
+                    obj.substring(1, 2) === '0' ||
+                    obj.substring(1, 2) === '10' ||
+                    obj.substring(1, 2) === '9'
+                  ) {
+                    objectNumberStraightSecret++;
+                    q = 1;
+                    secretStraight();
+                  } else {
+                    let ss =
+                      square.firstElementChild === null
+                        ? square.firstElementChild
+                        : square.firstElementChild.alt;
+                    if (square.id === obj) {
+                      if (
+                        square.firstElementChild &&
+                        ss !== 'wKK' &&
+                        square.firstElementChild &&
+                        ss !== 'bKK'
+                      ) {
+                        q = 1;
+                        if (
+                          square.firstElementChild.classList[0] === colorClass
+                        ) {
+                          secretAgent.push(obj);
+                          objectNumberStraightSecret++;
+                          secretStraight();
+                        } else {
+                          objectNumberStraightSecret++;
+                          q = 1;
+                          secretStraight();
+                        }
+                      } else {
+                        secretAgent.push(obj);
+                        secretStraight();
+                      }
+                    }
+                  }
+                });
               }
-            });
+            }
+          }
+
+          if (ele.alt.substring(2, 3) === 'B') {
+            diagonalSecret();
+          }
+          if (
+            ele.alt.substring(2, 3) === 'l' ||
+            ele.alt.substring(2, 3) === 'r'
+          ) {
+            secretStraight();
+          }
+          if (ele.alt.substring(2, 3) === 'Q') {
+            diagonalSecret();
+            secretStraight();
           }
         }
       }
 
-      if (dangerousPiece.alt.substring(2, 3) === 'B') {
-        diagonalSecret();
-      }
-      if (
-        dangerousPiece.alt.substring(2, 3) === 'l' ||
-        dangerousPiece.alt.substring(2, 3) === 'r'
-      ) {
-        secretStraight();
-      }
-      if (dangerousPiece.alt.substring(2, 3) === 'Q') {
-        diagonalSecret();
-        secretStraight();
-      }
       if (colorClass === 'white') {
         this.whiteSecretMoves = [];
         this.whiteSecretMoves.push(...new Set(secretAgent));
-        console.log(this.whiteSecretMoves);
       } else {
         this.blackSecretMoves = [];
         this.blackSecretMoves.push(...new Set(secretAgent));
