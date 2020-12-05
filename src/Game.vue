@@ -510,6 +510,7 @@ export default {
           }
         });
       });
+      // console.log(this.black_dominant_everything_take);
     },
     castling(entryPiece) {
       // white kingside
@@ -975,17 +976,32 @@ export default {
       let output_black_pawns_blockers = [];
       let output_black_figures_blockers = [];
       const output_black_figures_attackers = [];
+
       this.black_pawns.forEach((pawn) => {
-        this.dangerous_white_piece.finalMoves.forEach((s) => {
-          if (pawn.fine.includes(s)) {
-            blockers_black_pawns.push(pawn);
+        if (this.dangerous_white_piece.finalMoves) {
+          this.dangerous_white_piece.finalMoves.forEach((s) => {
+            if (pawn.fine.includes(s)) {
+              blockers_black_pawns.push(pawn);
+            }
+          });
+          if (pawn.newMoves.includes(this.dangerous_white_piece.piece)) {
+            output_black_pawns_attackers.push([
+              pawn.piece,
+              this.dangerous_white_piece.piece,
+            ]);
           }
-        });
-        if (pawn.newMoves.includes(this.dangerous_white_piece.piece)) {
-          output_black_pawns_attackers.push([
-            pawn.piece,
-            this.dangerous_white_piece.piece,
-          ]);
+        } else if (this.dangerous_white_piece) {
+          this.dangerous_white_piece.newMoves.forEach((s) => {
+            if (pawn.fine.includes(s)) {
+              blockers_black_pawns.push(pawn);
+            }
+          });
+          if (pawn.newMoves.includes(this.dangerous_white_piece.piece)) {
+            output_black_pawns_attackers.push([
+              pawn.piece,
+              this.dangerous_white_piece.piece,
+            ]);
+          }
         }
       });
       blockers_black_pawns.forEach((r) => {
@@ -1016,16 +1032,30 @@ export default {
       this.get_dominant_protection();
       this.check_if_king_can_take_unprotected_piece('black');
       this.black_figures.forEach((figure) => {
-        this.dangerous_white_piece.finalMoves.forEach((s) => {
-          if (figure.finalMoves.includes(s)) {
-            blockers_black_figures.push(figure);
+        if (this.dangerous_white_piece.finalMoves) {
+          this.dangerous_white_piece.finalMoves.forEach((s) => {
+            if (figure.finalMoves.includes(s)) {
+              blockers_black_figures.push(figure);
+            }
+          });
+          if (figure.finalMoves.includes(this.dangerous_white_piece.piece)) {
+            output_black_figures_attackers.push([
+              figure.piece,
+              this.dangerous_white_piece.piece,
+            ]);
           }
-        });
-        if (figure.finalMoves.includes(this.dangerous_white_piece.piece)) {
-          output_black_figures_attackers.push([
-            figure.piece,
-            this.dangerous_white_piece.piece,
-          ]);
+        } else if (this.dangerous_white_piece) {
+          this.dangerous_white_piece.newMoves.forEach((s) => {
+            if (figure.finalMoves.includes(s)) {
+              blockers_black_figures.push(figure);
+            }
+          });
+          if (figure.finalMoves.includes(this.dangerous_white_piece.piece)) {
+            output_black_figures_attackers.push([
+              figure.piece,
+              this.dangerous_white_piece.piece,
+            ]);
+          }
         }
       });
       blockers_black_figures.forEach((r) => {
@@ -1222,6 +1252,7 @@ export default {
           }
         });
       });
+
       const white_no_defence = Boolean(
         this.white_defence.find((val) => {
           return val.length > 0;
@@ -1809,7 +1840,7 @@ export default {
         this.get_queen_moves(selectedPiece, forbiden, check);
       }
       if (selectedPiece.selected_piece_initial === 'wKK') {
-        this.get_white_king_moves(selectedPiece, check, check);
+        this.get_white_king_moves(selectedPiece, check);
       }
       if (selectedPiece.selected_piece_initial === 'bKK') {
         this.get_black_king_moves(selectedPiece, check);
@@ -2367,7 +2398,7 @@ export default {
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-      let finalMoves = [];
+      let finalMoves1 = [];
       let protect = [];
       const magic = [];
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -2400,15 +2431,15 @@ export default {
                     square.firstElementChild.classList[0] === 'black' ||
                     square.firstElementChild.tagName === 'DIV'
                   ) {
-                    finalMoves.push(obj[1]);
+                    finalMoves1.push(obj[1]);
                   }
                 } else if (this.white_kingside_castling) {
-                  finalMoves.push(obj[1]);
+                  finalMoves1.push(obj[1]);
                 } else {
                   if (obj[0] === 'castleRight') {
                     return;
                   } else {
-                    finalMoves.push(obj[1]);
+                    finalMoves1.push(obj[1]);
                   }
                 }
                 /////
@@ -2434,23 +2465,32 @@ export default {
           });
         }
       }
+      // let output = magic.filter((e) => {
+      //   return !this.black_dominant_everything_take.includes(e);
+      // });
       let output = magic.filter((e) => {
-        return !this.black_dominant_everything_take.includes(e);
+        return (
+          !this.black_protection.includes(e) &&
+          !this.black_dominant_everything_take.includes(e)
+        );
       });
+
       if (!check) {
         this.moves = output;
       }
       this.white_king_moves = [];
+      const finalMoves = output;
       this.white_king_moves = output;
-      this.white_moves.push({ output, protect });
-      this.white_only_defence = output;
+      const alt = selectedPiece.selected_piece_initial;
+      this.white_moves.push({ finalMoves, output, protect, alt });
+      // this.white_only_defence = output;
     },
     get_black_king_moves(selectedPiece, check) {
       const squares = document.querySelectorAll('.square');
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-      let finalMoves = [];
+      let finalMoves1 = [];
       let protect = [];
       const magic = [];
       const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -2484,15 +2524,15 @@ export default {
                     (square.firstElementChild.tagName === 'DIV' &&
                       square.firstElementChild.classList[1] !== 'protected')
                   ) {
-                    finalMoves.push(obj[1]);
+                    finalMoves1.push(obj[1]);
                   }
                 } else if (this.black_kingside_castling) {
-                  finalMoves.push(obj[1]);
+                  finalMoves1.push(obj[1]);
                 } else {
                   if (obj[0] === 'castleRight') {
                     return;
                   } else {
-                    finalMoves.push(obj[1]);
+                    finalMoves1.push(obj[1]);
                   }
                 }
                 /////
@@ -2502,7 +2542,6 @@ export default {
                     square.firstElementChild.tagName === 'DIV'
                   ) {
                     magic.push(obj[1]);
-                    console.log(obj);
                   }
                 } else if (this.black_queenside_castling) {
                   magic.push(obj[1]);
@@ -2518,16 +2557,26 @@ export default {
           });
         }
       }
+      // console.log(this.white_king_moves);
+      // let output = magic.filter((e) => {
+      //   return !this.white_dominant_everything_take.includes(e);
+      // });
       let output = magic.filter((e) => {
-        return !this.white_dominant_everything_take.includes(e);
+        return (
+          !this.white_protection.includes(e) &&
+          !this.white_dominant_everything_take.includes(e)
+        );
       });
       if (!check) {
         this.moves = output;
       }
       // console.log(output);
+      const finalMoves = output;
+      const alt = selectedPiece.selected_piece_initial;
       this.black_king_moves = [];
       this.black_king_moves = output;
-      this.black_moves.push({ output, protect });
+      this.black_moves.push({ finalMoves, output, protect, alt });
+      // this.black_only_defence = output;
     },
     get_hidden_moves(dangerousDrop) {
       const squares = document.querySelectorAll('.square');
@@ -2792,10 +2841,10 @@ export default {
   bottom: -60px;
 }
 .promotBlackPawn img {
-  background-color: rgb(79, 255, 123);
+  background-color: rgb(255, 169, 41);
 }
 .promotBlackPawn img:hover {
-  background-color: rgb(0, 211, 63);
+  background-color: rgb(221, 107, 0);
 }
 /*  */
 .black_square {
