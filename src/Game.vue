@@ -134,7 +134,7 @@ export default {
           imageUrl: 'bPP.png',
           start_position: 'b7',
           new_position: 'b7',
-          captured: true,
+          captured: false,
         },
         {
           imageUrl: 'bPP.png',
@@ -227,8 +227,8 @@ export default {
         },
         {
           imageUrl: 'wPP.png',
-          start_position: 'b7',
-          new_position: 'b7',
+          start_position: 'b2',
+          new_position: 'b2',
           captured: false,
         },
         {
