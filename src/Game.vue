@@ -134,7 +134,7 @@ export default {
           imageUrl: 'bPP.png',
           start_position: 'b7',
           new_position: 'b7',
-          captured: false,
+          captured: true,
         },
         {
           imageUrl: 'bPP.png',
@@ -227,8 +227,8 @@ export default {
         },
         {
           imageUrl: 'wPP.png',
-          start_position: 'b2',
-          new_position: 'b2',
+          start_position: 'b7',
+          new_position: 'b7',
           captured: false,
         },
         {
@@ -445,7 +445,8 @@ export default {
       Object.values(this.entries).forEach((entryPiece) => {
         if (
           takenPiece !== null &&
-          takenPiece.alt === entryPiece.imageUrl.substring(0, 3)
+          takenPiece.alt === entryPiece.imageUrl.substring(0, 3) &&
+          takenPiece.id === entryPiece.new_position
         ) {
           entryPiece.captured = true;
           this.get_moves();
