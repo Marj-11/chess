@@ -1,16 +1,27 @@
 <template>
-  <div id="app" @mousedown="this.prevent">
-    <Game />
-  </div>
+  <v-app id="app" @mousedown="this.prevent">
+    <v-main>
+      <router-view>
+        <Home />
+        <GameLocal />
+      </router-view>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import Game from './Game.vue';
+import Home from './components/Home.vue';
+import GameLocal from './components/Game_local.vue';
+import GameGlobal from './components/Game_global.vue';
+import Modal from './components/Modal.vue';
 
 export default {
   name: 'App',
   components: {
-    Game,
+    GameLocal,
+    GameGlobal,
+    Home,
+    Modal,
   },
   methods: {
     prevent(e) {
@@ -22,20 +33,10 @@ export default {
 
 <style>
 #app {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-html {
   background-color: rgb(41, 41, 41);
-  height: 100vh;
+  height: 100%;
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-}
-body {
-  margin: 0;
-  height: 100%;
 }
 </style>

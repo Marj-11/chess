@@ -1,69 +1,100 @@
 <template>
-  <div class="chessboard">
-    <div
-      v-for="field in fields"
-      :key="field.id"
-      :class="[field.class, field.color]"
-      :id="field.id"
-    ></div>
-    <div v-show="whiteGroup === true" class="wrappingWhite">
-      <div class="promotWhitePawn">
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'wQQ.png'"
-          alt="Wqueen"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'wRr.png'"
-          alt="Wrook"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'wNN.png'"
-          alt="Wknight"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'wBB.png'"
-          alt="Wbishop"
-        />
+  <div class="container">
+    <div class="set">
+      <div class="subSet">
+        <h2 class="first">
+          {{ playerOne }}
+        </h2>
+        <h2 class="second">
+          {{ playerTwo }}
+        </h2>
+      </div>
+      <div class="chessboard">
+        <div
+          v-for="field in fields"
+          :key="field.id"
+          :class="[field.class, field.color]"
+          :id="field.id"
+        ></div>
+        <div v-show="whiteGroup === true" class="wrappingWhite">
+          <div class="promotWhitePawn">
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'wQQ.png'"
+              alt="Wqueen"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'wRr.png'"
+              alt="Wrook"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'wNN.png'"
+              alt="Wknight"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'wBB.png'"
+              alt="Wbishop"
+            />
+          </div>
+        </div>
+        <div v-show="blackGroup === true" class="wrappingBlack">
+          <div class="promotBlackPawn">
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'bQQ.png'"
+              alt="Bqueen"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'bRr.png'"
+              alt="Brook"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'bNN.png'"
+              alt="Bknight"
+            />
+            <img
+              @click="replacePiece"
+              v-bind:src="imageUrl + 'bBB.png'"
+              alt="Bbishop"
+            />
+          </div>
+        </div>
+        <audio ref="moving" src="@/assets/knock.mp3"></audio>
+        <audio ref="capture" src="@/assets/capture1.mp3"></audio>
+        <audio ref="castle" src="@/assets/castle.mp3"></audio>
+      </div>
+      <div class="text-center ml-5 d-flex flex-column">
+        <v-btn rounded color="primary" dark>
+          Resign
+        </v-btn>
       </div>
     </div>
-    <div v-show="blackGroup === true" class="wrappingBlack">
-      <div class="promotBlackPawn">
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'bQQ.png'"
-          alt="Bqueen"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'bRr.png'"
-          alt="Brook"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'bNN.png'"
-          alt="Bknight"
-        />
-        <img
-          @click="replacePiece"
-          v-bind:src="imageUrl + 'bBB.png'"
-          alt="Bbishop"
-        />
-      </div>
+
+    <div>
+      <Modal :player="player" :dialog="dialog" @close="dialog = false" />
     </div>
-    <audio ref="moving" src="@/assets/knock.mp3"></audio>
-    <audio ref="capture" src="@/assets/capture1.mp3"></audio>
-    <audio ref="castle" src="@/assets/castle.mp3"></audio>
   </div>
 </template>
 
 <script>
+import Modal from '@/components/Modal.vue';
+import io from 'socket.io-client';
 export default {
+  name: 'Game',
+  components: {
+    Modal,
+  },
   data() {
     return {
+      playerOne: '',
+      playerTwo: '',
+      message: '',
+      socket: {},
       white_kingside_castling: false,
       white_queenside_castling: false,
       black_kingside_castling: false,
@@ -291,6 +322,11 @@ export default {
       wK_position: '',
       bK_position: '',
       whiteToPlay: true,
+      allowedToPlay: false,
+      player_one: true,
+      browserId: true,
+      dialog: false,
+      player: '',
       white_checked: false,
       black_checked: false,
       white_checkmate: false,
@@ -1114,7 +1150,11 @@ export default {
           !this.black_place_to_go &&
           !this.can_take_dangerous_white_piece
         ) {
-          console.log('checkmate white win!');
+          this.explosion();
+          this.socket.emit('dialog', {
+            state: true,
+            player: 'white',
+          });
         }
       });
     },
@@ -1270,7 +1310,11 @@ export default {
           !this.white_place_to_go &&
           !this.can_take_dangerous_black_piece
         ) {
-          console.log('checkmate black win!');
+          this.explosion();
+          this.socket.emit('dialog', {
+            state: true,
+            player: 'white',
+          });
         }
       });
     },
@@ -1485,9 +1529,11 @@ export default {
                     });
                     if (currentDroppable) {
                       if (piece.alt.charAt(0) === 'b') {
-                        self.whiteToPlay = true;
+                        // self.whiteToPlay = true;
+                        self.socket.emit('turn', true);
                       } else {
-                        self.whiteToPlay = false;
+                        // self.whiteToPlay = false;
+                        self.socket.emit('turn', false);
                       }
                       // castling
                       if (
@@ -1586,12 +1632,14 @@ export default {
                           ) {
                             entryPiece.captured = true;
                             self.get_moves();
+                            self.socket.emit('move', self.entries);
                             self.get_dominant_protection();
                             self.render_new_position('capture');
                             self.castling(entryPiece);
                           } else if (piece.id === entryPiece.new_position) {
                             entryPiece.new_position = currentDroppable.id;
                             self.get_moves();
+                            self.socket.emit('move', self.entries);
                             self.get_dominant_protection();
                             self.render_new_position('move');
                             self.castling(entryPiece);
@@ -2798,14 +2846,96 @@ export default {
   },
   created() {
     this.drawChessboard();
+    this.socket = io('http://localhost:3000/');
   },
   mounted() {
     this.placePieces();
+    this.socket.on('connect', () => {
+      this.socket.emit('starter', this.socket.id);
+    });
+    this.socket.on('setBlackPlayer', (data) => {
+      const chess = document.querySelector('.chessboard');
+      if (this.socket.id === data.id) {
+        this.allowedToPlay = false;
+        chess.style.flexDirection = data.flexDirection;
+        chess.style.flexWrap = data.flexWrap;
+      } else {
+        this.allowedToPlay = true;
+      }
+    });
+    this.socket.on('setPlayers', (pl1, pl2) => {
+      const chess = document.querySelector('.chessboard');
+      if (this.socket.id === pl2.id) {
+        this.playerOne = pl1.name;
+        this.playerTwo = pl2.name;
+      }
+      if (this.socket.id === pl1.id) {
+        this.playerOne = pl2.name;
+        this.playerTwo = pl1.name;
+      }
+    });
+
+    this.socket.on('entries', (data) => {
+      this.entries = data;
+      this.render_new_position();
+    });
+    this.socket.on('change', (data, playerTwo) => {
+      this.whiteToPlay = data;
+      if (this.socket.id === playerTwo.id && !this.whiteToPlay) {
+        this.allowedToPlay = true;
+      } else if (this.socket.id !== playerTwo.id && this.whiteToPlay) {
+        this.allowedToPlay = true;
+      } else {
+        this.allowedToPlay = false;
+      }
+    });
+    this.socket.on('dialogResponse', (data) => {
+      this.dialog = data.state;
+      this.player = data.player;
+    });
   },
 };
 </script>
 
 <style>
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.set {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+}
+.subSet {
+  position: relative;
+  height: 100%;
+  width: 50px;
+  color: white;
+}
+.first {
+  position: absolute;
+  top: 20px;
+  margin-left: -50px;
+  color: white;
+}
+.second {
+  position: absolute;
+  margin-left: -50px;
+  bottom: 20px;
+}
+.v-application .black {
+  background-color: unset !important;
+  border-color: unset !important;
+}
+.v-application .white {
+  background-color: unset !important;
+  border-color: unset !important;
+}
 :root {
   --square_size: 500px;
 }
