@@ -1,25 +1,29 @@
 <template>
   <div class="d-flex justify-center">
+    <v-btn style="position: absolute; left: 0" color="error" @click="restart" text> restart server </v-btn>
     <div class="main">
-      <h1 class=" mt-5 white--text text-center">Welcome to Marj's Chess App</h1>
+      <h1 class="mt-5 white--text text-center">Welcome to Marj's Chess App</h1>
       <br />
       <br />
       <v-row justify="space-around">
         <v-col md="6">
-          <v-card class="mx-auto" width="300" height="400" disabled>
+          <v-card
+            class="mx-auto"
+            width="300"
+            height="400"
+            style="position: relative"
+          >
             <v-form ref="form" v-model="validGlobal">
               <v-list-item color="#26c6da" three-line>
                 <v-list-item-title class="headline text-center">
                   Play Globally
                 </v-list-item-title>
               </v-list-item>
-              <div class="text-center coming">
-                <h1>Coming Soon</h1>
-              </div>
               <v-row justify="center">
                 <v-col cols="8">
                   <v-text-field
-                    v-model="GlobalPlayer"
+                    class="pb-3"
+                    v-model="global_player"
                     :rules="nameRules"
                     :counter="10"
                     label="Player name"
@@ -27,34 +31,23 @@
                   ></v-text-field>
                 </v-col>
               </v-row>
-              <v-row justify="center">
-                <v-col cols="6" align="center">
-                  <v-img
-                    src="@/assets/bKK.png"
-                    alt="black king"
-                    width="100"
-                  ></v-img>
-                </v-col>
-
-                <v-col cols="6" align="center">
-                  <v-img
-                    src="@/assets/wKK.png"
-                    alt="white king"
-                    width="100"
-                  ></v-img>
-                </v-col>
-              </v-row>
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
 
               <v-divider></v-divider>
 
-              <v-card-actions class="d-flex justify-center" height="100">
+              <v-card-actions class="d-flex justify-center mt-1" height="100">
                 <v-btn
                   :disabled="!validGlobal"
                   color="success"
                   @click="validateGloabal"
                   text
                 >
-                  Available Rooms
+                  join
                 </v-btn>
               </v-card-actions>
             </v-form>
@@ -127,67 +120,50 @@
 </template>
 
 <script>
-// import io from 'socket.io-client';
 export default {
   data() {
     return {
-      playerOne: '',
-      playerTwo: '',
-      GlobalPlayer: '',
+      playerOne: "",
+      playerTwo: "",
+      global_player: "",
 
       validGlobal: true,
       nameRules: [
-        (v) => !!v || 'Name is required',
-        (v) => v.length <= 10 || 'Name must be less than 10 characters',
+        (v) => !!v || "Name is required",
+        (v) => v.length <= 10 || "Name must be less than 10 characters",
       ],
 
       validLocal: true,
       nameRules: [
-        (v) => !!v || 'Name is required',
-        (v) => v.length <= 10 || 'Name must be less than 10 characters',
+        (v) => !!v || "Name is required",
+        (v) => v.length <= 10 || "Name must be less than 10 characters",
       ],
-      // player: null,
-      // socket: '',
-      // playerList: [],
-      // showPlayer: false,
-      // message: '',
     };
   },
 
   methods: {
     validateLocal() {
-      this.$store.dispatch('set_players', {
+      this.$store.dispatch("set_players", {
         playerOne: this.playerOne,
         playerTwo: this.playerTwo,
       });
-      this.$router.push('/local');
+      this.$router.push("/local");
     },
     validateGloabal() {
-      // console.log('Global');
+      const player = {
+        name: this.global_player,
+        id: this.$socket.client.id,
+      };
+      this.$store.dispatch("set_global_player", {
+        global_player: player,
+      });
+      this.$socket.client.emit("join", player);
+      this.$router.push("/global_room");
     },
-    // join() {
-    // this.socket.emit('joinRoom', this.player);
-    // this.player = '';
-    // },
+    restart() {
+      this.$socket.client.emit("restart");
+    },
   },
-  created() {
-    // this.socket = io('http://localhost:3000/');
-  },
-  mounted() {
-    //  this.socket.on('updateList', (data)=>{
-    //    this.playerList = data;
-    //  });
-    //   this.socket.on('message', (data)=>{
-    //    this.message = data;
-    //    setTimeout(() => {
-    //      this.message = '';
-    //    }, 3000);
-    //  }),
-    //  this.socket.on('startGame', ()=>{
-    //    this.$router.push('/game')
-    //  })
-  },
-  computed: {},
 };
 </script>
 

@@ -3,10 +3,10 @@
     <div class="set">
       <div class="subSet">
         <h2 class="first">
-          {{ playerOne }}
+          {{ white_player }}
         </h2>
         <h2 class="second">
-          {{ playerTwo }}
+          {{ black_player }}
         </h2>
       </div>
       <div class="chessboard">
@@ -16,7 +16,7 @@
           :class="[field.class, field.color]"
           :id="field.id"
         ></div>
-        <div v-show="whiteGroup === true" class="wrappingWhite">
+        <div v-show="whiteGroup" class="wrappingWhite">
           <div class="promotWhitePawn">
             <img
               @click="replacePiece"
@@ -40,7 +40,7 @@
             />
           </div>
         </div>
-        <div v-show="blackGroup === true" class="wrappingBlack">
+        <div v-show="blackGroup" class="wrappingBlack">
           <div class="promotBlackPawn">
             <img
               @click="replacePiece"
@@ -69,233 +69,245 @@
         <audio ref="castle" src="@/assets/castle.mp3"></audio>
       </div>
       <div class="text-center ml-5 d-flex flex-column">
-        <v-btn rounded color="primary" dark>
-          Resign
-        </v-btn>
+        <v-btn @click="resign" color="primary" small dark> Resign </v-btn>
+        <br />
+        <v-btn :disabled="!newGameButton" @click="newGame" color="success" dark> New Game </v-btn>
       </div>
     </div>
 
     <div>
       <Modal :player="player" :dialog="dialog" @close="dialog = false" />
+      <ModalResign
+        :resigner="resigner"
+        :winner="winner"
+        :dialog="dialogTwo"
+        @close="dialogTwo = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import Modal from '@/components/Modal.vue';
-import io from 'socket.io-client';
+import Modal from "@/components/Modal.vue";
+import ModalResign from "@/components/ModalResign.vue";
 export default {
-  name: 'Game',
+  name: "Game",
   components: {
     Modal,
+    ModalResign,
   },
   data() {
     return {
-      playerOne: '',
-      playerTwo: '',
-      message: '',
+      newGameButton: false,
+      play: false,
+      white_player: "",
+      black_player: "",
+      resigner: "",
+      winner: "",
+      dialogTwo: false,
+      message: "",
       socket: {},
       white_kingside_castling: false,
       white_queenside_castling: false,
       black_kingside_castling: false,
       black_queenside_castling: false,
       imageUrl:
-        'https://raw.githubusercontent.com/Marj-11/chess-figures/master/',
+        "https://raw.githubusercontent.com/Marj-11/chess-figures/master/",
       fields: [],
-      x: ['8', '7', '6', '5', '4', '3', '2', '1'],
-      y: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-      color: '',
-      class: ['square', 'whiteS'],
+      x: ["8", "7", "6", "5", "4", "3", "2", "1"],
+      y: ["a", "b", "c", "d", "e", "f", "g", "h"],
+      color: "",
+      class: ["square", "whiteS"],
       entries: [
         {
-          imageUrl: 'bRl.png',
-          start_position: 'a8',
-          new_position: 'a8',
+          imageUrl: "bRl.png",
+          start_position: "a8",
+          new_position: "a8",
           captured: false,
         },
         {
-          imageUrl: 'bRr.png',
-          start_position: 'h8',
-          new_position: 'h8',
+          imageUrl: "bRr.png",
+          start_position: "h8",
+          new_position: "h8",
           captured: false,
         },
         {
-          imageUrl: 'bNN.png',
-          start_position: 'b8',
-          new_position: 'b8',
+          imageUrl: "bNN.png",
+          start_position: "b8",
+          new_position: "b8",
           captured: false,
         },
         {
-          imageUrl: 'bNN.png',
-          start_position: 'g8',
-          new_position: 'g8',
+          imageUrl: "bNN.png",
+          start_position: "g8",
+          new_position: "g8",
           captured: false,
         },
         {
-          imageUrl: 'bBB.png',
-          start_position: 'c8',
-          new_position: 'c8',
+          imageUrl: "bBB.png",
+          start_position: "c8",
+          new_position: "c8",
           captured: false,
         },
         {
-          imageUrl: 'bBB.png',
-          start_position: 'f8',
-          new_position: 'f8',
+          imageUrl: "bBB.png",
+          start_position: "f8",
+          new_position: "f8",
           captured: false,
         },
         {
-          imageUrl: 'bQQ.png',
-          start_position: 'd8',
-          new_position: 'd8',
+          imageUrl: "bQQ.png",
+          start_position: "d8",
+          new_position: "d8",
           captured: false,
         },
         {
-          imageUrl: 'bKK.png',
-          start_position: 'e8',
-          new_position: 'e8',
+          imageUrl: "bKK.png",
+          start_position: "e8",
+          new_position: "e8",
           black_checkmate: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'a7',
-          new_position: 'a7',
+          imageUrl: "bPP.png",
+          start_position: "a7",
+          new_position: "a7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'b7',
-          new_position: 'b7',
+          imageUrl: "bPP.png",
+          start_position: "b7",
+          new_position: "b7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'c7',
-          new_position: 'c7',
+          imageUrl: "bPP.png",
+          start_position: "c7",
+          new_position: "c7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'd7',
-          new_position: 'd7',
+          imageUrl: "bPP.png",
+          start_position: "d7",
+          new_position: "d7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'e7',
-          new_position: 'e7',
+          imageUrl: "bPP.png",
+          start_position: "e7",
+          new_position: "e7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'f7',
-          new_position: 'f7',
+          imageUrl: "bPP.png",
+          start_position: "f7",
+          new_position: "f7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'g7',
-          new_position: 'g7',
+          imageUrl: "bPP.png",
+          start_position: "g7",
+          new_position: "g7",
           captured: false,
         },
         {
-          imageUrl: 'bPP.png',
-          start_position: 'h7',
-          new_position: 'h7',
+          imageUrl: "bPP.png",
+          start_position: "h7",
+          new_position: "h7",
           captured: false,
         },
         {
-          imageUrl: 'wRl.png',
-          start_position: 'a1',
-          new_position: 'a1',
+          imageUrl: "wRl.png",
+          start_position: "a1",
+          new_position: "a1",
           captured: false,
         },
         {
-          imageUrl: 'wRr.png',
-          start_position: 'h1',
-          new_position: 'h1',
+          imageUrl: "wRr.png",
+          start_position: "h1",
+          new_position: "h1",
           captured: false,
         },
         {
-          imageUrl: 'wNN.png',
-          start_position: 'b1',
-          new_position: 'b1',
+          imageUrl: "wNN.png",
+          start_position: "b1",
+          new_position: "b1",
           captured: false,
         },
         {
-          imageUrl: 'wNN.png',
-          start_position: 'g1',
-          new_position: 'g1',
+          imageUrl: "wNN.png",
+          start_position: "g1",
+          new_position: "g1",
           captured: false,
         },
         {
-          imageUrl: 'wBB.png',
-          start_position: 'c1',
-          new_position: 'c1',
+          imageUrl: "wBB.png",
+          start_position: "c1",
+          new_position: "c1",
           captured: false,
         },
         {
-          imageUrl: 'wBB.png',
-          start_position: 'f1',
-          new_position: 'f1',
+          imageUrl: "wBB.png",
+          start_position: "f1",
+          new_position: "f1",
           captured: false,
         },
         {
-          imageUrl: 'wQQ.png',
-          start_position: 'd1',
-          new_position: 'd1',
+          imageUrl: "wQQ.png",
+          start_position: "d1",
+          new_position: "d1",
           captured: false,
         },
         {
-          imageUrl: 'wKK.png',
-          start_position: 'e1',
-          new_position: 'e1',
+          imageUrl: "wKK.png",
+          start_position: "e1",
+          new_position: "e1",
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'a2',
-          new_position: 'a2',
+          imageUrl: "wPP.png",
+          start_position: "a2",
+          new_position: "a2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'b2',
-          new_position: 'b2',
+          imageUrl: "wPP.png",
+          start_position: "b2",
+          new_position: "b2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'c2',
-          new_position: 'c2',
+          imageUrl: "wPP.png",
+          start_position: "c2",
+          new_position: "c2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'd2',
-          new_position: 'd2',
+          imageUrl: "wPP.png",
+          start_position: "d2",
+          new_position: "d2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'e2',
-          new_position: 'e2',
+          imageUrl: "wPP.png",
+          start_position: "e2",
+          new_position: "e2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'f2',
-          new_position: 'f2',
+          imageUrl: "wPP.png",
+          start_position: "f2",
+          new_position: "f2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'g2',
-          new_position: 'g2',
+          imageUrl: "wPP.png",
+          start_position: "g2",
+          new_position: "g2",
           captured: false,
         },
         {
-          imageUrl: 'wPP.png',
-          start_position: 'h2',
-          new_position: 'h2',
+          imageUrl: "wPP.png",
+          start_position: "h2",
+          new_position: "h2",
           captured: false,
         },
       ],
@@ -303,30 +315,30 @@ export default {
       moves: [],
       white_moves: [],
       black_moves: [],
-      black_dominant_without_pawns: '',
-      black_dominant_straight_pawns: '',
-      black_dominant_take_pawns: '',
-      black_dominant_everything_straight: '',
-      black_dominant_everything_take: '',
-      dangerous_white_piece: '',
-      dangerous_black_piece: '',
+      black_dominant_without_pawns: "",
+      black_dominant_straight_pawns: "",
+      black_dominant_take_pawns: "",
+      black_dominant_everything_straight: "",
+      black_dominant_everything_take: "",
+      dangerous_white_piece: "",
+      dangerous_black_piece: "",
       can_take_dangerous_black_piece: false,
       can_take_dangerous_white_piece: false,
-      white_dominant_without_pawns: '',
-      white_dominant_straight_pawns: '',
-      white_dominant_take_pawns: '',
-      white_dominant_everything_straight: '',
-      white_dominant_everything_take: '',
+      white_dominant_without_pawns: "",
+      white_dominant_straight_pawns: "",
+      white_dominant_take_pawns: "",
+      white_dominant_everything_straight: "",
+      white_dominant_everything_take: "",
       white_protection: [],
       black_protection: [],
-      wK_position: '',
-      bK_position: '',
+      wK_position: "",
+      bK_position: "",
       whiteToPlay: true,
       allowedToPlay: false,
       player_one: true,
       browserId: true,
       dialog: false,
-      player: '',
+      player: "",
       white_checked: false,
       black_checked: false,
       white_checkmate: false,
@@ -353,37 +365,37 @@ export default {
       whiteSecretMoves: [],
       whiteGroup: false,
       blackGroup: false,
-      currentDroppable: '',
+      currentDroppable: "",
     };
   },
   watch: {
     black_checked(n, o) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       if (n) {
         squares.forEach((s) => {
           if (s.id === this.bK_position) {
-            s.classList.add('kingDanger');
+            s.classList.add("kingDanger");
           }
         });
       } else {
-        const squares = document.querySelectorAll('.square');
+        const squares = document.querySelectorAll(".square");
         squares.forEach((s) => {
-          s.classList.remove('kingDanger');
+          s.classList.remove("kingDanger");
         });
       }
     },
     white_checked(n, o) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       if (n) {
         squares.forEach((s) => {
           if (s.id === this.wK_position) {
-            s.classList.add('kingDanger');
+            s.classList.add("kingDanger");
           }
         });
       } else {
-        const squares = document.querySelectorAll('.square');
+        const squares = document.querySelectorAll(".square");
         squares.forEach((s) => {
-          s.classList.remove('kingDanger');
+          s.classList.remove("kingDanger");
         });
       }
     },
@@ -391,10 +403,10 @@ export default {
   methods: {
     drawChessboard() {
       for (let row = 0; row < this.x.length; row++) {
-        this.color = row % 2 === 0 ? 'black_square' : 'white_square';
+        this.color = row % 2 === 0 ? "black_square" : "white_square";
         for (let field = 1; field < 9; field++) {
           this.color =
-            this.color === 'black_square' ? 'white_square' : 'black_square';
+            this.color === "black_square" ? "white_square" : "black_square";
           const object = {
             id: this.y[field - 1] + this.x[row],
             color: this.color,
@@ -405,7 +417,7 @@ export default {
       }
     },
     placePieces() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
         let img = new Image();
@@ -415,9 +427,9 @@ export default {
             img.alt = piece.imageUrl.substring(0, 3);
             img.id = square.id;
             img.draggable = true;
-            img.style.position = 'absolute';
+            img.style.position = "absolute";
             img.classList =
-              img.src.charAt(img.src.length - 7) == 'b' ? 'black' : 'white';
+              img.src.charAt(img.src.length - 7) == "b" ? "black" : "white";
             square.appendChild(img);
           }
         });
@@ -425,23 +437,23 @@ export default {
     },
     replacePiece(e) {
       const newPiece =
-        e.path[0].alt === 'Wqueen'
-          ? 'wQQ.png'
-          : e.path[0].alt === 'Wrook'
-          ? 'wRr.png'
-          : e.path[0].alt === 'Wknight'
-          ? 'wNN.png'
-          : e.path[0].alt === 'Wbishop'
-          ? 'wBB.png'
-          : e.path[0].alt === 'Bqueen'
-          ? 'bQQ.png'
-          : e.path[0].alt === 'Brook'
-          ? 'bRr.png'
-          : e.path[0].alt === 'Bknight'
-          ? 'bNN.png'
-          : e.path[0].alt === 'Bbishop'
-          ? 'bBB.png'
-          : '';
+        e.path[0].alt === "Wqueen"
+          ? "wQQ.png"
+          : e.path[0].alt === "Wrook"
+          ? "wRr.png"
+          : e.path[0].alt === "Wknight"
+          ? "wNN.png"
+          : e.path[0].alt === "Wbishop"
+          ? "wBB.png"
+          : e.path[0].alt === "Bqueen"
+          ? "bQQ.png"
+          : e.path[0].alt === "Brook"
+          ? "bRr.png"
+          : e.path[0].alt === "Bknight"
+          ? "bNN.png"
+          : e.path[0].alt === "Bbishop"
+          ? "bBB.png"
+          : "";
       // const whiteGroup = document.querySelector('.wrapping');
       this.get_moves();
       this.get_dominant_protection();
@@ -452,9 +464,9 @@ export default {
       let piece;
       Object.values(this.entries).forEach((entryPiece) => {
         if (
-          newPiece.substring(0, 1) === 'w' &&
-          entryPiece.new_position.substring(1) === '7' &&
-          entryPiece.imageUrl === 'wPP.png'
+          newPiece.substring(0, 1) === "w" &&
+          entryPiece.new_position.substring(1) === "7" &&
+          entryPiece.imageUrl === "wPP.png"
         ) {
           entryPiece.imageUrl = newPiece;
           entryPiece.new_position = this.currentDroppable.id;
@@ -462,9 +474,9 @@ export default {
           entryPiece.captured = false;
           piece = this.currentDroppable.id;
         } else if (
-          newPiece.substring(0, 1) === 'b' &&
-          entryPiece.new_position.substring(1) === '2' &&
-          entryPiece.imageUrl === 'bPP.png'
+          newPiece.substring(0, 1) === "b" &&
+          entryPiece.new_position.substring(1) === "2" &&
+          entryPiece.imageUrl === "bPP.png"
         ) {
           entryPiece.imageUrl = newPiece;
           entryPiece.new_position = this.currentDroppable.id;
@@ -487,12 +499,20 @@ export default {
           entryPiece.captured = true;
           this.get_moves();
           this.get_dominant_protection();
-          this.render_new_position('capture');
+          this.render_new_position();
+          this.$socket.client.emit("move", "capture");
+          this.whiteGroup = false;
+          this.blackGroup = false;
+          this.$socket.client.emit("clone", this.$data);
         } else if (piece === entryPiece.new_position) {
           entryPiece.new_position = this.currentDroppable.id;
           this.get_moves();
           this.get_dominant_protection();
-          this.render_new_position('move');
+          this.render_new_position();
+          this.$socket.client.emit("move", "move");
+          this.whiteGroup = false;
+          this.blackGroup = false;
+          this.$socket.client.emit("clone", this.$data);
         }
       });
       // console.log(this.currentDroppable);
@@ -511,25 +531,25 @@ export default {
         this.get_hidden_moves(this.currentDroppable.firstChild);
         this.check_for_white_checkmate();
       }
-      this.whiteGroup = false;
-      this.blackGroup = false;
     },
-    render_new_position(sound) {
-      if (sound === 'move') {
+    makeSound(sound) {
+      if (sound === "move") {
         this.moving();
       }
-      if (sound === 'capture') {
+      if (sound === "capture") {
         this.capture();
       }
-      if (sound === 'castle') {
+      if (sound === "castle") {
         this.castlingSound();
       }
-      if (sound === 'replace') {
+      if (sound === "replace") {
         // this.replaceSound();
       }
-      const squares = document.querySelectorAll('.square');
+    },
+    render_new_position() {
+      const squares = document.querySelectorAll(".square");
       squares.forEach((child) => {
-        child.innerHTML = '';
+        child.innerHTML = "";
       });
       squares.forEach((square) => {
         square.onmousedown = this.mouseDown;
@@ -540,9 +560,9 @@ export default {
             img.alt = piece.imageUrl.substring(0, 3);
             img.id = square.id;
             img.draggable = true;
-            img.style.position = 'absolute';
+            img.style.position = "absolute";
             img.classList =
-              img.src.charAt(img.src.length - 7) == 'b' ? 'black' : 'white';
+              img.src.charAt(img.src.length - 7) == "b" ? "black" : "white";
             square.appendChild(img);
           }
         });
@@ -556,30 +576,30 @@ export default {
       this.get_dominant_protection();
       this.check_kings();
       if (
-        (entryPiece.imageUrl === 'wRr.png' &&
-          entryPiece.new_position !== 'h1') ||
-        (entryPiece.imageUrl === 'wKK.png' &&
-          entryPiece.new_position !== 'e1' &&
-          entryPiece.new_position !== 'g1')
+        (entryPiece.imageUrl === "wRr.png" &&
+          entryPiece.new_position !== "h1") ||
+        (entryPiece.imageUrl === "wKK.png" &&
+          entryPiece.new_position !== "e1" &&
+          entryPiece.new_position !== "g1")
       ) {
         this.white_kingside_castling_king_or_rook = true;
       }
       const occupied1 = Boolean(
         this.black_dominant_everything_take.find((val) => {
-          return val === 'f1' || val === 'g1';
+          return val === "f1" || val === "g1";
         })
       );
       const whitePieces = Boolean(
         this.entries.find((val) => {
-          return val.new_position === 'f1' || val.new_position === 'g1';
+          return val.new_position === "f1" || val.new_position === "g1";
         })
       );
       const whitePieces1 = Boolean(
         this.entries.find((val) => {
           return (
-            val.new_position === 'd1' ||
-            val.new_position === 'b1' ||
-            val.new_position === 'c1'
+            val.new_position === "d1" ||
+            val.new_position === "b1" ||
+            val.new_position === "c1"
           );
         })
       );
@@ -595,17 +615,17 @@ export default {
       }
       // white queenside
       if (
-        (entryPiece.imageUrl === 'wRl.png' &&
-          entryPiece.new_position !== 'a1') ||
-        (entryPiece.imageUrl === 'wKK.png' &&
-          entryPiece.new_position !== 'e1' &&
-          entryPiece.new_position !== 'c1')
+        (entryPiece.imageUrl === "wRl.png" &&
+          entryPiece.new_position !== "a1") ||
+        (entryPiece.imageUrl === "wKK.png" &&
+          entryPiece.new_position !== "e1" &&
+          entryPiece.new_position !== "c1")
       ) {
         this.white_queenside_castling_king_or_rook = true;
       }
       const occupied2 = Boolean(
         this.black_dominant_everything_take.find((val) => {
-          return val === 'b1' || val === 'c1' || val === 'd1';
+          return val === "b1" || val === "c1" || val === "d1";
         })
       );
       if (
@@ -621,30 +641,30 @@ export default {
       // other side
       // black kingside
       if (
-        (entryPiece.imageUrl === 'bRr.png' &&
-          entryPiece.new_position !== 'h8') ||
-        (entryPiece.imageUrl === 'bKK.png' &&
-          entryPiece.new_position !== 'e8' &&
-          entryPiece.new_position !== 'g8')
+        (entryPiece.imageUrl === "bRr.png" &&
+          entryPiece.new_position !== "h8") ||
+        (entryPiece.imageUrl === "bKK.png" &&
+          entryPiece.new_position !== "e8" &&
+          entryPiece.new_position !== "g8")
       ) {
         this.black_kingside_castling_king_or_rook = true;
       }
       const occupied3 = Boolean(
         this.white_dominant_everything_take.find((val) => {
-          return val == 'f8' || val === 'g8';
+          return val == "f8" || val === "g8";
         })
       );
       const blackPieces = Boolean(
         this.entries.find((val) => {
-          return val.new_position === 'f8' || val.new_position === 'g8';
+          return val.new_position === "f8" || val.new_position === "g8";
         })
       );
       const blackPieces1 = Boolean(
         this.entries.find((val) => {
           return (
-            val.new_position === 'd8' ||
-            val.new_position === 'b8' ||
-            val.new_position === 'c8'
+            val.new_position === "d8" ||
+            val.new_position === "b8" ||
+            val.new_position === "c8"
           );
         })
       );
@@ -660,17 +680,17 @@ export default {
       }
       // black queenside
       if (
-        (entryPiece.imageUrl === 'bRl.png' &&
-          entryPiece.new_position !== 'a8') ||
-        (entryPiece.imageUrl === 'bKK.png' &&
-          entryPiece.new_position !== 'e8' &&
-          entryPiece.new_position !== 'c8')
+        (entryPiece.imageUrl === "bRl.png" &&
+          entryPiece.new_position !== "a8") ||
+        (entryPiece.imageUrl === "bKK.png" &&
+          entryPiece.new_position !== "e8" &&
+          entryPiece.new_position !== "c8")
       ) {
         this.black_queenside_castling_king_or_rook = true;
       }
       const occupied4 = Boolean(
         this.white_dominant_everything_take.find((val) => {
-          return val == 'b8' || val === 'c8' || val === 'd8';
+          return val == "b8" || val === "c8" || val === "d8";
         })
       );
       if (
@@ -685,25 +705,25 @@ export default {
       }
     },
     castle(castleType) {
-      if (castleType === 'wKK') {
-        const found = this.entries.find((e) => e.imageUrl === 'wRr.png');
-        found.new_position = 'f1';
-        this.render_new_position('castle');
+      if (castleType === "wKK") {
+        const found = this.entries.find((e) => e.imageUrl === "wRr.png");
+        found.new_position = "f1";
+        this.render_new_position("castle");
       }
-      if (castleType === 'wKQ') {
-        const found = this.entries.find((e) => e.imageUrl === 'wRl.png');
-        found.new_position = 'd1';
-        this.render_new_position('castle');
+      if (castleType === "wKQ") {
+        const found = this.entries.find((e) => e.imageUrl === "wRl.png");
+        found.new_position = "d1";
+        this.render_new_position("castle");
       }
-      if (castleType === 'bKK') {
-        const found = this.entries.find((e) => e.imageUrl === 'bRr.png');
-        found.new_position = 'f8';
-        this.render_new_position('castle');
+      if (castleType === "bKK") {
+        const found = this.entries.find((e) => e.imageUrl === "bRr.png");
+        found.new_position = "f8";
+        this.render_new_position("castle");
       }
-      if (castleType === 'bKQ') {
-        const found = this.entries.find((e) => e.imageUrl === 'bRl.png');
-        found.new_position = 'd8';
-        this.render_new_position('castle');
+      if (castleType === "bKQ") {
+        const found = this.entries.find((e) => e.imageUrl === "bRl.png");
+        found.new_position = "d8";
+        this.render_new_position("castle");
       }
     },
     moving() {
@@ -739,15 +759,15 @@ export default {
         arr5.push(move.finalMoves);
         arr5.push(move.newMoves);
         arr6.push(move.protect);
-        if (Object.keys(move).includes('fine')) {
+        if (Object.keys(move).includes("fine")) {
           arr8.push(move);
         }
-        if (Object.keys(move).includes('finalMoves')) {
+        if (Object.keys(move).includes("finalMoves")) {
           arr9.push(move);
         }
       });
       this.entries.forEach((entry) => {
-        if (entry.imageUrl.substring(0, 1) === 'w') {
+        if (entry.imageUrl.substring(0, 1) === "w") {
           arr7.push(entry.new_position);
         }
       });
@@ -791,15 +811,15 @@ export default {
         arr50.push(move.finalMoves);
         arr50.push(move.newMoves);
         arr60.push(move.protect);
-        if (Object.keys(move).includes('fine')) {
+        if (Object.keys(move).includes("fine")) {
           arr80.push(move);
         }
-        if (Object.keys(move).includes('finalMoves')) {
+        if (Object.keys(move).includes("finalMoves")) {
           arr90.push(move);
         }
       });
       this.entries.forEach((entry) => {
-        if (entry.imageUrl.substring(0, 1) === 'b') {
+        if (entry.imageUrl.substring(0, 1) === "b") {
           arr70.push(entry.new_position);
         }
       });
@@ -866,16 +886,16 @@ export default {
       });
     },
     protect_pieces() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.black_protection.forEach((p) => {
         if (p !== undefined) {
           squares.forEach((e) => {
             if (
               e.firstChild !== null &&
-              e.firstChild.classList == 'black' &&
+              e.firstChild.classList == "black" &&
               p === e.firstChild.id
             ) {
-              e.firstChild.classList.add('protected');
+              e.firstChild.classList.add("protected");
             }
           });
         }
@@ -885,10 +905,10 @@ export default {
           squares.forEach((e) => {
             if (
               e.firstChild !== null &&
-              e.firstChild.classList == 'white' &&
+              e.firstChild.classList == "white" &&
               p === e.firstChild.id
             ) {
-              e.firstChild.classList.add('protected');
+              e.firstChild.classList.add("protected");
             }
           });
         }
@@ -919,13 +939,13 @@ export default {
       }
     },
     track_kings_position() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       squares.forEach((square) => {
-        if (square.firstChild !== null && square.firstChild.alt === 'wKK') {
+        if (square.firstChild !== null && square.firstChild.alt === "wKK") {
           this.wK_position = square.id;
         } else if (
           square.firstChild !== null &&
-          square.firstChild.alt === 'bKK'
+          square.firstChild.alt === "bKK"
         ) {
           this.bK_position = square.id;
         }
@@ -936,27 +956,27 @@ export default {
       this.final_white_king_moves = [];
       let originalPiece = piece;
       let king_moves =
-        piece == 'white' ? this.white_king_moves : this.black_king_moves;
+        piece == "white" ? this.white_king_moves : this.black_king_moves;
       let dominant_take =
-        piece == 'white'
+        piece == "white"
           ? this.white_dominant_everything_take
           : this.black_dominant_everything_take;
       let arr = [];
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       let h = [...new Set(king_moves.flat(2))];
       h.forEach((e) => {
         squares.forEach((s) => {
           if (
             e === s.id &&
             s.firstChild !== null &&
-            s.firstChild.classList.contains('protected')
+            s.firstChild.classList.contains("protected")
           ) {
             arr.push(s.firstChild.id);
           }
         });
       });
       let alternative =
-        originalPiece == 'white'
+        originalPiece == "white"
           ? this.black_dominant_everything_take
           : this.white_dominant_everything_take;
       let difference = h.filter((x) => !arr.includes(x));
@@ -969,17 +989,17 @@ export default {
       });
       this.last_black_kings_moves = bb;
       this.last_white_kings_moves = ww;
-      if (originalPiece === 'black' && bb.length === 0) {
+      if (originalPiece === "black" && bb.length === 0) {
         this.black_place_to_go = false;
       } else {
         this.black_place_to_go = true;
       }
-      if (originalPiece === 'white' && ww.length === 0) {
+      if (originalPiece === "white" && ww.length === 0) {
         this.white_place_to_go = false;
       } else {
         this.white_place_to_go = true;
       }
-      if (originalPiece === 'black') {
+      if (originalPiece === "black") {
         let b = dominant_take.filter(
           (x) => x === this.dangerous_white_piece.piece
         );
@@ -989,7 +1009,7 @@ export default {
           this.can_take_dangerous_white_piece = false;
         }
       }
-      if (originalPiece === 'white') {
+      if (originalPiece === "white") {
         let b = dominant_take.filter(
           (x) => x === this.dangerous_black_piece.piece
         );
@@ -1001,11 +1021,11 @@ export default {
       }
     },
     check_for_black_checkmate() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.get_moves();
       this.get_dangerous_piece();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('black');
+      this.check_if_king_can_take_unprotected_piece("black");
       this.black_defence = [];
       const blockers_black_pawns = [];
       const blockers_black_figures = [];
@@ -1044,8 +1064,8 @@ export default {
       blockers_black_pawns.forEach((r) => {
         r.fine.forEach((e) => {
           squares.forEach((square) => {
-            let div = document.createElement('div');
-            div.classList.add('black');
+            let div = document.createElement("div");
+            div.classList.add("black");
             if (e === square.id) {
               square.appendChild(div);
               this.get_moves();
@@ -1055,8 +1075,8 @@ export default {
                 output_black_pawns_blockers.push([r.piece, e]);
               }
               squares.forEach((s) => {
-                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-                  s.innerHTML = '';
+                if (s.hasChildNodes() && s.firstChild.tagName === "DIV") {
+                  s.innerHTML = "";
                 }
               });
             }
@@ -1067,7 +1087,7 @@ export default {
       this.get_moves();
       this.get_dangerous_piece();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('black');
+      this.check_if_king_can_take_unprotected_piece("black");
       this.black_figures.forEach((figure) => {
         if (this.dangerous_white_piece.finalMoves) {
           this.dangerous_white_piece.finalMoves.forEach((s) => {
@@ -1098,8 +1118,8 @@ export default {
       blockers_black_figures.forEach((r) => {
         r.finalMoves.forEach((e) => {
           squares.forEach((square) => {
-            let div = document.createElement('div');
-            div.classList.add('black');
+            let div = document.createElement("div");
+            div.classList.add("black");
             if (e === square.id) {
               square.appendChild(div);
               this.get_moves();
@@ -1109,8 +1129,8 @@ export default {
                 output_black_figures_blockers.push([r.piece, e]);
               }
               squares.forEach((s) => {
-                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-                  s.innerHTML = '';
+                if (s.hasChildNodes() && s.firstChild.tagName === "DIV") {
+                  s.innerHTML = "";
                 }
               });
             }
@@ -1125,11 +1145,11 @@ export default {
       );
       const output = [];
       this.black_defence.forEach((e) => {
-        if (typeof e[0] === 'string') {
+        if (typeof e[0] === "string") {
           output.push(e);
         }
         e.forEach((d) => {
-          if (typeof d === 'object') {
+          if (typeof d === "object") {
             output.push(d);
           }
         });
@@ -1141,7 +1161,7 @@ export default {
       );
       this.get_moves();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('black');
+      this.check_if_king_can_take_unprotected_piece("black");
       this.check_kings();
       this.black_defence = output;
       this.white_dominant_everything_straight.forEach((e) => {
@@ -1150,20 +1170,18 @@ export default {
           !this.black_place_to_go &&
           !this.can_take_dangerous_white_piece
         ) {
-          this.explosion();
-          this.socket.emit('dialog', {
-            state: true,
-            player: 'white',
+          this.$socket.client.emit("dialog", {
+            player: "white",
           });
         }
       });
     },
     check_for_white_checkmate() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.get_dangerous_piece();
       this.get_moves();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('white');
+      this.check_if_king_can_take_unprotected_piece("white");
       this.white_defence = [];
       const blockers_white_pawns = [];
       const blockers_white_figures = [];
@@ -1201,8 +1219,8 @@ export default {
       blockers_white_pawns.forEach((r) => {
         r.fine.forEach((e) => {
           squares.forEach((square) => {
-            let div = document.createElement('div');
-            div.classList.add('black');
+            let div = document.createElement("div");
+            div.classList.add("black");
             if (e === square.id) {
               square.appendChild(div);
               this.get_moves();
@@ -1212,8 +1230,8 @@ export default {
                 output_white_pawns_blockers = [r.piece, e];
               }
               squares.forEach((s) => {
-                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-                  s.innerHTML = '';
+                if (s.hasChildNodes() && s.firstChild.tagName === "DIV") {
+                  s.innerHTML = "";
                 }
               });
             }
@@ -1224,7 +1242,7 @@ export default {
       this.get_moves();
       this.get_dangerous_piece();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('white');
+      this.check_if_king_can_take_unprotected_piece("white");
       this.white_figures.forEach((figure) => {
         if (this.dangerous_black_piece.finalMoves) {
           this.dangerous_black_piece.finalMoves.forEach((s) => {
@@ -1255,8 +1273,8 @@ export default {
       blockers_white_figures.forEach((r) => {
         r.finalMoves.forEach((e) => {
           squares.forEach((square) => {
-            let div = document.createElement('div');
-            div.classList.add('black');
+            let div = document.createElement("div");
+            div.classList.add("black");
             if (e === square.id) {
               square.appendChild(div);
               this.get_moves();
@@ -1266,8 +1284,8 @@ export default {
                 output_white_figures_blockers.push([r.piece, e]);
               }
               squares.forEach((s) => {
-                if (s.hasChildNodes() && s.firstChild.tagName === 'DIV') {
-                  s.innerHTML = '';
+                if (s.hasChildNodes() && s.firstChild.tagName === "DIV") {
+                  s.innerHTML = "";
                 }
               });
             }
@@ -1284,11 +1302,11 @@ export default {
       );
       const output = [];
       this.white_defence.forEach((e) => {
-        if (typeof e[0] === 'string') {
+        if (typeof e[0] === "string") {
           output.push(e);
         }
         e.forEach((d) => {
-          if (typeof d === 'object') {
+          if (typeof d === "object") {
             output.push(d);
           }
         });
@@ -1301,7 +1319,7 @@ export default {
       );
       this.get_moves();
       this.get_dominant_protection();
-      this.check_if_king_can_take_unprotected_piece('white');
+      this.check_if_king_can_take_unprotected_piece("white");
       this.check_kings();
       this.white_defence = output;
       this.black_dominant_everything_straight.forEach((e) => {
@@ -1311,37 +1329,36 @@ export default {
           !this.can_take_dangerous_black_piece
         ) {
           this.explosion();
-          this.socket.emit('dialog', {
-            state: true,
-            player: 'white',
+          this.$socket.client.emit("dialog", {
+            player: "black",
           });
         }
       });
     },
     mouseDown(event) {
       if (!this.whiteGroup && !this.blackGroup) {
-        const chess = document.querySelector('.chessboard');
-        chess.addEventListener('contextmenu', (event) =>
+        const chess = document.querySelector(".chessboard");
+        chess.addEventListener("contextmenu", (event) =>
           event.preventDefault()
         );
         event.preventDefault();
-        const squares = document.querySelectorAll('.square');
+        const squares = document.querySelectorAll(".square");
         squares.forEach((s) => {
-          s.classList.remove('droppable');
-          s.classList.remove('mark');
-          s.classList.remove('target');
+          s.classList.remove("droppable");
+          s.classList.remove("mark");
+          s.classList.remove("target");
         });
         const square = event.path[1];
         let piece = square.firstElementChild;
-        if (piece.tagName == 'DIV') {
+        if (piece.tagName == "DIV") {
           return;
         }
         if (event.button == 0) {
           let new_piece = this.selected_piece(piece, square);
           this.available_moves(new_piece);
-          piece.style.width = 'calc(var(--square_size) / 7)';
+          piece.style.width = "calc(var(--square_size) / 7)";
           piece.style.zIndex = 2;
-          piece.style.cursor = 'grabbing';
+          piece.style.cursor = "grabbing";
           // piece.style.position = 'absolute';
           // piece.style.top = event.clientX + 'px';
           // piece.style.left = event.clientY + 'px';
@@ -1353,7 +1370,7 @@ export default {
               }
             }
           });
-          if (piece.alt === 'bKK') {
+          if (piece.alt === "bKK" && this.play) {
             black_only_defence = this.last_black_kings_moves;
           }
           let white_only_defence = [];
@@ -1366,27 +1383,27 @@ export default {
               });
             }
           });
-          if (piece.alt === 'wKK') {
+          if (piece.alt === "wKK" && this.play) {
             white_only_defence = this.last_white_kings_moves;
           }
           if (this.black_checked) {
             black_only_defence.forEach((allowed) => {
               squares.forEach((s) => {
-                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (piece.classList[0] === "white" && this.whiteToPlay) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
-                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (piece.classList[0] === "black" && !this.whiteToPlay) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
@@ -1395,21 +1412,21 @@ export default {
           } else if (this.white_checked) {
             white_only_defence.forEach((allowed) => {
               squares.forEach((s) => {
-                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (piece.classList[0] === "white" && this.play) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
-                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (piece.classList[0] === "black" && this.play) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
@@ -1418,21 +1435,29 @@ export default {
           } else {
             this.moves.forEach((allowed) => {
               squares.forEach((s) => {
-                if (piece.classList[0] === 'white' && this.whiteToPlay) {
+                if (
+                  piece.classList[0] === "white" &&
+                  this.whiteToPlay &&
+                  this.play
+                ) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
-                if (piece.classList[0] === 'black' && !this.whiteToPlay) {
+                if (
+                  piece.classList[0] === "black" &&
+                  !this.whiteToPlay &&
+                  this.play
+                ) {
                   if (allowed === s.id) {
-                    s.classList.add('droppable');
-                    s.classList.add('mark');
+                    s.classList.add("droppable");
+                    s.classList.add("mark");
                     if (s.firstElementChild) {
-                      s.classList.add('target');
+                      s.classList.add("target");
                     }
                   }
                 }
@@ -1453,25 +1478,25 @@ export default {
           moveAt(event.pageX, event.pageY);
           function moveAt(pageX, pageY) {
             square.style.position = null;
-            piece.style.left = pageX - shiftX + 'px';
-            piece.style.top = pageY - shiftY + 'px';
+            piece.style.left = pageX - shiftX + "px";
+            piece.style.top = pageY - shiftY + "px";
             // whiteGroup.style.display = 'none';
           }
           function onMouseMove(event) {
-            const element = document.querySelector('.chessboard');
+            const element = document.querySelector(".chessboard");
             var rect = element.getBoundingClientRect();
             moveAt(event.pageX, event.pageY);
             if (event.pageX < rect.left - 8) {
-              piece.style.left = rect.left - 34 + 'px';
+              piece.style.left = rect.left - 34 + "px";
             }
             if (event.pageY < rect.top - 8) {
-              piece.style.top = rect.top - 34 + 'px';
+              piece.style.top = rect.top - 34 + "px";
             }
             if (event.pageY > rect.bottom - 10) {
-              piece.style.top = rect.bottom - 40 + 'px';
+              piece.style.top = rect.bottom - 40 + "px";
             }
             if (event.pageX > rect.right + 2) {
-              piece.style.left = rect.right - 34 + 'px';
+              piece.style.left = rect.right - 34 + "px";
             }
             piece.hidden = true;
             let elemBelow = document.elementFromPoint(event.pageX, event.pageY);
@@ -1484,10 +1509,10 @@ export default {
             //######################################################
             //######################################################
             if (!elemBelow) {
-              elemBelow = document.createElement('div');
+              elemBelow = document.createElement("div");
             }
-            let droppableBelow = elemBelow.closest('.droppable');
-            let normalSquare = elemBelow.closest('.square');
+            let droppableBelow = elemBelow.closest(".droppable");
+            let normalSquare = elemBelow.closest(".square");
             if (currentDroppable1 != normalSquare) {
               if (currentDroppable1) {
                 leave(currentDroppable1);
@@ -1499,13 +1524,13 @@ export default {
               if (elem == null) {
                 return;
               }
-              elem.style.borderColor = 'white';
+              elem.style.borderColor = "white";
             }
             function leave(elem) {
               if (elem == null) {
                 return;
               }
-              elem.style.borderColor = 'transparent';
+              elem.style.borderColor = "transparent";
             }
             if (currentDroppable != droppableBelow) {
               if (currentDroppable) {
@@ -1515,110 +1540,110 @@ export default {
               self.currentDroppable = currentDroppable;
               if (currentDroppable) {
                 if (
-                  (piece.classList[0] === 'white' && self.whiteToPlay) ||
-                  (piece.classList[0] === 'black' && !self.whiteToPlay)
+                  (piece.classList[0] === "white" && self.whiteToPlay) ||
+                  (piece.classList[0] === "black" && !self.whiteToPlay)
                 ) {
                   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                  window.onmouseup = function(e) {
+                  window.onmouseup = function (e) {
                     e.preventDefault();
                     squares.forEach((s) => {
-                      s.classList.remove('droppable');
-                      s.classList.remove('mark');
-                      s.classList.remove('target');
-                      s.style.borderColor = 'transparent';
+                      s.classList.remove("droppable");
+                      s.classList.remove("mark");
+                      s.classList.remove("target");
+                      s.style.borderColor = "transparent";
                     });
                     if (currentDroppable) {
-                      if (piece.alt.charAt(0) === 'b') {
-                        // self.whiteToPlay = true;
-                        self.socket.emit('turn', true);
+                      if (piece.alt.charAt(0) === "b") {
+                        self.whiteToPlay = true;
+                        // self.$socket.client.emit("turn", true);
                       } else {
-                        // self.whiteToPlay = false;
-                        self.socket.emit('turn', false);
+                        self.whiteToPlay = false;
+                        // self.$socket.client.emit("turn", false);
                       }
                       // castling
                       if (
                         !self.white_kingside_castling_king_or_rook &&
-                        currentDroppable.id === 'g1' &&
-                        piece.id === 'e1' &&
-                        piece.alt === 'wKK'
+                        currentDroppable.id === "g1" &&
+                        piece.id === "e1" &&
+                        piece.alt === "wKK"
                       ) {
-                        self.castle('wKK');
+                        self.castle("wKK");
                       }
                       if (
                         !self.white_queenside_castling_king_or_rook &&
-                        currentDroppable.id === 'c1' &&
-                        piece.id === 'e1' &&
-                        piece.alt === 'wKK'
+                        currentDroppable.id === "c1" &&
+                        piece.id === "e1" &&
+                        piece.alt === "wKK"
                       ) {
-                        self.castle('wKQ');
+                        self.castle("wKQ");
                       }
                       if (
                         !self.black_kingside_castling_king_or_rook &&
-                        currentDroppable.id === 'g8' &&
-                        piece.id === 'e8' &&
-                        piece.alt === 'bKK'
+                        currentDroppable.id === "g8" &&
+                        piece.id === "e8" &&
+                        piece.alt === "bKK"
                       ) {
-                        self.castle('bKK');
+                        self.castle("bKK");
                       }
                       if (
                         !self.black_queenside_castling_king_or_rook &&
-                        currentDroppable.id === 'c8' &&
-                        piece.id === 'e8' &&
-                        piece.alt === 'bKK'
+                        currentDroppable.id === "c8" &&
+                        piece.id === "e8" &&
+                        piece.alt === "bKK"
                       ) {
-                        self.castle('bKQ');
+                        self.castle("bKQ");
                       }
                       // promoting pawns
                       if (
-                        currentDroppable.id.substring('1') === '8' &&
-                        piece.alt === 'wPP'
+                        currentDroppable.id.substring("1") === "8" &&
+                        piece.alt === "wPP"
                       ) {
                         self.whiteGroup = true;
                         const whiteGroup = document.querySelector(
-                          '.wrappingWhite'
+                          ".wrappingWhite"
                         );
                         currentDroppable.appendChild(whiteGroup);
                         whiteGroup.style.zIndex = 100000;
-                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener("mousemove", onMouseMove);
                         window.onmouseup = null;
-                        piece.style.display = 'none';
+                        piece.style.display = "none";
                         // square.style.position = 'relative';
                         // const takenPiece = currentDroppable.firstChild;
                         // currentDroppable.style.position = 'relative';
                         // currentDroppable.style.boxSizing = 'border-box';
                         // currentDroppable.style.borderColor = 'transparent';
                       } else if (
-                        currentDroppable.id.substring('1') === '1' &&
-                        piece.alt === 'bPP'
+                        currentDroppable.id.substring("1") === "1" &&
+                        piece.alt === "bPP"
                       ) {
                         self.blackGroup = true;
                         const blackGroup = document.querySelector(
-                          '.wrappingBlack'
+                          ".wrappingBlack"
                         );
                         currentDroppable.appendChild(blackGroup);
                         blackGroup.style.zIndex = 100000;
-                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener("mousemove", onMouseMove);
                         window.onmouseup = null;
-                        piece.style.display = 'none';
+                        piece.style.display = "none";
                         // square.style.position = 'relative';
                         // const takenPiece = currentDroppable.firstChild;
                         // currentDroppable.style.position = 'relative';
                         // currentDroppable.style.boxSizing = 'border-box';
                         // currentDroppable.style.borderColor = 'transparent';
                       } else {
-                        document.removeEventListener('mousemove', onMouseMove);
+                        document.removeEventListener("mousemove", onMouseMove);
                         window.onmouseup = null;
-                        piece.style.width = 'calc(var(--square_size) / 8)';
-                        piece.style.cursor = 'grab';
+                        piece.style.width = "calc(var(--square_size) / 8)";
+                        piece.style.cursor = "grab";
                         piece.style.zIndex = 1;
-                        square.style.position = 'relative';
-                        piece.style.position = 'absolute';
-                        piece.style.top = '0px';
-                        piece.style.left = '0px';
+                        square.style.position = "relative";
+                        piece.style.position = "absolute";
+                        piece.style.top = "0px";
+                        piece.style.left = "0px";
                         const takenPiece = currentDroppable.firstChild;
-                        currentDroppable.style.position = 'relative';
-                        currentDroppable.style.boxSizing = 'border-box';
-                        currentDroppable.style.borderColor = 'transparent';
+                        currentDroppable.style.position = "relative";
+                        currentDroppable.style.boxSizing = "border-box";
+                        currentDroppable.style.borderColor = "transparent";
                         self.get_moves();
                         self.get_dominant_protection();
                         self.protect_pieces();
@@ -1632,16 +1657,16 @@ export default {
                           ) {
                             entryPiece.captured = true;
                             self.get_moves();
-                            self.socket.emit('move', self.entries);
                             self.get_dominant_protection();
-                            self.render_new_position('capture');
+                            self.render_new_position();
+                            self.$socket.client.emit("move", "capture");
                             self.castling(entryPiece);
                           } else if (piece.id === entryPiece.new_position) {
                             entryPiece.new_position = currentDroppable.id;
                             self.get_moves();
-                            self.socket.emit('move', self.entries);
                             self.get_dominant_protection();
-                            self.render_new_position('move');
+                            self.render_new_position();
+                            self.$socket.client.emit("move", "move");
                             self.castling(entryPiece);
                           }
                         });
@@ -1661,35 +1686,38 @@ export default {
                           self.get_hidden_moves(currentDroppable.firstChild);
                           self.check_for_white_checkmate();
                         }
+                        if (!self.whiteGroup && !self.blackGroup) {
+                          self.$socket.client.emit("clone", self.$data);
+                        }
                       }
                     } else {
-                      document.removeEventListener('mousemove', onMouseMove);
-                      piece.style.width = 'calc(var(--square_size) / 8)';
+                      document.removeEventListener("mousemove", onMouseMove);
+                      piece.style.width = "calc(var(--square_size) / 8)";
                       piece.style.zIndex = 1;
-                      piece.style.cursor = 'grab';
-                      square.style.position = 'relative';
-                      piece.style.position = 'absolute';
-                      piece.style.top = '0px';
-                      piece.style.left = '0px';
+                      piece.style.cursor = "grab";
+                      square.style.position = "relative";
+                      piece.style.position = "absolute";
+                      piece.style.top = "0px";
+                      piece.style.left = "0px";
                     }
                   };
                 }
               }
             }
           }
-          document.addEventListener('mousemove', onMouseMove);
-          window.onmouseup = function() {
-            document.removeEventListener('mousemove', onMouseMove);
+          document.addEventListener("mousemove", onMouseMove);
+          window.onmouseup = function () {
+            document.removeEventListener("mousemove", onMouseMove);
             piece.style.zIndex = 1;
             piece.onmouseup = null;
-            piece.style.width = 'calc(var(--square_size) / 8)';
-            piece.style.cursor = 'grab';
-            square.style.position = 'relative';
-            piece.style.position = 'absolute';
-            piece.style.top = '0px';
-            piece.style.left = '0px';
+            piece.style.width = "calc(var(--square_size) / 8)";
+            piece.style.cursor = "grab";
+            square.style.position = "relative";
+            piece.style.position = "absolute";
+            piece.style.top = "0px";
+            piece.style.left = "0px";
             squares.forEach((s) => {
-              s.style.borderColor = 'transparent';
+              s.style.borderColor = "transparent";
             });
           };
           //######################################################
@@ -1703,59 +1731,58 @@ export default {
             if (elem == null) {
               return;
             }
-            elem.style.borderColor = 'white';
+            elem.style.borderColor = "white";
           }
           function leaveDroppable(elem) {
             if (elem == null) {
               return;
             }
-            elem.style.borderColor = 'transparent';
+            elem.style.borderColor = "transparent";
           }
-          piece.ondragstart = function() {
+          piece.ondragstart = function () {
             return false;
           };
         }
-        let self = this;
       }
     },
     get_moves() {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.white_moves = [];
       this.black_moves = [];
       let check = true;
       const forbiden = [
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'h7',
-        'h8',
-        'a1',
-        'b1',
-        'c1',
-        'd1',
-        'e1',
-        'f1',
-        'g1',
-        'h1',
-        'a8',
-        'b8',
-        'c8',
-        'd8',
-        'e8',
-        'f8',
-        'g8',
-        'h8',
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "h7",
+        "h8",
+        "a1",
+        "b1",
+        "c1",
+        "d1",
+        "e1",
+        "f1",
+        "g1",
+        "h1",
+        "a8",
+        "b8",
+        "c8",
+        "d8",
+        "e8",
+        "f8",
+        "g8",
+        "h8",
       ];
       squares.forEach((square) => {
         if (square.firstElementChild === null) {
@@ -1767,47 +1794,47 @@ export default {
           selected_piece_initial,
           selected_piece_position,
         };
-        if (selectedPiece.selected_piece_initial === 'wPP') {
+        if (selectedPiece.selected_piece_initial === "wPP") {
           this.get_white_pawn_moves(selectedPiece, check);
         }
-        if (selectedPiece.selected_piece_initial === 'wNN') {
-          this.get_knight_moves(selectedPiece, check, 'w');
+        if (selectedPiece.selected_piece_initial === "wNN") {
+          this.get_knight_moves(selectedPiece, check, "w");
         }
-        if (selectedPiece.selected_piece_initial === 'wBB') {
-          this.get_bishop_moves(selectedPiece, forbiden, check, 'w');
+        if (selectedPiece.selected_piece_initial === "wBB") {
+          this.get_bishop_moves(selectedPiece, forbiden, check, "w");
         }
         if (
-          selectedPiece.selected_piece_initial === 'wRr' ||
-          selectedPiece.selected_piece_initial === 'wRl'
+          selectedPiece.selected_piece_initial === "wRr" ||
+          selectedPiece.selected_piece_initial === "wRl"
         ) {
-          this.get_rook_moves(selectedPiece, forbiden, check, 'w');
+          this.get_rook_moves(selectedPiece, forbiden, check, "w");
         }
-        if (selectedPiece.selected_piece_initial === 'wQQ') {
-          this.get_queen_moves(selectedPiece, forbiden, check, 'w');
+        if (selectedPiece.selected_piece_initial === "wQQ") {
+          this.get_queen_moves(selectedPiece, forbiden, check, "w");
         }
-        if (selectedPiece.selected_piece_initial === 'wKK') {
+        if (selectedPiece.selected_piece_initial === "wKK") {
           this.get_white_king_moves(selectedPiece, check);
         }
-        if (selectedPiece.selected_piece_initial === 'bPP') {
+        if (selectedPiece.selected_piece_initial === "bPP") {
           this.get_black_pawn_moves(selectedPiece, check);
         }
-        if (selectedPiece.selected_piece_initial === 'bNN') {
-          this.get_knight_moves(selectedPiece, check, 'b');
+        if (selectedPiece.selected_piece_initial === "bNN") {
+          this.get_knight_moves(selectedPiece, check, "b");
         }
-        if (selectedPiece.selected_piece_initial === 'bBB') {
-          this.get_bishop_moves(selectedPiece, forbiden, check, 'b');
+        if (selectedPiece.selected_piece_initial === "bBB") {
+          this.get_bishop_moves(selectedPiece, forbiden, check, "b");
         }
         if (
-          selectedPiece.selected_piece_initial === 'bRr' ||
-          selectedPiece.selected_piece_initial === 'bRl'
+          selectedPiece.selected_piece_initial === "bRr" ||
+          selectedPiece.selected_piece_initial === "bRl"
         ) {
-          this.get_rook_moves(selectedPiece, forbiden, check, 'b');
+          this.get_rook_moves(selectedPiece, forbiden, check, "b");
         }
-        if (selectedPiece.selected_piece_initial === 'bQQ') {
-          this.get_queen_moves(selectedPiece, forbiden, check, 'b');
+        if (selectedPiece.selected_piece_initial === "bQQ") {
+          this.get_queen_moves(selectedPiece, forbiden, check, "b");
         }
-        if (selectedPiece.selected_piece_initial === 'bKK') {
-          this.get_black_king_moves(selectedPiece, check, 'b');
+        if (selectedPiece.selected_piece_initial === "bKK") {
+          this.get_black_king_moves(selectedPiece, check, "b");
         }
       });
     },
@@ -1821,77 +1848,77 @@ export default {
     },
     available_moves(selectedPiece) {
       let check = false;
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const forbiden = [
-        'a1',
-        'a2',
-        'a3',
-        'a4',
-        'a5',
-        'a6',
-        'a7',
-        'a8',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'h7',
-        'h8',
-        'a1',
-        'b1',
-        'c1',
-        'd1',
-        'e1',
-        'f1',
-        'g1',
-        'h1',
-        'a8',
-        'b8',
-        'c8',
-        'd8',
-        'e8',
-        'f8',
-        'g8',
-        'h8',
+        "a1",
+        "a2",
+        "a3",
+        "a4",
+        "a5",
+        "a6",
+        "a7",
+        "a8",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "h7",
+        "h8",
+        "a1",
+        "b1",
+        "c1",
+        "d1",
+        "e1",
+        "f1",
+        "g1",
+        "h1",
+        "a8",
+        "b8",
+        "c8",
+        "d8",
+        "e8",
+        "f8",
+        "g8",
+        "h8",
       ];
-      if (selectedPiece.selected_piece_initial === 'wPP') {
+      if (selectedPiece.selected_piece_initial === "wPP") {
         this.get_white_pawn_moves(selectedPiece, check);
       }
-      if (selectedPiece.selected_piece_initial === 'bPP') {
+      if (selectedPiece.selected_piece_initial === "bPP") {
         this.get_black_pawn_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wNN' ||
-        selectedPiece.selected_piece_initial === 'bNN'
+        selectedPiece.selected_piece_initial === "wNN" ||
+        selectedPiece.selected_piece_initial === "bNN"
       ) {
         this.get_knight_moves(selectedPiece, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wBB' ||
-        selectedPiece.selected_piece_initial === 'bBB'
+        selectedPiece.selected_piece_initial === "wBB" ||
+        selectedPiece.selected_piece_initial === "bBB"
       ) {
         this.get_bishop_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wRr' ||
-        selectedPiece.selected_piece_initial === 'bRr' ||
-        selectedPiece.selected_piece_initial === 'wRl' ||
-        selectedPiece.selected_piece_initial === 'bRl'
+        selectedPiece.selected_piece_initial === "wRr" ||
+        selectedPiece.selected_piece_initial === "bRr" ||
+        selectedPiece.selected_piece_initial === "wRl" ||
+        selectedPiece.selected_piece_initial === "bRl"
       ) {
         this.get_rook_moves(selectedPiece, forbiden, check);
       }
       if (
-        selectedPiece.selected_piece_initial === 'wQQ' ||
-        selectedPiece.selected_piece_initial === 'bQQ'
+        selectedPiece.selected_piece_initial === "wQQ" ||
+        selectedPiece.selected_piece_initial === "bQQ"
       ) {
         this.get_queen_moves(selectedPiece, forbiden, check);
       }
-      if (selectedPiece.selected_piece_initial === 'wKK') {
+      if (selectedPiece.selected_piece_initial === "wKK") {
         this.get_white_king_moves(selectedPiece, check);
       }
-      if (selectedPiece.selected_piece_initial === 'bKK') {
+      if (selectedPiece.selected_piece_initial === "bKK") {
         this.get_black_king_moves(selectedPiece, check);
       }
     },
@@ -1899,23 +1926,23 @@ export default {
       if (!check) {
         this.moves = [];
       }
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const forward = +1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       const oneForward = `${letter}${num + forward}`;
       const twoForward = `${letter}${num + forward + forward}`;
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
           const letterLeft = `${letters[i - 1]}${num + forward}`;
           const letterRight = `${letters[i + 1]}${num + forward}`;
           const fields = {
-            l: letterLeft.substring(1, 2) == '9' ? null : letterLeft,
-            r: letterRight.substring(0, 2) == 'un' ? null : letterRight,
-            of: oneForward.substring(1, 2) == '9' ? null : oneForward,
-            tf: twoForward.substring(1, 2) == '9' ? null : twoForward,
+            l: letterLeft.substring(1, 2) == "9" ? null : letterLeft,
+            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
+            of: oneForward.substring(1, 2) == "9" ? null : oneForward,
+            tf: twoForward.substring(1, 2) == "9" ? null : twoForward,
           };
           const newMoves = [];
           const fine = [];
@@ -1923,7 +1950,7 @@ export default {
             if (square.id === fields.r) {
               newMoves.push(fields.r);
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === 'black') {
+                if (square.firstElementChild.classList[0] === "black") {
                   fine.push(fields.r);
                 }
               }
@@ -1931,7 +1958,7 @@ export default {
             if (square.id === fields.l) {
               newMoves.push(fields.l);
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === 'black') {
+                if (square.firstElementChild.classList[0] === "black") {
                   fine.push(fields.l);
                 }
               }
@@ -1941,7 +1968,7 @@ export default {
                 fine.push(fields.of);
               }
             }
-            if (selectedPiece.selected_piece_position.substring(1, 2) == '2') {
+            if (selectedPiece.selected_piece_position.substring(1, 2) == "2") {
               if (square.id === fields.tf) {
                 const numberMinusOne = square.id.substring(1, 2) - 1;
                 const letter = square.id.substring(0, 1);
@@ -1977,23 +2004,23 @@ export default {
       if (!check) {
         this.moves = [];
       }
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const forward = -1;
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       const oneForward = `${letter}${num + forward}`;
       const twoForward = `${letter}${num + forward + forward}`;
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
           const letterLeft = `${letters[i - 1]}${num + forward}`;
           const letterRight = `${letters[i + 1]}${num + forward}`;
           const fields = {
-            l: letterLeft.substring(1, 2) == '0' ? null : letterLeft,
-            r: letterRight.substring(0, 2) == 'un' ? null : letterRight,
-            of: oneForward.substring(1, 2) == '0' ? null : oneForward,
-            tf: twoForward.substring(1, 2) == '0' ? null : twoForward,
+            l: letterLeft.substring(1, 2) == "0" ? null : letterLeft,
+            r: letterRight.substring(0, 2) == "un" ? null : letterRight,
+            of: oneForward.substring(1, 2) == "0" ? null : oneForward,
+            tf: twoForward.substring(1, 2) == "0" ? null : twoForward,
           };
           const newMoves = [];
           const fine = [];
@@ -2001,7 +2028,7 @@ export default {
             if (square.id === fields.r) {
               newMoves.push(fields.r);
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === 'white') {
+                if (square.firstElementChild.classList[0] === "white") {
                   fine.push(fields.r);
                 }
               }
@@ -2009,7 +2036,7 @@ export default {
             if (square.id === fields.l) {
               newMoves.push(fields.l);
               if (square.firstElementChild) {
-                if (square.firstElementChild.classList[0] === 'white') {
+                if (square.firstElementChild.classList[0] === "white") {
                   fine.push(fields.l);
                 }
               }
@@ -2019,7 +2046,7 @@ export default {
                 fine.push(fields.of);
               }
             }
-            if (selectedPiece.selected_piece_position.substring(1, 2) == '7') {
+            if (selectedPiece.selected_piece_position.substring(1, 2) == "7") {
               if (square.id === fields.tf) {
                 const numberPlusOne = parseInt(square.id.substring(1, 2));
                 const parsedNumber = numberPlusOne + 1;
@@ -2055,15 +2082,15 @@ export default {
       }
     },
     get_knight_moves(selectedPiece, check, color) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wNN' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === "wNN" ? "black" : "white";
       if (!check) {
         this.moves = [];
       }
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -2099,7 +2126,7 @@ export default {
           const alt = selectedPiece.selected_piece_initial;
           if (!check) {
             this.moves = finalMoves;
-          } else if (color === 'b') {
+          } else if (color === "b") {
             this.moves = [];
             const piece = selectedPiece.selected_piece_position;
             this.black_moves.push({ piece, finalMoves, protect, id, alt });
@@ -2114,9 +2141,9 @@ export default {
       }
     },
     get_bishop_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wBB' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === "wBB" ? "black" : "white";
       if (!check) {
         this.moves = [];
       }
@@ -2127,7 +2154,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -2141,18 +2168,18 @@ export default {
             squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
-                return obj == 'undefined';
+                return obj == "undefined";
               }
-              if (obj.substring(0, 1) === 'u') {
+              if (obj.substring(0, 1) === "u") {
                 objectNumber++;
                 objectNumber++;
                 m = 1;
                 diagonal();
               }
               if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
               ) {
                 objectNumber++;
                 m = 1;
@@ -2193,7 +2220,7 @@ export default {
       const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
-      } else if (color === 'b') {
+      } else if (color === "b") {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
@@ -2206,12 +2233,12 @@ export default {
       }
     },
     get_rook_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wRr' ||
-        selectedPiece.selected_piece_initial === 'wRl'
-          ? 'black'
-          : 'white';
+        selectedPiece.selected_piece_initial === "wRr" ||
+        selectedPiece.selected_piece_initial === "wRl"
+          ? "black"
+          : "white";
       if (!check) {
         this.moves = [];
       }
@@ -2222,7 +2249,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function straight() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -2236,17 +2263,17 @@ export default {
             squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
-                return obj == 'undefined';
+                return obj == "undefined";
               }
-              if (obj.substring(0, 1) === 'u') {
+              if (obj.substring(0, 1) === "u") {
                 objectNumber++;
                 m = 1;
                 straight();
               }
               if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
               ) {
                 objectNumber++;
                 m = 1;
@@ -2281,7 +2308,7 @@ export default {
       const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
-      } else if (color === 'b') {
+      } else if (color === "b") {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
@@ -2294,9 +2321,9 @@ export default {
       }
     },
     get_queen_moves(selectedPiece, forbiden, check, color) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const colorClass =
-        selectedPiece.selected_piece_initial === 'wQQ' ? 'black' : 'white';
+        selectedPiece.selected_piece_initial === "wQQ" ? "black" : "white";
       if (!check) {
         this.moves = [];
       }
@@ -2307,7 +2334,7 @@ export default {
       let objectNumber = 0;
       let m = 1;
       function diagonal() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -2321,18 +2348,18 @@ export default {
             squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumber]];
               if (obj == undefined) {
-                return obj == 'undefined';
+                return obj == "undefined";
               }
-              if (obj.substring(0, 1) === 'u') {
+              if (obj.substring(0, 1) === "u") {
                 objectNumber++;
                 objectNumber++;
                 m = 1;
                 diagonal();
               }
               if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
               ) {
                 objectNumber++;
                 m = 1;
@@ -2370,7 +2397,7 @@ export default {
       let objectNumberStraight = 0;
       let n = 1;
       function straight() {
-        const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
         for (let i = 0; i < letters.length; i++) {
           const element = letters[i];
           if (element === letter) {
@@ -2384,17 +2411,17 @@ export default {
             squares.forEach((square) => {
               const obj = objects[Object.keys(objects)[objectNumberStraight]];
               if (obj == undefined) {
-                return obj == 'undefined';
+                return obj == "undefined";
               }
-              if (obj.substring(0, 1) === 'u') {
+              if (obj.substring(0, 1) === "u") {
                 objectNumberStraight++;
                 n = 1;
                 straight();
               }
               if (
-                obj.substring(1, 2) === '0' ||
-                obj.substring(1, 2) === '10' ||
-                obj.substring(1, 2) === '9'
+                obj.substring(1, 2) === "0" ||
+                obj.substring(1, 2) === "10" ||
+                obj.substring(1, 2) === "9"
               ) {
                 objectNumberStraight++;
                 n = 1;
@@ -2430,7 +2457,7 @@ export default {
       const alt = selectedPiece.selected_piece_initial;
       if (!check) {
         this.moves = finalMoves;
-      } else if (color === 'b') {
+      } else if (color === "b") {
         this.moves = [];
         const piece = selectedPiece.selected_piece_position;
         this.black_moves.push({ piece, finalMoves, protect, initial, id, alt });
@@ -2443,14 +2470,14 @@ export default {
       }
     },
     get_white_king_moves(selectedPiece, check) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves1 = [];
       let protect = [];
       const magic = [];
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -2477,15 +2504,15 @@ export default {
                 protect.push(obj[1]);
                 if (square.firstElementChild) {
                   if (
-                    square.firstElementChild.classList[0] === 'black' ||
-                    square.firstElementChild.tagName === 'DIV'
+                    square.firstElementChild.classList[0] === "black" ||
+                    square.firstElementChild.tagName === "DIV"
                   ) {
                     finalMoves1.push(obj[1]);
                   }
                 } else if (this.white_kingside_castling) {
                   finalMoves1.push(obj[1]);
                 } else {
-                  if (obj[0] === 'castleRight') {
+                  if (obj[0] === "castleRight") {
                     return;
                   } else {
                     finalMoves1.push(obj[1]);
@@ -2494,16 +2521,16 @@ export default {
                 /////
                 if (square.firstElementChild) {
                   if (
-                    square.firstElementChild.tagName === 'DIV' ||
-                    (square.firstElementChild.classList[0] === 'black' &&
-                      square.firstElementChild.classList[1] !== 'protected')
+                    square.firstElementChild.tagName === "DIV" ||
+                    (square.firstElementChild.classList[0] === "black" &&
+                      square.firstElementChild.classList[1] !== "protected")
                   ) {
                     magic.push(obj[1]);
                   }
                 } else if (this.white_queenside_castling) {
                   magic.push(obj[1]);
                 } else {
-                  if (obj[0] === 'castleLeft') {
+                  if (obj[0] === "castleLeft") {
                     return;
                   } else {
                     magic.push(obj[1]);
@@ -2535,14 +2562,14 @@ export default {
       // this.white_only_defence = output;
     },
     get_black_king_moves(selectedPiece, check) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       this.moves = [];
       const letter = selectedPiece.selected_piece_position.charAt(0);
       const num = parseInt(selectedPiece.selected_piece_position.charAt(1));
       let finalMoves1 = [];
       let protect = [];
       const magic = [];
-      const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+      const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
       for (let i = 0; i < letters.length; i++) {
         const element = letters[i];
         if (element === letter) {
@@ -2569,16 +2596,16 @@ export default {
                 protect.push(obj[1]);
                 if (square.firstElementChild) {
                   if (
-                    square.firstElementChild.classList[0] === 'white' ||
-                    (square.firstElementChild.tagName === 'DIV' &&
-                      square.firstElementChild.classList[1] !== 'protected')
+                    square.firstElementChild.classList[0] === "white" ||
+                    (square.firstElementChild.tagName === "DIV" &&
+                      square.firstElementChild.classList[1] !== "protected")
                   ) {
                     finalMoves1.push(obj[1]);
                   }
                 } else if (this.black_kingside_castling) {
                   finalMoves1.push(obj[1]);
                 } else {
-                  if (obj[0] === 'castleRight') {
+                  if (obj[0] === "castleRight") {
                     return;
                   } else {
                     finalMoves1.push(obj[1]);
@@ -2587,15 +2614,15 @@ export default {
                 /////
                 if (square.firstElementChild) {
                   if (
-                    square.firstElementChild.classList[0] === 'white' ||
-                    square.firstElementChild.tagName === 'DIV'
+                    square.firstElementChild.classList[0] === "white" ||
+                    square.firstElementChild.tagName === "DIV"
                   ) {
                     magic.push(obj[1]);
                   }
                 } else if (this.black_queenside_castling) {
                   magic.push(obj[1]);
                 } else {
-                  if (obj[0] === 'castleLeft') {
+                  if (obj[0] === "castleLeft") {
                     return;
                   } else {
                     magic.push(obj[1]);
@@ -2628,11 +2655,11 @@ export default {
       // this.black_only_defence = output;
     },
     get_hidden_moves(dangerousDrop) {
-      const squares = document.querySelectorAll('.square');
+      const squares = document.querySelectorAll(".square");
       const colorClass =
-        dangerousDrop.alt.substring(0, 1) === 'b' ? 'black' : 'white';
+        dangerousDrop.alt.substring(0, 1) === "b" ? "black" : "white";
       let dangerousMain =
-        colorClass === 'white'
+        colorClass === "white"
           ? this.dangerous_white_piece
           : this.dangerous_black_piece;
       let letter;
@@ -2648,43 +2675,43 @@ export default {
         letter = ele.id.charAt(0);
         num = parseInt(ele.id.charAt(1));
         const forbiden = [
-          'a1',
-          'a2',
-          'a3',
-          'a4',
-          'a5',
-          'a6',
-          'a7',
-          'a8',
-          'h1',
-          'h2',
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'h7',
-          'h8',
-          'a1',
-          'b1',
-          'c1',
-          'd1',
-          'e1',
-          'f1',
-          'g1',
-          'h1',
-          'a8',
-          'b8',
-          'c8',
-          'd8',
-          'e8',
-          'f8',
-          'g8',
-          'h8',
+          "a1",
+          "a2",
+          "a3",
+          "a4",
+          "a5",
+          "a6",
+          "a7",
+          "a8",
+          "h1",
+          "h2",
+          "h3",
+          "h4",
+          "h5",
+          "h6",
+          "h7",
+          "h8",
+          "a1",
+          "b1",
+          "c1",
+          "d1",
+          "e1",
+          "f1",
+          "g1",
+          "h1",
+          "a8",
+          "b8",
+          "c8",
+          "d8",
+          "e8",
+          "f8",
+          "g8",
+          "h8",
         ];
         let objectNumberSecret = 0;
         let j = 1;
         function diagonalSecret() {
-          const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
           for (let i = 0; i < letters.length; i++) {
             const element = letters[i];
             if (element === letter) {
@@ -2698,18 +2725,18 @@ export default {
               squares.forEach((square) => {
                 const obj = objects[Object.keys(objects)[objectNumberSecret]];
                 if (obj == undefined) {
-                  return obj == 'undefined';
+                  return obj == "undefined";
                 }
-                if (obj.substring(0, 1) === 'u') {
+                if (obj.substring(0, 1) === "u") {
                   objectNumberSecret++;
                   objectNumberSecret++;
                   j = 1;
                   diagonalSecret();
                 }
                 if (
-                  obj.substring(1, 2) === '0' ||
-                  obj.substring(1, 2) === '10' ||
-                  obj.substring(1, 2) === '9'
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
                 ) {
                   objectNumberSecret++;
                   j = 1;
@@ -2722,9 +2749,9 @@ export default {
                   if (square.id === obj) {
                     if (
                       square.firstElementChild &&
-                      ss !== 'wKK' &&
+                      ss !== "wKK" &&
                       square.firstElementChild &&
-                      ss !== 'bKK'
+                      ss !== "bKK"
                     ) {
                       j = 1;
                       if (
@@ -2757,7 +2784,7 @@ export default {
         let objectNumberStraightSecret = 0;
         let q = 1;
         function secretStraight() {
-          const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+          const letters = ["a", "b", "c", "d", "e", "f", "g", "h"];
           for (let i = 0; i < letters.length; i++) {
             const element = letters[i];
             if (element === letter) {
@@ -2772,17 +2799,17 @@ export default {
                 const obj =
                   objects[Object.keys(objects)[objectNumberStraightSecret]];
                 if (obj == undefined) {
-                  return obj == 'undefined';
+                  return obj == "undefined";
                 }
-                if (obj.substring(0, 1) === 'u') {
+                if (obj.substring(0, 1) === "u") {
                   objectNumberStraightSecret++;
                   q = 1;
                   secretStraight();
                 }
                 if (
-                  obj.substring(1, 2) === '0' ||
-                  obj.substring(1, 2) === '10' ||
-                  obj.substring(1, 2) === '9'
+                  obj.substring(1, 2) === "0" ||
+                  obj.substring(1, 2) === "10" ||
+                  obj.substring(1, 2) === "9"
                 ) {
                   objectNumberStraightSecret++;
                   q = 1;
@@ -2795,9 +2822,9 @@ export default {
                   if (square.id === obj) {
                     if (
                       square.firstElementChild &&
-                      ss !== 'wKK' &&
+                      ss !== "wKK" &&
                       square.firstElementChild &&
-                      ss !== 'bKK'
+                      ss !== "bKK"
                     ) {
                       q = 1;
                       if (
@@ -2821,21 +2848,21 @@ export default {
             }
           }
         }
-        if (ele.alt.substring(2, 3) === 'B') {
+        if (ele.alt.substring(2, 3) === "B") {
           diagonalSecret();
         }
         if (
-          ele.alt.substring(2, 3) === 'l' ||
-          ele.alt.substring(2, 3) === 'r'
+          ele.alt.substring(2, 3) === "l" ||
+          ele.alt.substring(2, 3) === "r"
         ) {
           secretStraight();
         }
-        if (ele.alt.substring(2, 3) === 'Q') {
+        if (ele.alt.substring(2, 3) === "Q") {
           diagonalSecret();
           secretStraight();
         }
       }
-      if (colorClass === 'white') {
+      if (colorClass === "white") {
         this.whiteSecretMoves = [];
         this.whiteSecretMoves.push(...new Set(secretAgent));
       } else {
@@ -2843,55 +2870,118 @@ export default {
         this.blackSecretMoves.push(...new Set(secretAgent));
       }
     },
+    resign() {
+      if (confirm("Are you sure?!")) {
+        this.$socket.client.emit("resign", this.$socket.client.id);
+      }
+    },
+    newGame() {
+      if (confirm("Are you sure?!")) {
+        this.$socket.client.emit("newGame");
+      }
+    },
   },
   created() {
     this.drawChessboard();
-    this.socket = io('http://localhost:3000/');
   },
   mounted() {
     this.placePieces();
-    this.socket.on('connect', () => {
-      this.socket.emit('starter', this.socket.id);
-    });
-    this.socket.on('setBlackPlayer', (data) => {
-      const chess = document.querySelector('.chessboard');
-      if (this.socket.id === data.id) {
-        this.allowedToPlay = false;
-        chess.style.flexDirection = data.flexDirection;
-        chess.style.flexWrap = data.flexWrap;
+    const chess = document.querySelector(".chessboard");
+    this.$socket.client.on("getNames", (player_one, player_two) => {
+      this.$store.dispatch("set_players", {
+        playerOne: player_one,
+        playerTwo: player_two,
+      });
+      if (this.$socket.client.id === this.$store.state.black_player) {
+        this.black_player = this.$store.state.playerTwo.name;
+        this.white_player = this.$store.state.playerOne.name;
       } else {
-        this.allowedToPlay = true;
-      }
-    });
-    this.socket.on('setPlayers', (pl1, pl2) => {
-      const chess = document.querySelector('.chessboard');
-      if (this.socket.id === pl2.id) {
-        this.playerOne = pl1.name;
-        this.playerTwo = pl2.name;
-      }
-      if (this.socket.id === pl1.id) {
-        this.playerOne = pl2.name;
-        this.playerTwo = pl1.name;
+        this.black_player = this.$store.state.playerOne.name;
+        this.white_player = this.$store.state.playerTwo.name;
       }
     });
 
-    this.socket.on('entries', (data) => {
-      this.entries = data;
-      this.render_new_position();
+    if (this.$socket.client.id === this.$store.state.black_player) {
+      chess.style.flexDirection = "row-reverse";
+      chess.style.flexWrap = "wrap-reverse";
+    } else {
+      this.play = true;
+    }
+
+    this.$socket.client.on("sounds", (sound) => {
+      this.makeSound(sound);
     });
-    this.socket.on('change', (data, playerTwo) => {
-      this.whiteToPlay = data;
-      if (this.socket.id === playerTwo.id && !this.whiteToPlay) {
+
+    this.$socket.client.on("gettingClonedData", (data, black_player_id) => {
+      Object.assign(this.$data, data);
+      if (this.$socket.client.id === black_player_id && !this.whiteToPlay) {
+        this.black_player = this.$store.state.playerTwo.name;
+        this.white_player = this.$store.state.playerOne.name;
         this.allowedToPlay = true;
-      } else if (this.socket.id !== playerTwo.id && this.whiteToPlay) {
+        this.play = true;
+      } else if (
+        this.$socket.client.id !== black_player_id &&
+        this.whiteToPlay
+      ) {
+        this.black_player = this.$store.state.playerOne.name;
+        this.white_player = this.$store.state.playerTwo.name;
         this.allowedToPlay = true;
+        this.play = true;
       } else {
         this.allowedToPlay = false;
+        this.play = false;
       }
+      this.render_new_position();
+      if (this.white_checked) {
+        this.check_for_white_checkmate();
+      }
+      if (this.black_checked) {
+        this.check_for_black_checkmate();
+      }
+
+      this.$socket.client.on("resign1", (resigner, winner) => {
+        this.newGameButton = true;
+        this.resigner = resigner;
+        this.winner = winner;
+        console.log(resigner, winner);
+        this.dialogTwo = true;
+      });
+      // this.$data = infos;
+      // console.log(this.$data);
+      // this.render_new_position();
+      // Object.assign(this.$data, this.$options.data());
     });
-    this.socket.on('dialogResponse', (data) => {
-      this.dialog = data.state;
+    this.$socket.client.on("newGame", () => {
+      this.newGameButton = false;
+      Object.assign(this.$data, this.$options.data());
+      if (
+        this.$socket.client.id === this.$store.state.black_player &&
+        !this.whiteToPlay
+      ) {
+        this.black_player = this.$store.state.playerTwo.name;
+        this.white_player = this.$store.state.playerOne.name;
+        this.allowedToPlay = true;
+        this.play = true;
+      } else if (
+        this.$socket.client.id !== this.$store.state.black_player &&
+        this.whiteToPlay
+      ) {
+        this.black_player = this.$store.state.playerOne.name;
+        this.white_player = this.$store.state.playerTwo.name;
+        this.allowedToPlay = true;
+        this.play = true;
+      } else {
+        this.allowedToPlay = false;
+        this.play = false;
+      }
+      this.drawChessboard();
+      this.render_new_position();
+    });
+
+    this.$socket.client.on("dialogResponse", (data) => {
+      this.dialog = true
       this.player = data.player;
+      this.newGameButton = true;
     });
   },
 };
@@ -2967,9 +3057,8 @@ export default {
 }
 .promotBlackPawn {
   display: flex;
-  flex-direction: column-reverse;
-  position: absolute;
-  bottom: -60px;
+  flex-direction: column;
+  top: 0px;
 }
 .promotBlackPawn img {
   background-color: rgb(255, 169, 41);
@@ -3001,7 +3090,7 @@ img {
 }
 .mark::after {
   display: block;
-  content: ' ';
+  content: " ";
   margin: calc(var(--square_size) / 30) auto;
   width: calc(var(--square_size) / 20);
   height: calc(var(--square_size) / 20);
@@ -3011,7 +3100,7 @@ img {
 }
 .target::after {
   display: block;
-  content: ' ';
+  content: " ";
   margin: calc(var(--square_size) / 200) auto;
   width: calc(var(--square_size) / 10);
   height: calc(var(--square_size) / 10);

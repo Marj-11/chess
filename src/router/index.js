@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../components/Home.vue';
 import GameLocal from '../components/Game_local.vue';
 import GameGlobal from '../components/Game_global.vue';
+import Global_room from '../components/Global_room.vue';
 
 Vue.use(VueRouter);
 
@@ -20,6 +21,11 @@ const routes = [{
         path: '/global',
         name: 'GameGlobal',
         component: GameGlobal,
+    },
+    {
+        path: '/global_room',
+        name: 'Global_room',
+        component: Global_room,
     },
     // {
     // path: '/about',
